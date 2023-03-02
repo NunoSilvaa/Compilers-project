@@ -34,8 +34,11 @@ statement
     | ID '=' INTEGER ';'
     | ID '=' expression ';'
     | ID '[' expression ']' '=' expression ';'
+    | 'if' '(' expression ')' ('{' ( statement )* '}')? ('else' '{' ( statement )* '}')?
     | 'if' '(' expression ')' statement 'else' statement
+    | 'while' '(' expression ')' '{' ( statement )* '}'
     | 'while' '(' expression ')' statement
+    | '{' (statement)* '}'
     ;
 
 expression
