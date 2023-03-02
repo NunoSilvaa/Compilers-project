@@ -22,17 +22,31 @@ importSpecifier
   : ID ( '.' ID )*
   ;
 
+type
+      : 'int' '[' ']'
+      | 'boolean'
+      | 'int'
+      | ID
+      ;
+
 statement
     : expression ';'
     | ID '=' INTEGER ';'
+    | 'if' '(' expression ')' statement 'else' statement
+    | 'while' '(' expression ')' statement
+    | expression ';'
+    | ID '=' expression ';'
+    | ID '[' expression ']' '=' expression ';'
     ;
 
 expression
     : importSpecifier #ImportExpression
     |'(' expression ')' #BinaryOp
+    | '!' expression #BinaryOp
     | expression op=('*' | '/') expression #BinaryOp
     | expression op=('+' | '-') expression #BinaryOp
-    | expression op=('&&' | '||' | '<' | '>') expression #BinaryOp
+    | expression op=( '<' | '>') expression #BinaryOp
+    | expression op=('&&' | '||') expression #BinaryOp
     | value=INTEGER #Integer
     | value=ID #Identifier
     ;
