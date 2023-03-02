@@ -30,6 +30,7 @@ statement
 expression
     : importSpecifier #ImportExpression
     |'(' expression ')' #BinaryOp
+    | '!' expression #BinaryOp
     | expression op=('*' | '/') expression #BinaryOp
     | expression op=('+' | '-') expression #BinaryOp
     | expression op=('&&' | '||' | '<' | '>') expression #BinaryOp
