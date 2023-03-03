@@ -18,16 +18,19 @@ classDeclaration: 'class' ID ('extends' ID)? '{' (varDeclaration)* (methodDeclar
 varDeclaration: type ID ';';
 
 methodDeclaration
-  : ('public')? type ID '(' ( type ID ( ',' type ID )* )? ')' '{' ( varDeclaration )* ( statement )* 'return' expression ';' '}'
-  | ('public')? 'static' 'void' 'main' '(' 'String' '[' ']' ID ')' '{' ( varDeclaration )* ( statement )* '}'
-  ;
+    : ('public')? type ID '(' ( type ID ( ',' type ID )* )? ')' '{' ( varDeclaration )* ( statement )* 'return' expression ';' '}'
+    | ('public')? 'static' 'void' 'main' '(' 'String' '[' ']' ID ')' '{' ( varDeclaration )* ( statement )* '}'
+    | ('public')? type ID '(' ( type ID ( ',' type ID )* )? ')' '{' '}'
+    ;
+
 
 type
-      : 'int' '[' ']'
-      | 'boolean'
-      | 'int'
-      | ID
-      ;
+    : 'int' '[' ']'
+    | 'boolean'
+    | 'int'
+    | 'void'
+    | ID
+    ;
 
 statement
     : expression ';'
@@ -43,14 +46,18 @@ statement
 
 expression
     : '(' expression ')' #BinaryOp
-    | expression '[' expression ']' #BinaryOp
+    | expression '[' expression ']' #ArrayAccessChain
     | '!' expression #BinaryOp
     | expression op=('*' | '/') expression #BinaryOp
     | expression op=('+' | '-') expression #BinaryOp
     | expression op=( '<' | '>') expression #BinaryOp
     | expression op=('&&' | '||') expression #BinaryOp
     | expression '.' 'length' #Length
+    | 'new' type '[' expression ']' #NewArray
+    | 'new' ID '(' (expression (',' expression)*)? ')' #NewObject
     | classDeclaration #ClassExpression
+    | expression '.' ID  #MemberAccess
+    | expression '.' ID '(' (expression (',' expression)*)? ')' #MethodCall
     | value=INTEGER #Integer
     | value=ID #Identifier
     ;
