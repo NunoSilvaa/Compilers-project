@@ -18,17 +18,19 @@ classDeclaration: 'class' ID ('extends' ID)? '{' (varDeclaration)* (methodDeclar
 varDeclaration: type ID ';';
 
 methodDeclaration
-    : ('public')? type ID '(' ( type ID ( ',' type ID )* )? ')' '{' ( varDeclaration )* ( statement )* 'return' expression ';' '}'
+    : ('public')? type ID '(' ( parameter ( ',' parameter )* )? ')' '{' ( varDeclaration )* ( statement )* 'return' expression ';' '}'
     | ('public')? 'static' 'void' 'main' '(' 'String' '[' ']' ID ')' '{' ( varDeclaration )* ( statement )* '}'
-    | ('public')? type ID '(' ( type ID ( ',' type ID )* )? ')' '{' '}'
+    | ('public')? type ID '(' ( parameter ( ',' parameter )* )? ')' '{' '}'
     ;
 
+parameter: type ID;
 
 type
     : 'int' '[' ']'
     | 'boolean'
     | 'int'
     | 'void'
+    | 'String'
     | ID
     ;
 
