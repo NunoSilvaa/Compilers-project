@@ -6,21 +6,30 @@ grammar Javamm;
 
 INTEGER : [0-9]+ ;
 ID : [a-zA-Z_][a-zA-Z_0-9]* ;
+NEWLINE : '\n';
+WS : [ \t\r\f]+ -> skip ;
 
-WS : [ \t\n\r\f]+ -> skip ;
 
-program: importDeclaration* expression EOF;
+program
+    : (importOrClassDeclaration | statement)* EOF
+    ;
+
+
+importOrClassDeclaration
+    : importDeclaration
+    | classDeclaration
+    ;
 
 importDeclaration: 'import' ID ( '.' ID )* ';';
 
-classDeclaration: 'class' ID ('extends' ID)? '{' (varDeclaration)* (methodDeclaration)* '}';
+classDeclaration: 'class' ID ('extends' ID)? '{' (varDeclaration)* (methodDeclaration)* '}'? ';'? ;
 
 varDeclaration: type ID ';';
 
 methodDeclaration
     : ('public')? type ID '(' ( parameter ( ',' parameter )* )? ')' '{' ( varDeclaration )* ( statement )* 'return' expression ';' '}'
     | ('public')? 'static' 'void' 'main' '(' 'String' '[' ']' ID ')' '{' ( varDeclaration )* ( statement )* '}'
-    | ('public')? type ID '(' ( parameter ( ',' parameter )* )? ')' '{' '}'
+    | ('public')? type ID '(' ( parameter ( ',' parameter )* )? ')' '{' '}' ';'
     ;
 
 parameter: type ID;
@@ -44,6 +53,7 @@ statement
     | 'while' '(' expression ')' '{' ( statement )* '}'
     | 'while' '(' expression ')' statement
     | '{' (statement)* '}'
+    | NEWLINE
     ;
 
 expression

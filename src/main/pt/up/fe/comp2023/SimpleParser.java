@@ -1,5 +1,7 @@
 package pt.up.fe.comp2023;
 
+import pt.up.fe.comp2023.JavammLexer;
+import pt.up.fe.comp2023.JavammParser;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import pt.up.fe.comp.jmm.analysis.table.SymbolTable;
