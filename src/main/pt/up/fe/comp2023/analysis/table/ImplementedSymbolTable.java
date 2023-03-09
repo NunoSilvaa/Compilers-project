@@ -21,17 +21,9 @@ public class ImplementedSymbolTable implements SymbolTable {
         return imports;
     }
 
-    public void setImports(List<String> imports) {
-        this.imports = imports;
-    }
-
     @Override
     public String getClassName() {
         return className;
-    }
-
-    public void setClassName(String className) {
-        this.className = className;
     }
 
     @Override
@@ -39,26 +31,14 @@ public class ImplementedSymbolTable implements SymbolTable {
         return superClassName;
     }
 
-    public void setSuper(String superClassName) {
-        this.superClassName = superClassName;
-    }
-
     @Override
     public List<Symbol> getFields() {
         return fields;
     }
 
-    public void addField(Symbol field) {
-        this.fields.add(field);
-    }
-
     @Override
     public List<String> getMethods() {
         return new ArrayList<>(this.methods.keySet());
-    }
-
-    public void addMethod(String name, List<Symbol> parameters, Type returnType, List<Symbol> localVariables) {
-        this.methods.put(name, new Method(parameters, returnType, localVariables));
     }
 
     @Override

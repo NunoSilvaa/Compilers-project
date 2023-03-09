@@ -11,14 +11,12 @@ import java.util.List;
 
 public class Analysis implements JmmAnalysis {
 
+    ImplementedSymbolTable symbolTable = new ImplementedSymbolTable();
+
     @Override
     public JmmSemanticsResult semanticAnalysis(JmmParserResult jmmParserResult) {
 
-        ImplementedSymbolTable symbolTable = new ImplementedSymbolTable();
-
-        List<Report> reportSymbolTable = new SymbolTableConstructor().visit(jmmParserResult.getRootNode(), symbolTable);
-        List<Report> reportAnalysis = new AnalyseVisitor().visit(jmmParserResult.getRootNode(), symbolTable);
-        List<Report> reports = SpecsCollections.concat(reportSymbolTable, reportAnalysis);
+        List<Report> reports = new SymbolTableConstructor().visit(jmmParserResult.getRootNode(), symbolTable);
 
         if (jmmParserResult.getConfig().getOrDefault("debug", "false").equals("true")) {
             System.out.println("AST:\n");
