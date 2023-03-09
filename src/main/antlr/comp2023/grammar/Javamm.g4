@@ -20,25 +20,25 @@ importOrClassDeclaration
     | classDeclaration
     ;
 
-importDeclaration: 'import' ID ( '.' ID )* ';';
+importDeclaration: 'import' subImport ( '.' subImport )* ';';
 
-classDeclaration: 'class' ID ('extends' ID)? '{' (varDeclaration)* (methodDeclaration)* '}'? ';'? ;
+subImport: ID;
 
-varDeclaration: type ID ';';
+classDeclaration: 'class' className=ID ('extends' superClassName=ID)? '{' (varDeclaration)* (methodDeclaration)* '}'? ';'? ;
+
+varDeclaration: type varName=ID ';';
 
 methodDeclaration
-    : ('public')? type ID '(' ( parameter ( ',' parameter )* )? ')' '{' ( varDeclaration )* ( statement )* 'return' expression ';' '}'
-    | ('public')? 'static' 'void' 'main' '(' 'String' '[' ']' ID ')' '{' ( varDeclaration )* ( statement )* '}'
-    | ('public')? type ID '(' ( parameter ( ',' parameter )* )? ')' '{' '}' ';'
+    : ('public')? type methodName=ID '(' ( parameter ( ',' parameter )* )? ')' '{' ( varDeclaration )* ( statement )* 'return' expression ';' '}'
+    | ('public')? 'static' 'void' 'main' '(' 'String' '[' ']' parameterName=ID ')' '{' ( varDeclaration )* ( statement )* '}'
     ;
 
-parameter: type ID;
+parameter: type parameterName=ID;
 
 type
-    : 'int' '[' ']'
+    : 'int[]'
     | 'boolean'
     | 'int'
-    | 'void'
     | 'String'
     | ID
     ;
@@ -48,7 +48,7 @@ statement
     | ID '=' INTEGER ';'
     | ID '=' expression ';'
     | ID '[' expression ']' '=' expression ';'
-    | 'if' '(' expression ')' ('{' ( statement )* '}')? ('else' '{' ( statement )* '}')?
+    | 'if' '(' expression ')' ('{' ( statement )* '}')? ('else' '{' ( statement )* '}')
     | 'if' '(' expression ')' statement 'else' statement
     | 'while' '(' expression ')' '{' ( statement )* '}'
     | 'while' '(' expression ')' statement

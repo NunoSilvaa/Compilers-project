@@ -7,7 +7,7 @@ import pt.up.fe.comp2023.analysis.table.ImplementedSymbolTable;
 
 import java.util.List;
 
-public class SymbolTableConstructor extends AJmmVisitor<ImplementedSymbolTable, List<Report>> {
+public class SymbolTableVisitor extends AJmmVisitor<ImplementedSymbolTable, List<Report>> {
 
     @Override
     protected void buildVisitor() {
@@ -30,7 +30,10 @@ public class SymbolTableConstructor extends AJmmVisitor<ImplementedSymbolTable, 
     }
 
     private List<Report> dealWithClassDeclaration(JmmNode jmmNode, ImplementedSymbolTable implementedSymbolTable) {
-        List<Report> reports;
+
+        implementedSymbolTable.setClassName(jmmNode.get("className"));
+        implementedSymbolTable.setSuper(jmmNode.get("superClassName"));
+
         return null;
     }
 }
