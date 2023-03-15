@@ -6,7 +6,7 @@ grammar Javamm;
 
 SLC : '//' ~[\n]* ;
 MLC : '/' .? '*/' ;
-INTEGER : [0-9]+[0-9]* ;
+INTEGER : '-'? [0-9]+ ;
 ID : [$a-zA-Z_][$a-zA-Z_0-9]* ;
 NEWLINE : '\n';
 WS : [ \t\r\f]+ -> skip ;
@@ -51,12 +51,12 @@ statement
     | ID '[' expression ']' '=' expression ';' #BracketsAssignment
     | 'if' '(' expression ')' statement 'else' statement #IfElseStatement
     | 'while' '(' expression ')' statement #While
-    | '{' (statement)* '}' #CurlyBracesStatement
+    | '{' ( statement )* '}' #CurlyBracesStatement
     | NEWLINE #NewLine
     ;
 
 expression
-    : '(' expression ')' #BinaryOp
+    : '(' expression ')' #Parenthesis
     | expression '[' expression ']' #ArrayAccessChain
     | '!' expression #BinaryOp
     | expression op=('*' | '/') expression #BinaryOp
