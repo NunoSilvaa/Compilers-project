@@ -6,16 +6,14 @@ grammar Javamm;
 
 SLC : '//' ~[\n]* ;
 MLC : '/' .? '*/' ;
-INTEGER : '-'? [0-9]+ ;
-ID : [$a-zA-Z_][$a-zA-Z_0-9]* ;
+INTEGER : [0] | [1-9][0-9]* ;
+ID : [a-zA-Z$_][a-zA-Z_0-9]* ;
 NEWLINE : '\n';
 WS : [ \t\r\f]+ -> skip ;
-
 
 program
     : (importOrClassDeclaration | statement)* EOF
     ;
-
 
 importOrClassDeclaration
     : importDeclaration
@@ -61,7 +59,7 @@ expression
     | '!' expression #BinaryOp
     | expression op=('*' | '/') expression #BinaryOp
     | expression op=('+' | '-') expression #BinaryOp
-    | expression op=( '<' | '>') expression #BinaryOp
+    | expression op=('<' | '>') expression #BinaryOp
     | expression op=('&&' | '||') expression #BinaryOp
     | expression '.' 'length' #Length
     | 'new' type '[' expression ']' #NewArray
