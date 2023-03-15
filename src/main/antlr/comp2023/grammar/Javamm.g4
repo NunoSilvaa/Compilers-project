@@ -49,9 +49,7 @@ statement
     : expression ';' #ExpressionStatement
     | ID '=' expression ';' #Assignment
     | ID '[' expression ']' '=' expression ';' #BracketsAssignment
-    | 'if' '(' expression ')' ('{' ( statement )* '}')? ('else' '{' ( statement )* '}') #CurlyBracesIfElseStatement
     | 'if' '(' expression ')' statement 'else' statement #IfElseStatement
-    | 'while' '(' expression ')' '{' ( statement )* '}' #CurlyBracesWhile
     | 'while' '(' expression ')' statement #While
     | '{' (statement)* '}' #CurlyBracesStatement
     | NEWLINE #NewLine
