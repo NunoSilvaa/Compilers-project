@@ -29,6 +29,7 @@ public class Analysis implements JmmAnalysis {
         SymbolTableVisitor visitor = new SymbolTableVisitor();
         ImplementedSymbolTable symbolTable = visitor.getSymbolTable(node);
 
+
         return new JmmSemanticsResult(jmmParserResult, symbolTable, reports);
     }
 }

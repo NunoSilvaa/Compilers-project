@@ -41,6 +41,7 @@ public class SimpleParser implements JmmParser {
     public JmmParserResult parse(String jmmCode, String startingRule, Map<String, String> config) {
 
         try {
+
             // Convert code string into a character stream
             var input = new ANTLRInputStream(jmmCode);
             // Transform characters into tokens using the lexer
@@ -49,8 +50,8 @@ public class SimpleParser implements JmmParser {
             var tokens = new CommonTokenStream(lex);
             // Transforms tokens into a parse tree
             var parser = new JavammParser(tokens);
-
             // Convert ANTLR CST to JmmNode AST
+
             return AntlrParser.parse(lex, parser, startingRule)
                     // If there were no errors and a root node was generated, create a JmmParserResult with the node
                     .map(root -> new JmmParserResult(root, Collections.emptyList(), config))
@@ -60,7 +61,7 @@ public class SimpleParser implements JmmParser {
 
         } catch (Exception e) {
             // There was an uncaught exception during parsing, create an error JmmParserResult without root node
-            return JmmParserResult.newError(Report.newError(Stage.SYNTATIC, -1, -1, "Exception during parsing", e));
+                return JmmParserResult.newError(Report.newError(Stage.SYNTATIC, -1, -1, "Exception during parsing", e));
         }
     }
 }

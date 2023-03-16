@@ -32,7 +32,7 @@ public class ImplementedSymbolTable implements SymbolTable {
 
     @Override
     public String getClassName() {
-        return className;
+        return this.className;
     }
 
     public void setClassName(String className) {
@@ -41,7 +41,7 @@ public class ImplementedSymbolTable implements SymbolTable {
 
     @Override
     public String getSuper() {
-        return superClassName;
+        return this.superClassName;
     }
 
     public void setSuper(String superClassName) {
@@ -50,7 +50,7 @@ public class ImplementedSymbolTable implements SymbolTable {
 
     @Override
     public List<Symbol> getFields() {
-        return new ArrayList<>(fields.keySet());
+        return new ArrayList<>(this.fields.keySet());
     }
 
     public void addField(Symbol field, boolean isStatic) {

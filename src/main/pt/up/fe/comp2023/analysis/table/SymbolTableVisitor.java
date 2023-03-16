@@ -6,6 +6,7 @@ import pt.up.fe.comp.jmm.ast.PreorderJmmVisitor;
 import pt.up.fe.comp.jmm.report.Report;
 import pt.up.fe.comp2023.analysis.table.ImplementedSymbolTable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,24 +46,23 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
 
     private String dealWithProgram(JmmNode node, String s) {
         s = ((s !=null) ? s : "");
-
-        for(JmmNode child : node.getChildren()) {
-            if(child.getKind().equals("ImportDeclaration")){
-                String path = child.get("name");
-                for (JmmNode grandChild : child.getChildren()){
-                    path += '.' + grandChild.get("name");
-                }
-                this.symbolTable.addImports(path);
-            }
-            else {
-                visit(child, null);
-            }
-        }
         return null;
     }
 
     private String dealWithImport(JmmNode jmmNode, String s) {
-        symbolTable.addImports(jmmNode.get("name"));
+        ArrayList<String> valuesList = (ArrayList<String>) jmmNode.getObject("name");
+        StringBuilder importFull = new StringBuilder();
+        boolean start = true;
+        for (String value: valuesList) {
+            if (start) {
+                start = false;
+            } else {
+                importFull.append('.');
+            }
+            importFull.append(value);
+        }
+        symbolTable.addImports(importFull.toString());
+        System.out.println(jmmNode);
         return s + "IMPORT";
     }
     private String dealWithMethodDeclaration(JmmNode jmmNode, String s) {

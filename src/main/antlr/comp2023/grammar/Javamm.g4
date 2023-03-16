@@ -7,15 +7,15 @@ grammar Javamm;
 SLC : '//' ~[\n]* ;
 MLC : '/' .? '*/' ;
 INTEGER : [0] | [1-9][0-9]* ;
-ID : [a-zA-Z$_][a-zA-Z0-9_]* ;
-NEWLINE : '\n';
-WS : [ \t\r\f]+ -> skip ;
+ID : [a-zA-Z$_][a-zA-Z0-9_]*;
+WS : [ \n\t\r\f]+ -> skip ;
+
 
 program
     : (importDeclaration)* (classDeclaration) EOF
     ;
 
-importDeclaration: 'import' name=ID ( '.' ID )* ';';
+importDeclaration: 'import' name+=ID ( '.' name+=ID )* ';';
 
 classDeclaration: 'class' className=ID ('extends' superClassName=ID)? '{' (varDeclaration)* (methodDeclaration)* '}'? ';'? ;
 
@@ -43,7 +43,6 @@ statement
     | 'if' '(' expression ')' statement 'else' statement #IfElseStatement
     | 'while' '(' expression ')' statement #While
     | '{' ( statement )* '}' #CurlyBracesStatement
-    | NEWLINE #NewLine
     ;
 
 expression

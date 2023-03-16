@@ -32,7 +32,6 @@ public class Method {
         return parameters;
     }
 
-
     /*public void setParameters(List<Symbol> parameters) {
         this.parameters = parameters;
     }*/
