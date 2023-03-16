@@ -4,16 +4,16 @@ grammar Javamm;
     package pt.up.fe.comp2023;
 }
 
-INTEGER : [0-9]+ ;
-ID : [a-zA-Z_][a-zA-Z_0-9]* ;
+SLC : '//' ~[\n]* ;
+MLC : '/' .? '*/' ;
+INTEGER : [0] | [1-9][0-9]* ;
+ID : [a-zA-Z_$][a-zA-Z_$0-9]* ;
 NEWLINE : '\n';
 WS : [ \t\r\f]+ -> skip ;
-
 
 program
     : (importOrClassDeclaration | statement)* EOF
     ;
-
 
 importOrClassDeclaration
     : importDeclaration
@@ -44,25 +44,22 @@ type
     ;
 
 statement
-    : expression ';'
-    | ID '=' INTEGER ';'
-    | ID '=' expression ';'
-    | ID '[' expression ']' '=' expression ';'
-    | 'if' '(' expression ')' ('{' ( statement )* '}')? ('else' '{' ( statement )* '}')
-    | 'if' '(' expression ')' statement 'else' statement
-    | 'while' '(' expression ')' '{' ( statement )* '}'
-    | 'while' '(' expression ')' statement
-    | '{' (statement)* '}'
-    | NEWLINE
+    : expression ';' #ExpressionStatement
+    | ID '=' expression ';' #Assignment
+    | ID '[' expression ']' '=' expression ';' #BracketsAssignment
+    | 'if' '(' expression ')' statement 'else' statement #IfElseStatement
+    | 'while' '(' expression ')' statement #While
+    | '{' ( statement )* '}' #CurlyBracesStatement
+    | NEWLINE #NewLine
     ;
 
 expression
-    : '(' expression ')' #BinaryOp
+    : '(' expression ')' #Parenthesis
     | expression '[' expression ']' #ArrayAccessChain
     | '!' expression #BinaryOp
     | expression op=('*' | '/') expression #BinaryOp
     | expression op=('+' | '-') expression #BinaryOp
-    | expression op=( '<' | '>') expression #BinaryOp
+    | expression op=('<' | '>') expression #BinaryOp
     | expression op=('&&' | '||') expression #BinaryOp
     | expression '.' 'length' #Length
     | 'new' type '[' expression ']' #NewArray
