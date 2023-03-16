@@ -7,17 +7,12 @@ grammar Javamm;
 SLC : '//' ~[\n]* ;
 MLC : '/' .? '*/' ;
 INTEGER : [0] | [1-9][0-9]* ;
-ID : [a-zA-Z_$][a-zA-Z_$0-9]* ;
+ID : [a-zA-Z$_][a-zA-Z0-9_]* ;
 NEWLINE : '\n';
 WS : [ \t\r\f]+ -> skip ;
 
 program
-    : (importOrClassDeclaration | statement)* EOF
-    ;
-
-importOrClassDeclaration
-    : importDeclaration
-    | classDeclaration
+    : (importDeclaration)* (classDeclaration) EOF
     ;
 
 importDeclaration: 'import' name=ID ( '.' ID )* ';';

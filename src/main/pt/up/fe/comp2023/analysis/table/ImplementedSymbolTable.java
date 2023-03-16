@@ -1,4 +1,4 @@
-package pt.up.fe.comp2023.analysis;
+package pt.up.fe.comp2023.analysis.table;
 
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.SymbolTable;
@@ -19,7 +19,7 @@ public class ImplementedSymbolTable implements SymbolTable {
 
     @Override
     public List<String> getImports() {
-        return imports;
+        return this.imports;
     }
 
     /*public void setImports(List<String> imports) {
