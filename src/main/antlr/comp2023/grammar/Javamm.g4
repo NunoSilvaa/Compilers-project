@@ -7,7 +7,7 @@ grammar Javamm;
 SLC : '//' ~[\n]* ;
 MLC : '/' .? '*/' ;
 INTEGER : [0] | [1-9][0-9]* ;
-ID : [a-zA-Z$_][a-zA-Z0-9_]* ;
+ID : [a-zA-Z_$][a-zA-Z_$0-9]* ;
 NEWLINE : '\n';
 WS : [ \t\r\f]+ -> skip ;
 
