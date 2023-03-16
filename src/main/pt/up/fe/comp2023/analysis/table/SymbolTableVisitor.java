@@ -62,7 +62,7 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
             importFull.append(value);
         }
         symbolTable.addImports(importFull.toString());
-        System.out.println(jmmNode);
+        //System.out.println(jmmNode);
         return s + "IMPORT";
     }
     private String dealWithMethodDeclaration(JmmNode jmmNode, String s) {

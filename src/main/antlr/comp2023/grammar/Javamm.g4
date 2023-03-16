@@ -4,8 +4,8 @@ grammar Javamm;
     package pt.up.fe.comp2023;
 }
 
-SLC : '//' ~[\n]* ;
-MLC : '/' .? '*/' ;
+SLC : '//' ~[\n]* -> skip;
+MLC : '/*' .*? '*/' -> skip;
 INTEGER : [0] | [1-9][0-9]* ;
 ID : [a-zA-Z$_][a-zA-Z0-9_]*;
 WS : [ \n\t\r\f]+ -> skip ;
