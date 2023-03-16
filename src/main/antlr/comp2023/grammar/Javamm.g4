@@ -20,9 +20,7 @@ importOrClassDeclaration
     | classDeclaration
     ;
 
-importDeclaration: 'import' subImport ( '.' subImport )* ';';
-
-subImport: ID;
+importDeclaration: 'import' name=ID ( '.' ID )* ';';
 
 classDeclaration: 'class' className=ID ('extends' superClassName=ID)? '{' (varDeclaration)* (methodDeclaration)* '}'? ';'? ;
 

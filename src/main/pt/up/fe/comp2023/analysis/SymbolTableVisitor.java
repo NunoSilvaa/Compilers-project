@@ -1,39 +1,56 @@
 package pt.up.fe.comp2023.analysis;
 
-import pt.up.fe.comp.jmm.ast.AJmmVisitor;
 import pt.up.fe.comp.jmm.ast.JmmNode;
+import pt.up.fe.comp.jmm.ast.PreorderJmmVisitor;
 import pt.up.fe.comp.jmm.report.Report;
-import pt.up.fe.comp2023.analysis.table.ImplementedSymbolTable;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-public class SymbolTableVisitor extends AJmmVisitor<ImplementedSymbolTable, List<Report>> {
+public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
+
+    private ImplementedSymbolTable symbolTable;
+    private List<Report> reports;
 
     @Override
-    protected void buildVisitor() {
+    protected void buildVisitor(){}
+    public SymbolTableVisitor (ImplementedSymbolTable symbolTable, List<Report> reports) {
+        this.symbolTable = symbolTable;
+        this.reports = reports;
+
         addVisit("Program", this::dealWithProgram);
-        addVisit("importDeclaration", this::dealWithImport);
-        addVisit("methodDeclaration", this::dealWithMethodDeclaration);
-        addVisit("classDeclaration", this::dealWithClassDeclaration);
+        addVisit("ImportDeclaration", this::dealWithImport);
+        addVisit("MethodDeclaration", this::dealWithMethodDeclaration);
+        addVisit("ClassDeclaration", this::dealWithClassDeclaration);
+
+        setDefaultVisit(this::defaultVisit);
     }
 
-    private List<Report> dealWithProgram(JmmNode jmmNode, ImplementedSymbolTable implementedSymbolTable) {
+    private String defaultVisit(JmmNode jmmNode, String s){
+        String ret = s + jmmNode.getKind();
+        String attributes = jmmNode.getAttributes()
+                .stream()
+                .filter(a->!a.equals("line"))
+                .map(a->a + "="+ jmmNode.get(a))
+                .collect(Collectors.joining(", ", "[", "]"));
+
+        ret += ((attributes.length() > 2) ? attributes : "");
+        return ret;
+    }
+
+    private String dealWithProgram(JmmNode node, String s) {
         return null;
     }
 
-    private List<Report> dealWithImport(JmmNode jmmNode, ImplementedSymbolTable implementedSymbolTable) {
+    private String dealWithImport(JmmNode jmmNode, String s) {
+        symbolTable.addImports(jmmNode.get("name"));
+        return s + "IMPORT";
+    }
+    private String dealWithMethodDeclaration(JmmNode jmmNode, String s) {
         return null;
     }
 
-    private List<Report> dealWithMethodDeclaration(JmmNode jmmNode, ImplementedSymbolTable implementedSymbolTable) {
-        return null;
-    }
-
-    private List<Report> dealWithClassDeclaration(JmmNode jmmNode, ImplementedSymbolTable implementedSymbolTable) {
-
-        implementedSymbolTable.setClassName(jmmNode.get("className"));
-        implementedSymbolTable.setSuper(jmmNode.get("superClassName"));
-
+    private String dealWithClassDeclaration(JmmNode jmmNode, String s) {
         return null;
     }
 }
