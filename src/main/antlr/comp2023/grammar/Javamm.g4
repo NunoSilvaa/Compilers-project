@@ -22,18 +22,22 @@ classDeclaration: 'class' className=ID ('extends' superClassName=ID)? '{' (varDe
 varDeclaration: type varName=ID ';';
 
 methodDeclaration
-    : ('public')? type methodName=ID '(' ( parameter ( ',' parameter )* )? ')' '{' ( varDeclaration )* ( statement )* 'return' expression ';' '}'
-    | ('public')? 'static' 'void' 'main' '(' 'String' '[' ']' parameterName=ID ')' '{' ( varDeclaration )* ( statement )* '}'
+    : ('public')? 'static' 'void' 'main' '(' 'String' '[' ']' parameterName=ID ')' '{' ( varDeclaration )* ( statement )* '}' #MainDeclaration
+    | ('public')? retType methodName=ID '(' ( parameter ( ',' parameter )* )? ')' '{' ( varDeclaration )* ( statement )* 'return' retExpr ';' '}'#MetDeclaration
     ;
 
 parameter: type parameterName=ID;
 
+retType: type;
+
+retExpr: expression;
+
 type
-    : 'int[]'
-    | 'boolean'
-    | 'int'
-    | 'String'
-    | ID
+    : ty='int[]'
+    | ty='int'
+    | ty='boolean'
+    | ty='String'
+    | ty=ID
     ;
 
 statement

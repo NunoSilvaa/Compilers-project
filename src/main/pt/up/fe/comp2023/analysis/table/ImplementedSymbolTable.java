@@ -3,6 +3,7 @@ package pt.up.fe.comp2023.analysis.table;
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.SymbolTable;
 import pt.up.fe.comp.jmm.analysis.table.Type;
+import pt.up.fe.comp.jmm.ast.JmmNode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,7 +15,8 @@ public class ImplementedSymbolTable implements SymbolTable {
     private final List<String> imports = new ArrayList<>();
     private String className, superClassName;
     private Map<Symbol, Boolean> fields = new HashMap<>();
-    private List<Method> methods = new ArrayList<>();
+    //private List<Method> methods = new ArrayList<>();
+    private final HashMap<String, Method> methods = new HashMap<>();
     private Method current;
 
     @Override
@@ -57,42 +59,45 @@ public class ImplementedSymbolTable implements SymbolTable {
         this.fields.put(field, isStatic);
     }
 
+    public static Type getType(JmmNode jmmNode, String attribute) {
+        //System.out.println(jmmNode.get(attribute));
+        String strType = jmmNode.get(attribute);
+        //System.out.println(strType);
+        Type type = new Type(strType, strType.equals("int[]"));
+        return type;
+    }
+
     @Override
     public List<String> getMethods() {
-        List<String> methodName = new ArrayList<>();
-        for (Method m : methods){
-            methodName.add(m.getName());
-        }
-        return methodName;
+        return List.copyOf(this.methods.keySet());
     }
 
     /*public void addMethod(String name, List<Symbol> parameters, Type returnType, List<Symbol> localVariables) {
         this.methods.put(name, new Method(parameters, returnType, localVariables));
     }*/
 
+    public void addMethod(String name, Type returnType) {
+        this.current = new Method(name);
+        current.setReturnType(returnType);
+        this.methods.put(name, current);
+    }
+
+    public Method getCurrentMethod() {
+        return this.current;
+    }
+
     @Override
     public Type getReturnType(String s) {
-
-        for (Method m : methods){
-            if(m.getName().equals(s)){
-                return m.getReturnType();
-            }
-        }
-        return null;
+        return this.methods.get(s).getReturnType();
     }
 
     @Override
     public List<Symbol> getParameters(String s) {
-        for (Method m : methods){
-            if(m.getName().equals(s)){
-                return m.getParameters();
-            }
-        }
-        return null;
+        return this.methods.get(s).getParameters();
     }
 
     @Override
     public List<Symbol> getLocalVariables(String s) {
-        return null;
+        return this.methods.get(s).getLocalVariables();
     }
 }
