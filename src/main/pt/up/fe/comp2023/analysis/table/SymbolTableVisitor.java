@@ -45,7 +45,7 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
     }
 
     private String dealWithProgram(JmmNode node, String s) {
-        s = ((s !=null) ? s : "");
+        //s = ((s !=null) ? s : "");
         return null;
     }
 
@@ -61,6 +61,16 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
     }
 
     private String dealWithClassDeclaration(JmmNode jmmNode, String s) {
+        // Get the name of the class from the "className" object
+        String className = (String) jmmNode.getObject("className");
+        symbolTable.setClassName(className);
+        // Check if the class has a superclass
+        boolean hasSuperclass = jmmNode.hasAttribute("superClassName");
+        if(hasSuperclass){
+            String superClassName = (String) jmmNode.getObject("superClassName");
+            symbolTable.setSuper(superClassName);
+        }
+        //return s + "CLASS_DECLARATION";
         return null;
     }
 }
