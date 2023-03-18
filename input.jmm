@@ -1,5 +1,4 @@
-import utils.M;
-import utils.N.hey;
+
 class MethodsAndFields{
 	int field1;
 	boolean field2;

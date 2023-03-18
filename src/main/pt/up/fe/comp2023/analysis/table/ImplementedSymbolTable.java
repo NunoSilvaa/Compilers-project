@@ -60,10 +60,8 @@ public class ImplementedSymbolTable implements SymbolTable {
     }
 
     public static Type getType(JmmNode jmmNode, String attribute) {
-        //System.out.println(jmmNode.get(attribute));
         String strType = jmmNode.get(attribute);
-        //System.out.println(strType);
-        Type type = new Type(strType, strType.equals("int[]"));
+        Type type = new Type(strType, jmmNode.hasAttribute("isArray"));
         return type;
     }
 
@@ -71,10 +69,6 @@ public class ImplementedSymbolTable implements SymbolTable {
     public List<String> getMethods() {
         return List.copyOf(this.methods.keySet());
     }
-
-    /*public void addMethod(String name, List<Symbol> parameters, Type returnType, List<Symbol> localVariables) {
-        this.methods.put(name, new Method(parameters, returnType, localVariables));
-    }*/
 
     public void addMethod(String name, Type returnType) {
         this.current = new Method(name);

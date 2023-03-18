@@ -22,8 +22,13 @@ classDeclaration: 'class' className=ID ('extends' superClassName=ID)? '{' (varDe
 varDeclaration: type varName=ID ';';
 
 methodDeclaration
-    : ('public')? 'static' 'void' 'main' '(' 'String' '[' ']' parameterName=ID ')' '{' ( varDeclaration )* ( statement )* '}' #MainDeclaration
-    | ('public')? retType methodName=ID '(' ( parameter ( ',' parameter )* )? ')' '{' ( varDeclaration )* ( statement )* 'return' retExpr ';' '}'#MetDeclaration
+    : ('public')? 'static' 'void' 'main' '(' 'String' '[' ']' parameterName=ID ')' '{' ( localVariables )* ( statement )* '}' #MainDeclaration
+    | ('public')? retType methodName=ID '(' ( parameter ( ',' parameter )* )? ')' '{' ( localVariables )* ( statement )* 'return' retExpr ';' '}'#MetDeclaration
+    ;
+
+localVariables
+    : type varName=ID ';'
+    | varName=ID ('=' (ID | INT)) ';'
     ;
 
 parameter: type parameterName=ID;
@@ -33,7 +38,7 @@ retType: type;
 retExpr: expression;
 
 type
-    : ty='int[]'
+    : ty='int' ( isArray='[' ']' )?
     | ty='int'
     | ty='boolean'
     | ty='String'

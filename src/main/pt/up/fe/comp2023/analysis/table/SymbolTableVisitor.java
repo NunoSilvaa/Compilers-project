@@ -22,7 +22,6 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
     protected void buildVisitor(){
         addVisit("Program", this::dealWithProgram);
         addVisit("ImportDeclaration", this::dealWithImport);
-        //addVisit("MainDeclaration", this::dealWithMainDeclaration);
         addVisit("MethodDeclaration", this::dealWithMethodDeclaration);
         addVisit("ClassDeclaration", this::dealWithClassDeclaration);
         addVisit("VarDeclaration", this::dealWithVarDeclaration);
@@ -60,40 +59,25 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
         ArrayList<String> valuesList = (ArrayList<String>) jmmNode.getObject("name");
         String importFull = String.join(".", valuesList);
         symbolTable.addImports(importFull);
-        //System.out.println(jmmNode);
         return s + "IMPORT";
     }
 
-    /*private String dealWithMainDeclaration(JmmNode jmmNode,String s) {
-     return null;
-    }*/
 
     private String dealWithMethodDeclaration(JmmNode jmmNode, String s) {
         // Get the name of the method from the "methodName" object
         this.scope = "METHOD";
-        //System.out.println("ESTOU AQUI linha 74 ");
-        System.out.println(jmmNode.getKind());
         if (jmmNode.getKind().equals("MainDeclaration")) { // MainDeclaration
-            System.out.println("ESTOU AQUI linha 77");
             this.scope = "MAIN";
             this.symbolTable.addMethod("main", new Type("void", false));
-            jmmNode.put("params","");
 
         } else { // MethodDeclarationOther
-            //System.out.println(jmmNode.getKind());
-            this.scope = "METHOD";
             String methodName = (String) jmmNode.getObject("methodName");
-            //System.out.println(methodName);
             for (JmmNode parameterNode : jmmNode.getChildren()) {
-                System.out.println("line 88:" + parameterNode.getKind());
                 if (parameterNode.getKind().equals("RetType")) {
-                    System.out.println("linha 90");
                     Type retType = ImplementedSymbolTable.getType(parameterNode.getChildren().get(0), "ty");
                     this.symbolTable.addMethod(methodName, retType);
-                    System.out.println("linha 93:" + parameterNode.getKind());
 
                 } else if (parameterNode.getKind().equals("RetExpr")) {
-                    System.out.println("linha 96");
                     continue; // ignore
                 } else {
                     visit(parameterNode);
@@ -113,19 +97,10 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
             String superClassName = (String) jmmNode.getObject("superClassName");
             symbolTable.setSuper(superClassName);
         }
-        //return s + "CLASS_DECLARATION";
-        return null;
+        return s + "CLASS_DECLARATION";
     }
 
     private String dealWithParameters(JmmNode jmmNode, String s) {
-
-        /*Type type = symbolTable.getType(jmmNode.getChildren().get(0), "ty");
-        Symbol symbol = new Symbol(type, jmmNode.get("parameterName"));
-
-        symbolTable.getCurrentMethod().setParameters(symbol);
-        System.out.println("hererrererererer");
-        return null;*/
-
         s = ((s != null) ? s : "");
 
         if (scope.equals("METHOD")) {
@@ -136,31 +111,20 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
             Type type = ImplementedSymbolTable.getType(parameterType, "ty");
 
             Symbol symbol = new Symbol(type, parameterValue);
-            //System.out.println("hererrere");
             this.symbolTable.getCurrentMethod().setParameters(symbol);
         }
         return null;
     }
 
-    public String dealWithVarDeclaration(JmmNode node, String s) {
-        s = ((s != null) ? s : "");
+    public String dealWithVarDeclaration(JmmNode jmmNode, String s) {
+        String name = jmmNode.get("varName");
+        String type = jmmNode.getJmmChild(0).get("ty");
 
-        if (scope.equals("METHOD")) {
-            System.out.println("hererrdewjkrvdbewnjfdfhdeweqdfgergwerdfere");
-            if (node.getChildren().size() > 0) {
-                String variableName = node.get("varName");
+        Type t = ImplementedSymbolTable.getType(jmmNode.getChildren().get(0), "ty");
 
-                Type localVarType = ImplementedSymbolTable.getType(node.getChildren().get(0), "ty");
+        Symbol symbol = new Symbol(t, name);
 
-                Symbol localVarSymbol = new Symbol(localVarType, variableName);
-                this.symbolTable.getCurrentMethod().setLocalVariable(localVarSymbol);
-            } else {
-                String variableName = node.get("varName");
-
-                Symbol localVarSymbol = new Symbol(new Type("", false), variableName);
-                this.symbolTable.getCurrentMethod().setLocalVariable(localVarSymbol);
-            }
-        }
+        symbolTable.addField(symbol, false);
 
         return null;
     }
