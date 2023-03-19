@@ -70,4 +70,5 @@ expression
     | expression '.' ID '(' (expression (',' expression)*)? ')' #MethodCall
     | value=INTEGER #Integer
     | value=ID #Identifier
+    | 'this' #This
     ;

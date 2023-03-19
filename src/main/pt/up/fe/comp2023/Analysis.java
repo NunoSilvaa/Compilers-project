@@ -19,12 +19,6 @@ public class Analysis implements JmmAnalysis {
 
         List<Report> reports = new ArrayList<>();
 
-        /*if (jmmParserResult.getConfig().getOrDefault("debug", "false").equals("true")) {
-            System.out.println("AST:\n");
-            System.out.println(jmmParserResult.getRootNode().toTree());
-            System.out.println("Symbol Table:\n");
-            symbolTable.print();
-        }*/
         JmmNode node = jmmParserResult.getRootNode();
         SymbolTableVisitor visitor = new SymbolTableVisitor();
         ImplementedSymbolTable symbolTable = visitor.getSymbolTable(node);

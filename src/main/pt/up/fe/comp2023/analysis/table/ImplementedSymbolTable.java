@@ -28,7 +28,7 @@ public class ImplementedSymbolTable implements SymbolTable {
         this.imports = imports;
     }*/
 
-    public void addImports(String importN) {
+    public void setImports(String importN) {
         imports.add(importN);
     }
 
@@ -55,7 +55,7 @@ public class ImplementedSymbolTable implements SymbolTable {
         return new ArrayList<>(this.fields.keySet());
     }
 
-    public void addField(Symbol field, boolean isStatic) {
+    public void setField(Symbol field, boolean isStatic) {
         this.fields.put(field, isStatic);
     }
 

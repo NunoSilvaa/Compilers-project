@@ -36,12 +36,9 @@ public class Launcher {
 
         // Parse stage
         JmmParserResult parserResult = parser.parse(code, config);
-        //parserResult.getReports();
+        parserResult.getReports();
         // Check if there are parsing errors\
-        System.out.println("hereeeeeeee");
         TestUtils.noErrors(parserResult.getReports());
-        System.out.println(parserResult.getReports());
-        System.out.println("hereeeeeeeeeeeeeeee");
         // ... add remaining stages
         Analysis analysis = new Analysis();
         analysis.semanticAnalysis(parserResult);

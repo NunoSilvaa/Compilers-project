@@ -15,12 +15,10 @@ import java.util.stream.Collectors;
 public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
     private ImplementedSymbolTable symbolTable;
     private List<Report> reports;
-
     private String scope;
 
     @Override
     protected void buildVisitor(){
-        addVisit("Program", this::dealWithProgram);
         addVisit("ImportDeclaration", this::dealWithImport);
         addVisit("MethodDeclaration", this::dealWithMethodDeclaration);
         addVisit("ClassDeclaration", this::dealWithClassDeclaration);
@@ -50,18 +48,12 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
         return ret;
     }
 
-    private String dealWithProgram(JmmNode node, String s) {
-        //s = ((s !=null) ? s : "");
-        return null;
-    }
-
     private String dealWithImport(JmmNode jmmNode, String s) {
         ArrayList<String> valuesList = (ArrayList<String>) jmmNode.getObject("name");
         String importFull = String.join(".", valuesList);
-        symbolTable.addImports(importFull);
+        symbolTable.setImports(importFull);
         return s + "IMPORT";
     }
-
 
     private String dealWithMethodDeclaration(JmmNode jmmNode, String s) {
         // Get the name of the method from the "methodName" object
@@ -70,7 +62,7 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
             this.scope = "MAIN";
             this.symbolTable.addMethod("main", new Type("void", false));
 
-        } else { // MethodDeclarationOther
+        } else { // MethodDeclaration
             String methodName = (String) jmmNode.getObject("methodName");
             for (JmmNode parameterNode : jmmNode.getChildren()) {
                 if (parameterNode.getKind().equals("RetType")) {
@@ -101,8 +93,6 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
     }
 
     private String dealWithParameters(JmmNode jmmNode, String s) {
-        s = ((s != null) ? s : "");
-
         if (scope.equals("METHOD")) {
 
             var parameterType = jmmNode.getChildren().get(0);
@@ -113,7 +103,7 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
             Symbol symbol = new Symbol(type, parameterValue);
             this.symbolTable.getCurrentMethod().setParameters(symbol);
         }
-        return null;
+        return s + "PARAMETER";
     }
 
     public String dealWithVarDeclaration(JmmNode jmmNode, String s) {
@@ -124,9 +114,9 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
 
         Symbol symbol = new Symbol(t, name);
 
-        symbolTable.addField(symbol, false);
+        symbolTable.setField(symbol, false);
 
-        return null;
+        return s + "VAR_DECLARATION";
     }
 
 
