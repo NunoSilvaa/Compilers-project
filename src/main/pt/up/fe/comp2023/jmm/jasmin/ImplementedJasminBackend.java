@@ -166,7 +166,7 @@ public class ImplementedJasminBackend implements JasminBackend {
             if (method.getReturnType().getTypeOfElement() == ElementType.VOID) met.append("\treturn\n");
         }
 
-        met.append(".end method\n");
+        met.append(".end method\n\n");
         return met.toString();
     }
 
