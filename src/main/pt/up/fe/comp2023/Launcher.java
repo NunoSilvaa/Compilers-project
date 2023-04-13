@@ -48,7 +48,7 @@ public class Launcher {
         analysis.semanticAnalysis(parserResult);
         //JmmSemanticsResult semanticsResult = analysis.semanticAnalysis(parserResult);
 
-        String ollirCode = SpecsIo.read("OllirToJasminBasic.ollir");
+        String ollirCode = SpecsIo.read("../test/pt/up/fe/comp/cp2/jasmin/OllirToJasminBasic.ollir");
         OllirResult ollirResult = new OllirResult(code, Collections.emptyMap());
         ImplementedJasminBackend implementedJasminBackend = new ImplementedJasminBackend();
         JasminResult jasminResult = implementedJasminBackend.toJasmin(ollirResult);

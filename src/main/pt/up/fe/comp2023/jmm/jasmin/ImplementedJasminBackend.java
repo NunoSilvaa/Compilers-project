@@ -19,9 +19,7 @@ public class ImplementedJasminBackend implements JasminBackend {
 
     @Override
     public JasminResult toJasmin(OllirResult ollirResult) {
-        System.out.println("Gets here");
         classUnit = ollirResult.getOllirClass();
-
         try {
             classUnit.checkMethodLabels();
         } catch (OllirErrorException e) {
@@ -38,13 +36,16 @@ public class ImplementedJasminBackend implements JasminBackend {
             System.out.println(code);
         }
 
+        //System.out.println(code);
+
+
         return new JasminResult(ollirResult, code, Collections.emptyList());
     }
 
     private String builder() {
         StringBuilder code = new StringBuilder();
 
-        code.append(".class public").append(classUnit.getClassName()).append("\n");
+        code.append(".class public ").append(classUnit.getClassName()).append("\n");
 
         String superClass = classUnit.getSuperClass();
 
@@ -102,7 +103,7 @@ public class ImplementedJasminBackend implements JasminBackend {
         switch (elementType) {
             case VOID ->  variable.append("V");
             case INT32 -> variable.append("I");
-            case STRING -> variable.append("Ljava/lang/String");
+            case STRING -> variable.append("Ljava/lang/String;");
             case BOOLEAN -> variable.append("Z");
             case OBJECTREF -> {
                 variable.append("L").append(this.getImpClass(((ClassType) type).getName())).append(";");
@@ -130,7 +131,7 @@ public class ImplementedJasminBackend implements JasminBackend {
         met.append("(");
 
         for (Element element : method.getParams()) {
-            met.append(this.getType(element.getType())).append("\n");
+            met.append(this.getType(element.getType()));
         }
         met.append(")");
         met.append(this.getType(method.getReturnType())).append("\n");
