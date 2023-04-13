@@ -19,7 +19,7 @@ public class ImplementedJasminBackend implements JasminBackend {
 
     @Override
     public JasminResult toJasmin(OllirResult ollirResult) {
-
+        System.out.println("Gets here");
         classUnit = ollirResult.getOllirClass();
 
         try {
@@ -34,7 +34,7 @@ public class ImplementedJasminBackend implements JasminBackend {
         String code = builder();
 
         if (ollirResult.getConfig().getOrDefault("debug", "false").equals("true")) {
-            System.out.println("JASMIN CODE: ");
+            System.out.println("JASMIN CODE:");
             System.out.println(code);
         }
 
@@ -58,14 +58,14 @@ public class ImplementedJasminBackend implements JasminBackend {
             StringBuilder accessModName =  new StringBuilder();
 
             if (accessModifiers != AccessModifiers.DEFAULT) {
-                accessModName.append(field.getFieldAccessModifier().name().toLowerCase()).append(" ");
+                accessModName.append(accessModifiers.name().toLowerCase()).append(" ");
             }
 
             if (field.isStaticField()) accessModName.append("static ");
 
             if (field.isFinalField()) accessModName.append("final ");
 
-            code.append(".field ").append(accessModName).append(field.getFieldName()).append(" ").append(field.getFieldType());
+            code.append(".field ").append(accessModName).append(field.getFieldName()).append(" ").append(this.getType(field.getFieldType()));
 
             if (field.isInitialized()) code.append(" = ").append(field.getInitialValue());
 
@@ -105,7 +105,6 @@ public class ImplementedJasminBackend implements JasminBackend {
             case STRING -> variable.append("Ljava/lang/String");
             case BOOLEAN -> variable.append("Z");
             case OBJECTREF -> {
-                assert type instanceof ClassType;
                 variable.append("L").append(this.getImpClass(((ClassType) type).getName())).append(";");
             }
             default -> variable.append("Error: type not supported;\n");
@@ -138,6 +137,9 @@ public class ImplementedJasminBackend implements JasminBackend {
 
         current = 0;
 
+        met.append("\t.limit stack " + stackLimit + "\n" + "\t.limit locals " +
+                localLimit + "\n");
+
         List<Instruction> instructions = method.getInstructions();
 
         for (Instruction instruction : method.getInstructions()) {
@@ -158,13 +160,10 @@ public class ImplementedJasminBackend implements JasminBackend {
             }
         }
 
-        if (!((instructions.get(instructions.size() - 1).getInstType() == InstructionType.RETURN) && (instructions.size() != 0)))
+        if (!((instructions.get(instructions.size() - 1).getInstType() == InstructionType.RETURN) && (instructions.size() > 0)))
         {
             if (method.getReturnType().getTypeOfElement() == ElementType.VOID) met.append("\treturn\n");
         }
-
-        met.append("\t.limit stack " + stackLimit + "\n" + "\t.limit locals " +
-                                            localLimit + "\n");
 
         met.append(".end method\n");
         return met.toString();

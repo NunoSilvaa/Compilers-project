@@ -2,11 +2,15 @@ package pt.up.fe.comp2023;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import pt.up.fe.comp.TestUtils;
+import pt.up.fe.comp.jmm.jasmin.JasminResult;
+import pt.up.fe.comp.jmm.ollir.OllirResult;
 import pt.up.fe.comp.jmm.parser.JmmParserResult;
+import pt.up.fe.comp2023.jmm.jasmin.ImplementedJasminBackend;
 import pt.up.fe.specs.util.SpecsIo;
 import pt.up.fe.specs.util.SpecsLogs;
 import pt.up.fe.specs.util.SpecsSystem;
@@ -44,6 +48,12 @@ public class Launcher {
         analysis.semanticAnalysis(parserResult);
         //JmmSemanticsResult semanticsResult = analysis.semanticAnalysis(parserResult);
 
+        String ollirCode = SpecsIo.read("OllirToJasminBasic.ollir");
+        OllirResult ollirResult = new OllirResult(code, Collections.emptyMap());
+        ImplementedJasminBackend implementedJasminBackend = new ImplementedJasminBackend();
+        JasminResult jasminResult = implementedJasminBackend.toJasmin(ollirResult);
+
+        TestUtils.noErrors(jasminResult);
     }
 
     private static Map<String, String> parseArgs(String[] args) {
