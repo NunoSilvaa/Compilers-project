@@ -106,6 +106,7 @@ public class ImplementedJasminBackend implements JasminBackend {
             case STRING -> variable.append("Ljava/lang/String;");
             case BOOLEAN -> variable.append("Z");
             case OBJECTREF -> {
+                assert type instanceof ClassType;
                 variable.append("L").append(this.getImpClass(((ClassType) type).getName())).append(";");
             }
             default -> variable.append("Error: type not supported;\n");
