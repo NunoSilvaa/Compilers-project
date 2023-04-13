@@ -10,6 +10,8 @@ import java.util.*;
 public class ImplementedJasminBackend implements JasminBackend {
 
     ClassUnit classUnit;
+
+    String superClass;
     int current;
 
     final int localLimit = 99;
@@ -47,7 +49,7 @@ public class ImplementedJasminBackend implements JasminBackend {
 
         code.append(".class public ").append(classUnit.getClassName()).append("\n");
 
-        String superClass = classUnit.getSuperClass();
+        superClass = classUnit.getSuperClass();
 
         if (superClass == null) superClass = "java/lang/Object";
 
@@ -154,7 +156,7 @@ public class ImplementedJasminBackend implements JasminBackend {
                 CallInstruction inst = (CallInstruction) instruction;
                 ElementType ret = inst.getReturnType().getTypeOfElement();
 
-                if ((ret != ElementType.VOID) || (inst.getInvocationType() == CallType.invokespecial)) {
+                if (ret != ElementType.VOID) {
                     met.append("\tpop\n");
                     current -= 1;
                 }
@@ -559,8 +561,7 @@ public class ImplementedJasminBackend implements JasminBackend {
 
                 strInst.append("\tinvokespecial ");
 
-                if (instruction.getFirstArg().getType().getTypeOfElement() == ElementType.THIS) strInst.append(classUnit.getSuperClass());
-
+                if (instruction.getFirstArg().getType().getTypeOfElement() == ElementType.THIS) strInst.append(superClass);
                 else {
                     String className = this.getImpClass(((ClassType) instruction.getFirstArg().getType()).getName());
                     strInst.append(className);
