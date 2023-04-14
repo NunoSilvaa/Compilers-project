@@ -4,6 +4,8 @@ import org.specs.comp.ollir.*;
 import pt.up.fe.comp.jmm.jasmin.JasminBackend;
 import pt.up.fe.comp.jmm.jasmin.JasminResult;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
+import pt.up.fe.comp.jmm.report.Report;
+import pt.up.fe.comp.jmm.report.Stage;
 
 import java.util.*;
 
@@ -25,7 +27,9 @@ public class ImplementedJasminBackend implements JasminBackend {
         try {
             classUnit.checkMethodLabels();
         } catch (OllirErrorException e) {
-            throw new RuntimeException(e);
+            return new JasminResult(classUnit.getClassName(), null,
+                    Collections.singletonList(Report.newError(Stage.GENERATION, -1,
+                            -1, "Jasmin Exception\n", e)));
         }
 
         classUnit.buildCFGs();
