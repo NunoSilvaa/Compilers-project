@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import pt.up.fe.comp.TestUtils;
+import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
 import pt.up.fe.comp.jmm.jasmin.JasminResult;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
 import pt.up.fe.comp.jmm.parser.JmmParserResult;
@@ -46,14 +47,31 @@ public class Launcher {
         // ... add remaining stages
         Analysis analysis = new Analysis();
         analysis.semanticAnalysis(parserResult);
-        //JmmSemanticsResult semanticsResult = analysis.semanticAnalysis(parserResult);
+        JmmSemanticsResult semanticsResult = analysis.semanticAnalysis(parserResult);
 
-        String ollirCode = SpecsIo.read("../test/pt/up/fe/comp/cp2/jasmin/OllirToJasminBasic.ollir");
-        OllirResult ollirResult = new OllirResult(code, Collections.emptyMap());
+        TestUtils.noErrors(semanticsResult);
+
+        /* ollir ollir = new ollir();
+
+        if (config.get("optimize") != null && config.get("optimize").equals("true")) {
+            semanticsResult = ollir.optimize(semanticsResult);
+        }
+        TestUtils.noErrors(semanticsResult);
+
+        OllirResult ollirResult = ollir.toOllir(semanticsResult);
+        TestUtils.noErrors(ollirResult);
+
+        if (config.get("registerAllocation") != null) {
+            ollirResult = ollir.optimize(ollirResult);
+        }
+        TestUtils.noErrors(ollirResult);
+
         ImplementedJasminBackend implementedJasminBackend = new ImplementedJasminBackend();
         JasminResult jasminResult = implementedJasminBackend.toJasmin(ollirResult);
 
         TestUtils.noErrors(jasminResult);
+
+         */
     }
 
     private static Map<String, String> parseArgs(String[] args) {
