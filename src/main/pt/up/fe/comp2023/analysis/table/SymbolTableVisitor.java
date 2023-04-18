@@ -77,9 +77,6 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                     Type retType = ImplementedSymbolTable.getType(parameterNode.getChildren().get(0), "ty");
                     method.setReturnType(retType);
                 } else if (parameterNode.getKind().equals("RetExpr")) {
-                    /*for(JmmNode retExprNode : parameterNode.getChildren()){
-                        if(retExprNode.)
-                    }*/
                     continue; // ignore
                 } else if (parameterNode.getKind().equals("LocalVariables")) {
                     for (JmmNode localVariable : parameterNode.getChildren()) {

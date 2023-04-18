@@ -33,6 +33,7 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
     @Override
     protected void buildVisitor() {
         addVisit("Type", this::visitType);
+        addVisit("Identifier", this::visitVariable);
         //addVisit("Assignment", this::visitAssignment);
         //addVisit("ClassDeclaration", this::visitClassDeclaration);
         //addVisit("ReturnStatement", this::visitReturnStatement);
@@ -88,6 +89,18 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
         }
         return s;
     }
+
+    private String visitVariable(JmmNode node, String s){
+        JmmNode methodNode = node;
+        while (!methodNode.hasAttribute("methodName")){
+            methodNode = methodNode.getJmmParent();
+        }
+
+        if(!symbolTable.getLocalVariables(methodNode.get("methodName")).contains(node.get("value"))){
+            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Variable not declared!"));
+        }
+
+        return s;}
 
     private String visitAssignment(JmmNode node, String s){
         JmmNode methodNode = node;
