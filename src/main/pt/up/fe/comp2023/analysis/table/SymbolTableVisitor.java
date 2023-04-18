@@ -9,7 +9,9 @@ import pt.up.fe.comp.jmm.report.Report;
 import pt.up.fe.comp2023.analysis.table.ImplementedSymbolTable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
@@ -23,14 +25,16 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
         addVisit("MethodDeclaration", this::dealWithMethodDeclaration);
         addVisit("ClassDeclaration", this::dealWithClassDeclaration);
         addVisit("VarDeclaration", this::dealWithVarDeclaration);
-        addVisit("Parameter",this::dealWithParameters);
+        //addVisit("Parameter",this::dealWithParameters);
 
         setDefaultVisit(this::defaultVisit);
     }
 
-    public ImplementedSymbolTable getSymbolTable(JmmNode node) {
+    public Map<ImplementedSymbolTable, List<Report>> getSymbolTableAndReports(JmmNode node) {
+        Map<ImplementedSymbolTable, List<Report>> tableAndReports = new HashMap<>();
         visit(node, null);
-        return this.symbolTable;
+        tableAndReports.put(this.symbolTable, this.reports);
+        return tableAndReports;
     }
     public SymbolTableVisitor () {
         this.symbolTable = new ImplementedSymbolTable();
@@ -60,6 +64,44 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
         this.scope = "METHOD";
         if (jmmNode.getKind().equals("MainDeclaration")) { // MainDeclaration
             this.scope = "MAIN";
+            List<Symbol> localVariables = new ArrayList<>();
+            List<Symbol> parameters = new ArrayList<>();
+            this.symbolTable.addMethod("main", new Type("void", false), localVariables, parameters);
+        } else { // MethodDeclaration
+            String methodName = (String) jmmNode.getObject("methodName");
+            Method method = new Method(methodName);
+            for (JmmNode parameterNode : jmmNode.getChildren()) {
+                if (parameterNode.getKind().equals("RetType")) {
+                    Type retType = ImplementedSymbolTable.getType(parameterNode.getChildren().get(0), "ty");
+                    method.setReturnType(retType);
+                } else if (parameterNode.getKind().equals("RetExpr")) {
+                    continue; // ignore
+                } else if (parameterNode.getKind().equals("LocalVariables")) {
+                    for (JmmNode localVariable : parameterNode.getChildren()) {
+                        Type variableType = ImplementedSymbolTable.getType(localVariable, "ty");
+                        String variableName = (String) parameterNode.getObject("varName");
+                        Symbol variableSymbol = new Symbol(variableType, variableName);
+                        method.setLocalVariable(variableSymbol);
+                    }
+                } else if(parameterNode.getKind().equals("Parameter")){
+                    var parameterType = parameterNode.getChildren().get(0);
+
+                    Type type = ImplementedSymbolTable.getType(parameterType, "ty");
+                    var parameterValue = (String) parameterNode.getObject("parameterName");
+
+                    //var name = this.symbolTable.getCurrentMethod().getName();
+                    //System.out.println("Current " + this.symbolTable.getCurrentMethod().getName());
+                    Symbol parameterSymbol = new Symbol(type, parameterValue);
+                    method.setParameters(parameterSymbol);
+                }
+            }
+            this.symbolTable.addMethod(methodName, method.getReturnType(), method.getLocalVariables(), method.getParameters());
+        }
+        System.out.println("Methods" + this.symbolTable.getMethods());
+        return s + "METHOD_DECLARATION";
+        /*this.scope = "METHOD";
+        if (jmmNode.getKind().equals("MainDeclaration")) { // MainDeclaration
+            this.scope = "MAIN";
             this.symbolTable.addMethod("main", new Type("void", false));
 
         } else { // MethodDeclaration
@@ -76,7 +118,7 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                 }
             }
         }
-        return s + "METHOD_DECLARATION";
+        return s + "METHOD_DECLARATION";*/
     }
 
     private String dealWithClassDeclaration(JmmNode jmmNode, String s) {
@@ -92,7 +134,7 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
         return s + "CLASS_DECLARATION";
     }
 
-    private String dealWithParameters(JmmNode jmmNode, String s) {
+    /*private String dealWithParameters(JmmNode jmmNode, String s) {
         if (scope.equals("METHOD")) {
 
             var parameterType = jmmNode.getChildren().get(0);
@@ -100,11 +142,13 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
 
             Type type = ImplementedSymbolTable.getType(parameterType, "ty");
 
+            var name = this.symbolTable.getCurrentMethod().getName();
+            System.out.println("Current " + this.symbolTable.getCurrentMethod().getName());
             Symbol symbol = new Symbol(type, parameterValue);
             this.symbolTable.getCurrentMethod().setParameters(symbol);
         }
         return s + "PARAMETER";
-    }
+    }*/
 
     public String dealWithVarDeclaration(JmmNode jmmNode, String s) {
         String name = jmmNode.get("varName");
@@ -119,5 +163,8 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
         return s + "VAR_DECLARATION";
     }
 
-
+    public List<Report> getReports(JmmNode node) {
+        visit(node, null);
+        return this.reports;
+    }
 }
