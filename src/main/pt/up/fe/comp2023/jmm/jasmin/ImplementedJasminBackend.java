@@ -4,12 +4,16 @@ import org.specs.comp.ollir.*;
 import pt.up.fe.comp.jmm.jasmin.JasminBackend;
 import pt.up.fe.comp.jmm.jasmin.JasminResult;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
+import pt.up.fe.comp.jmm.report.Report;
+import pt.up.fe.comp.jmm.report.Stage;
 
 import java.util.*;
 
 public class ImplementedJasminBackend implements JasminBackend {
 
     ClassUnit classUnit;
+
+    String superClass;
     int current;
 
     final int localLimit = 99;
@@ -19,13 +23,13 @@ public class ImplementedJasminBackend implements JasminBackend {
 
     @Override
     public JasminResult toJasmin(OllirResult ollirResult) {
-
         classUnit = ollirResult.getOllirClass();
-
         try {
             classUnit.checkMethodLabels();
         } catch (OllirErrorException e) {
-            throw new RuntimeException(e);
+            return new JasminResult(classUnit.getClassName(), null,
+                    Collections.singletonList(Report.newError(Stage.GENERATION, -1,
+                            -1, "Jasmin Exception\n", e)));
         }
 
         classUnit.buildCFGs();
@@ -34,9 +38,12 @@ public class ImplementedJasminBackend implements JasminBackend {
         String code = builder();
 
         if (ollirResult.getConfig().getOrDefault("debug", "false").equals("true")) {
-            System.out.println("JASMIN CODE: ");
+            System.out.println("JASMIN CODE:");
             System.out.println(code);
         }
+
+        //System.out.println(code);
+
 
         return new JasminResult(ollirResult, code, Collections.emptyList());
     }
@@ -44,9 +51,9 @@ public class ImplementedJasminBackend implements JasminBackend {
     private String builder() {
         StringBuilder code = new StringBuilder();
 
-        code.append(".class public").append(classUnit.getClassName()).append("\n");
+        code.append(".class public ").append(classUnit.getClassName()).append("\n");
 
-        String superClass = classUnit.getSuperClass();
+        superClass = classUnit.getSuperClass();
 
         if (superClass == null) superClass = "java/lang/Object";
 
@@ -58,14 +65,14 @@ public class ImplementedJasminBackend implements JasminBackend {
             StringBuilder accessModName =  new StringBuilder();
 
             if (accessModifiers != AccessModifiers.DEFAULT) {
-                accessModName.append(field.getFieldAccessModifier().name().toLowerCase()).append(" ");
+                accessModName.append(accessModifiers.name().toLowerCase()).append(" ");
             }
 
             if (field.isStaticField()) accessModName.append("static ");
 
             if (field.isFinalField()) accessModName.append("final ");
 
-            code.append(".field ").append(accessModName).append(field.getFieldName()).append(" ").append(field.getFieldType());
+            code.append(".field ").append(accessModName).append(field.getFieldName()).append(" ").append(this.getType(field.getFieldType()));
 
             if (field.isInitialized()) code.append(" = ").append(field.getInitialValue());
 
@@ -102,7 +109,7 @@ public class ImplementedJasminBackend implements JasminBackend {
         switch (elementType) {
             case VOID ->  variable.append("V");
             case INT32 -> variable.append("I");
-            case STRING -> variable.append("Ljava/lang/String");
+            case STRING -> variable.append("Ljava/lang/String;");
             case BOOLEAN -> variable.append("Z");
             case OBJECTREF -> {
                 assert type instanceof ClassType;
@@ -131,12 +138,15 @@ public class ImplementedJasminBackend implements JasminBackend {
         met.append("(");
 
         for (Element element : method.getParams()) {
-            met.append(this.getType(element.getType())).append("\n");
+            met.append(this.getType(element.getType()));
         }
         met.append(")");
         met.append(this.getType(method.getReturnType())).append("\n");
 
         current = 0;
+
+        met.append("\t.limit stack " + stackLimit + "\n" + "\t.limit locals " +
+                localLimit + "\n");
 
         List<Instruction> instructions = method.getInstructions();
 
@@ -150,7 +160,7 @@ public class ImplementedJasminBackend implements JasminBackend {
                 CallInstruction inst = (CallInstruction) instruction;
                 ElementType ret = inst.getReturnType().getTypeOfElement();
 
-                if ((ret != ElementType.VOID) || (inst.getInvocationType() == CallType.invokespecial)) {
+                if (ret != ElementType.VOID) {
                     met.append("\tpop\n");
                     current -= 1;
                 }
@@ -158,15 +168,12 @@ public class ImplementedJasminBackend implements JasminBackend {
             }
         }
 
-        if (!((instructions.get(instructions.size() - 1).getInstType() == InstructionType.RETURN) && (instructions.size() != 0)))
+        if (!((instructions.get(instructions.size() - 1).getInstType() == InstructionType.RETURN) && (instructions.size() > 0)))
         {
             if (method.getReturnType().getTypeOfElement() == ElementType.VOID) met.append("\treturn\n");
         }
 
-        met.append("\t.limit stack " + stackLimit + "\n" + "\t.limit locals " +
-                                            localLimit + "\n");
-
-        met.append(".end method\n");
+        met.append(".end method\n\n");
         return met.toString();
     }
 
@@ -558,8 +565,7 @@ public class ImplementedJasminBackend implements JasminBackend {
 
                 strInst.append("\tinvokespecial ");
 
-                if (instruction.getFirstArg().getType().getTypeOfElement() == ElementType.THIS) strInst.append(classUnit.getSuperClass());
-
+                if (instruction.getFirstArg().getType().getTypeOfElement() == ElementType.THIS) strInst.append(superClass);
                 else {
                     String className = this.getImpClass(((ClassType) instruction.getFirstArg().getType()).getName());
                     strInst.append(className);
