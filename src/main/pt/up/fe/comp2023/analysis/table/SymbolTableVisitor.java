@@ -6,6 +6,8 @@ import pt.up.fe.comp.jmm.ast.JmmNode;
 import pt.up.fe.comp.jmm.ast.JmmSerializer;
 import pt.up.fe.comp.jmm.ast.PreorderJmmVisitor;
 import pt.up.fe.comp.jmm.report.Report;
+import pt.up.fe.comp.jmm.report.ReportType;
+import pt.up.fe.comp.jmm.report.Stage;
 import pt.up.fe.comp2023.analysis.table.ImplementedSymbolTable;
 
 import java.util.ArrayList;
@@ -16,7 +18,7 @@ import java.util.stream.Collectors;
 
 public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
     private ImplementedSymbolTable symbolTable;
-    private List<Report> reports;
+    private List<Report> reports =  new ArrayList<>();
     private String scope;
 
     @Override
@@ -75,6 +77,9 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                     Type retType = ImplementedSymbolTable.getType(parameterNode.getChildren().get(0), "ty");
                     method.setReturnType(retType);
                 } else if (parameterNode.getKind().equals("RetExpr")) {
+                    /*for(JmmNode retExprNode : parameterNode.getChildren()){
+                        if(retExprNode.)
+                    }*/
                     continue; // ignore
                 } else if (parameterNode.getKind().equals("LocalVariables")) {
                     for (JmmNode localVariable : parameterNode.getChildren()) {
@@ -93,6 +98,22 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                     //System.out.println("Current " + this.symbolTable.getCurrentMethod().getName());
                     Symbol parameterSymbol = new Symbol(type, parameterValue);
                     method.setParameters(parameterSymbol);
+                } else if(parameterNode.getKind().equals("Assignment")){
+                    for(JmmNode assignmentNode : parameterNode.getChildren()){
+                        Type assignmentType = new Type("boolean", false);
+                        var assignmentName = (String) parameterNode.getObject("assignmentName");
+                        if(assignmentNode.getKind().equals("Integer"))
+                            assignmentType = new Type("int", false);
+                        for(Symbol localVariable : method.getLocalVariables()){
+                            if(localVariable.getName().equals(assignmentName))
+                                if(!localVariable.getType().getName().equals(assignmentType.getName()))
+                                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Assignment type mismatch"));
+                        }
+                        Symbol assignmentSymbol = new Symbol(assignmentType, assignmentName);
+                        method.setAssignment(assignmentSymbol);
+
+                    }
+                    //var assignmentType = ImplementedSymbolTable.getType(parameterNode, "ty");
                 }
             }
             this.symbolTable.addMethod(methodName, method.getReturnType(), method.getLocalVariables(), method.getParameters());

@@ -1,5 +1,6 @@
 package pt.up.fe.comp2023;
 
+import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.SymbolTable;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 import pt.up.fe.comp.jmm.ast.JmmNode;
@@ -32,6 +33,7 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
     @Override
     protected void buildVisitor() {
         addVisit("Type", this::visitType);
+        //addVisit("Assignment", this::visitAssignment);
         //addVisit("ClassDeclaration", this::visitClassDeclaration);
         //addVisit("ReturnStatement", this::visitReturnStatement);
         addVisit("BinaryOp", this::visitBinaryOp);
@@ -77,6 +79,25 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
         }
         Type lhsType = symbolTable.getVariableType(methodNode.get("methodName"), node.getChildren().get(0).get("value"));
         //Type lhsType = getType(node.getChildren().get(0), "ty");
+        //Type lhsType = getType(node.getChildren().get(0), "ty");
+        Type rhsType = symbolTable.getVariableType(methodNode.get("methodName"), node.getChildren().get(1).get("value"));
+        //Type rhsType = getType(node.getChildren().get(1), "ty");
+
+        if(!lhsType.equals(rhsType)){
+            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Both operands must be integers!"));
+        }
+        return s;
+    }
+
+    private String visitAssignment(JmmNode node, String s){
+        JmmNode methodNode = node;
+        while (!methodNode.hasAttribute("methodName")){
+            methodNode = methodNode.getJmmParent();
+        }
+        for(Symbol local : symbolTable.getLocalVariables(methodNode.get("methodName"))){
+
+        }
+        Type lhsType = symbolTable.getVariableType(methodNode.get("methodName"), node.getChildren().get(0).get("value"));
         //Type lhsType = getType(node.getChildren().get(0), "ty");
         Type rhsType = symbolTable.getVariableType(methodNode.get("methodName"), node.getChildren().get(1).get("value"));
         //Type rhsType = getType(node.getChildren().get(1), "ty");
