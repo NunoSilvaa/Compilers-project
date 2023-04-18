@@ -2,6 +2,9 @@ package pt.up.fe.comp2023.jmm.ollir;
 
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.Type;
+import pt.up.fe.comp2023.analysis.table.ImplementedSymbolTable;
+
+import java.util.List;
 
 public class OllirUtils {
 

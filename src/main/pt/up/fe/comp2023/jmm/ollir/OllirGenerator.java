@@ -1,14 +1,18 @@
 package pt.up.fe.comp2023.jmm.ollir;
+import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 import pt.up.fe.comp.jmm.ast.JmmNode;
 import pt.up.fe.comp.jmm.ast.PreorderJmmVisitor;
 import pt.up.fe.comp2023.analysis.table.ImplementedSymbolTable;
 
+import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static pt.up.fe.comp2023.jmm.ollir.OllirUtils.getOllirType;
 
 public class OllirGenerator extends PreorderJmmVisitor<String, String> {
     private final StringBuilder ollirCode;
@@ -32,8 +36,8 @@ public class OllirGenerator extends PreorderJmmVisitor<String, String> {
         //addVisit("ImportDeclaration", this::dealWithImport);
         addVisit("MethodDeclaration", this::dealWithMethodDeclaration);
         addVisit("ClassDeclaration", this::dealWithClassDeclaration);
-        /*addVisit("VarDeclaration", this::dealWithVarDeclaration);
-        addVisit("Parameter",this::dealWithParameters);*/
+        addVisit("VarDeclaration", this::dealWithStatements);
+        //addVisit("Parameter",this::dealWithParameters);*/
 
         setDefaultVisit(this::defaultVisit);
     }
@@ -54,65 +58,55 @@ public class OllirGenerator extends PreorderJmmVisitor<String, String> {
         return "\t".repeat(indentationLevel);
     }
 
-   private String dealWithMethodDeclaration(JmmNode jmmNode, String s) {
-       /*var methodName = "";
-       List<JmmNode> statements;
-
-       boolean isMain = jmmNode.getKind().equals("MainDeclaration");
-
-       if (isMain) {
-           methodName = "main";
-           ollirCode.append(getIndentation()).append(".method public static ").append(methodName).append("(");
-
-           //statements = jmmNode.getJmmChild(0).getChildren();
-
-       } else {
-           // First child of MethodDeclaration is MethodHeader
-           //JmmNode methodHeader = jmmNode.getJmmChild(0);
-           methodName = (String) jmmNode.getObject("methodName");
-
-           ollirCode.append(getIndentation()).append(".method public ").append(methodName).append("(");
-
-           //statements = jmmNode.getJmmChild(1).getChildren();
-       }
-
-       var params = symbolTable.getParameters(methodName);
-
-       System.out.println(params);
-
-       var paramCode = params.stream()
-               .map(OllirUtils::getCode).
-               collect(Collectors.joining(", "));
-
-       ollirCode.append(paramCode).append(")");
-       //ollirCode.append(OllirUtils.getOllirType(symbolTable.getReturnType(methodName)));
-
-       ollirCode.append(" {\n");
-
-       this.incrementIndentation();
-
-       for (var child : statements) {
-           visit(child);
-       }
-
-       // return
-       String returnString, returnReg;
-       if (isMain) {
-           returnString = ".V";
-           returnReg = "";
-       } else {
-           returnString = OllirUtils.getOllirType(symbolTable.getReturnType(methodName)) + " ";
-           System.out.println("linha 105" + symbolTable.getReturnType(methodName));
-           //returnReg = visit(jmmNode.getJmmChild(2).getJmmChild(0), String.valueOf(new OllirInference(returnString, true)));
-       }
-       ollirCode.append(getIndentation()).append("ret").append(returnString).append(";\n");
-
-       this.decrementIndentation();
-
-       ollirCode.append(getIndentation()).append("}\n");*/
-
-       return "";
+    private String dealWithStatements(JmmNode jmmNode, String s){
+        return "";
     }
+
+    private String dealWithMethodDeclaration(JmmNode jmmNode, String s) {
+        var methodName = "";
+        //List<JmmNode> statements;
+
+        boolean isMain = jmmNode.getKind().equals("MainDeclaration");
+
+        ollirCode.append(".method public ");
+        if(jmmNode.getKind().equals("MainDeclaration")){
+            ollirCode.append("static ");
+            methodName = "main";
+        } else{
+            methodName = jmmNode.get("methodName");
+        }
+
+        ollirCode.append(methodName).append("(");
+
+        if(isMain) ollirCode.append("args.array.String");
+
+        var params = symbolTable.getParameters(methodName);
+        if(params.size() != 0) {
+
+            Collections.reverse(params);
+            var paramCode = params.stream()
+                    .map(OllirUtils::getCode).
+                    collect(Collectors.joining(", "));
+
+            System.out.println("linha 84" + params);
+            ollirCode.append(paramCode);
+        }
+        ollirCode.append(")").append(getOllirType(symbolTable.getReturnType(methodName)));
+        ollirCode.append(" {\n");
+
+        for( var statements : symbolTable.getLocalVariables(methodName)){
+
+        }
+        System.out.println(methodName);
+        System.out.println("tem algo dentro:" + symbolTable.getLocalVariables(methodName));
+        if(jmmNode.getKind().equals("MainDeclaration")){
+            ollirCode.append("ret.V;\n");
+        }
+        ollirCode.append("}\n\n");
+
+        return "";
+    }
+
 
 
 
@@ -130,7 +124,7 @@ public class OllirGenerator extends PreorderJmmVisitor<String, String> {
 
         // fields
         for (var field : symbolTable.getFields()) {
-            ollirCode.append(getIndentation()).append(".field ").append(field.getName()).append(OllirUtils.getOllirType(field.getType())).append(";\n");
+            ollirCode.append(getIndentation()).append(".field ").append(field.getName()).append(getOllirType(field.getType())).append(";\n");
         }
         ollirCode.append("\n");
 
@@ -146,8 +140,10 @@ public class OllirGenerator extends PreorderJmmVisitor<String, String> {
             ollirCode.append("\n");
             visit(child);
         }
+        System.out.println(jmmNode.getChildren().subList(symbolTable.getFields().size(), jmmNode.getNumChildren()));
 
         this.decrementIndentation();
+
 
         ollirCode.append(getIndentation()).append("}\n");
         return "";
@@ -156,10 +152,10 @@ public class OllirGenerator extends PreorderJmmVisitor<String, String> {
 
     private String dealWithImport(JmmNode node, String s){
         for(String a : symbolTable.getImports()){
-            s += "import " + a + ";\n";
+            ollirCode.append("import ").append(a).append(";\n");
 
         }
-        return s;
+        return "";
     }
 
     private String defaultVisit(JmmNode jmmNode, String s){
