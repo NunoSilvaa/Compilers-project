@@ -4,6 +4,7 @@ import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.SymbolTable;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 import pt.up.fe.comp.jmm.ast.JmmNode;
+import pt.up.fe.comp.jmm.report.Report;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -70,8 +71,14 @@ public class ImplementedSymbolTable implements SymbolTable {
         return List.copyOf(this.methods.keySet());
     }
 
-    public void addMethod(String name, Type returnType) {
+    public void addMethod(String name, Type returnType, List<Symbol> localVariables, List<Symbol> parameters) {
         this.current = new Method(name);
+        for(Symbol localVariable : localVariables){
+            current.setLocalVariable(localVariable);
+        }
+        for(Symbol parameter: parameters){
+            current.setParameters(parameter);
+        }
         current.setReturnType(returnType);
         this.methods.put(name, current);
     }
@@ -94,4 +101,17 @@ public class ImplementedSymbolTable implements SymbolTable {
     public List<Symbol> getLocalVariables(String s) {
         return this.methods.get(s).getLocalVariables();
     }
+
+    public Type getVariableType(String method, String variable){
+        if(getLocalVariables(method).isEmpty()) {
+            return new Type("impossible", false);
+        }
+        for(Symbol symbol : getLocalVariables(method)){
+            if(symbol.getName().equals(variable)){
+                return symbol.getType();
+            }
+        }
+        return new Type("impossible",false);
+    }
+
 }

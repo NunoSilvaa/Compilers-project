@@ -7,9 +7,11 @@ import pt.up.fe.comp.jmm.parser.JmmParserResult;
 import pt.up.fe.comp.jmm.report.Report;
 import pt.up.fe.comp2023.analysis.table.ImplementedSymbolTable;
 import pt.up.fe.comp2023.analysis.table.SymbolTableVisitor;
+import pt.up.fe.specs.util.collections.SpecsCollection;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Analysis implements JmmAnalysis {
 
@@ -17,11 +19,29 @@ public class Analysis implements JmmAnalysis {
     @Override
     public JmmSemanticsResult semanticAnalysis(JmmParserResult jmmParserResult) {
 
-        List<Report> reports = new ArrayList<>();
+        List<Report> reports = new ArrayList<Report>();
 
         JmmNode node = jmmParserResult.getRootNode();
         SymbolTableVisitor visitor = new SymbolTableVisitor();
-        ImplementedSymbolTable symbolTable = visitor.getSymbolTable(node);
+        AnalysisVisitor analysisVisitor = new AnalysisVisitor();
+        Map<ImplementedSymbolTable, List<Report>> symbolTableAndReports = visitor.getSymbolTableAndReports(node);
+        ImplementedSymbolTable symbolTable = symbolTableAndReports.entrySet().iterator().next().getKey();
+        List<Report> symbolTableReports = symbolTableAndReports.entrySet().iterator().next().getValue();
+        /*ImplementedSymbolTable symbolTable = visitor.getSymbolTable(node);
+        List<Report> symbolTableReports = symbolTable.getReports(node);*/
+        List<Report> analysisReports = analysisVisitor.getReports(node, symbolTable);
+
+        if(symbolTableReports != null && symbolTableReports.size() > 0)
+            reports.addAll(symbolTableReports);
+
+        if(analysisReports != null && analysisReports.size() > 0)
+            reports.addAll(analysisReports);
+
+        System.out.println(reports);
+
+        /*ImplementedSymbolTable symbolTable = new ImplementedSymbolTable();
+
+        List<Report> symbolTableReports = new SymbolTableVisitor().visit(jmmParserResult.getRootNode(), symbolTable);*/
 
 
         return new JmmSemanticsResult(jmmParserResult, symbolTable, reports);

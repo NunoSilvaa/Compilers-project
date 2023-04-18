@@ -47,7 +47,7 @@ type
 
 statement
     : expression ';' #ExpressionStatement
-    | ID '=' expression ';' #Assignment
+    | assignmentName=ID '=' expression ';' #Assignment
     | ID '[' expression ']' '=' expression ';' #BracketsAssignment
     | 'if' '(' expression ')' statement 'else' statement #IfElseStatement
     | 'while' '(' expression ')' statement #While
@@ -72,3 +72,4 @@ expression
     | value=ID #Identifier
     | 'this' #This
     ;
+
