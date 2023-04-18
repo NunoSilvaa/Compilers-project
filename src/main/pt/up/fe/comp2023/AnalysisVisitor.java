@@ -34,6 +34,7 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
     protected void buildVisitor() {
         addVisit("Type", this::visitType);
         addVisit("Identifier", this::visitVariable);
+        addVisit("IfElseStatement", this::visitIfElseStatement);
         //addVisit("Assignment", this::visitAssignment);
         //addVisit("ClassDeclaration", this::visitClassDeclaration);
         //addVisit("ReturnStatement", this::visitReturnStatement);
@@ -102,22 +103,21 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
 
         return s;}
 
-    private String visitAssignment(JmmNode node, String s){
+    private String visitIfElseStatement(JmmNode node, String s){
         JmmNode methodNode = node;
         while (!methodNode.hasAttribute("methodName")){
             methodNode = methodNode.getJmmParent();
         }
-        for(Symbol local : symbolTable.getLocalVariables(methodNode.get("methodName"))){
-
+        if(node.getChildren().get(0).getKind().equals(("Identifier"))){
+            for(Symbol s1 : symbolTable.getLocalVariables(methodNode.get("methodName"))){
+                if(s1.getName().equals(node.getChildren().get(0).get("value"))){
+                    if(!s1.getType().equals(new Type("boolean", false))){
+                        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Condition must be a boolean!"));
+                    }
+                }
+            }
         }
-        Type lhsType = symbolTable.getVariableType(methodNode.get("methodName"), node.getChildren().get(0).get("value"));
-        //Type lhsType = getType(node.getChildren().get(0), "ty");
-        Type rhsType = symbolTable.getVariableType(methodNode.get("methodName"), node.getChildren().get(1).get("value"));
-        //Type rhsType = getType(node.getChildren().get(1), "ty");
-
-        if(!lhsType.equals(rhsType)){
-            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Both operands must be integers!"));
-        }
+        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Condition must be a boolean!"));
         return s;
     }
 
