@@ -107,10 +107,30 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                                     assignmentType = new Type(localVariable.getType().getName(), false);
                             }
                         }
+                        else if(assignmentNode.getKind().equals("Identifier")){
+                            for (Symbol localVariable : method.getLocalVariables()) {
+                                if (localVariable.getName().equals(assignmentName)) {
+                                    var teste2 = assignmentNode.get("value");
+                                    for(Symbol localVariable2 : method.getLocalVariables()){
+                                        if(localVariable2.getName().equals(teste2)){
+                                            var test3 =  localVariable2.getType().getName();
+                                            var tesd = symbolTable.getClassName();
+                                            if(localVariable2.getType().getName().equals(symbolTable.getClassName()) && !localVariable.getType().getName().equals(symbolTable.getSuper()))
+                                                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Class does not extendsuperclass"));
+                                        }
+
+                                    }
+                                    var teste134 = localVariable.getType();
+                                    assignmentType = new Type(localVariable.getType().getName(), false);
+                                }
+                            }
+                        }
                         for(Symbol localVariable : method.getLocalVariables()){
                             if(localVariable.getName().equals(assignmentName)) {
+                                var localVariableType = localVariable.getType();
                                 if (!localVariable.getType().getName().equals(assignmentType.getName()))
                                     reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Assignment type mismatch"));
+
                             }
                         }
                         Symbol assignmentSymbol = new Symbol(assignmentType, assignmentName);

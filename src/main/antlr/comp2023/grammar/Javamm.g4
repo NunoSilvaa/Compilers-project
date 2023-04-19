@@ -67,7 +67,7 @@ expression
     | 'new' ID '(' (expression (',' expression)*)? ')' #NewObject
     | classDeclaration #ClassExpression
     | expression '.' ID  #MemberAccess
-    | expression '.' ID '(' (expression (',' expression)*)? ')' #MethodCall
+    | expression '.' methodCallName=ID '(' (expression (',' expression)*)? ')' #MethodCall
     | value=INTEGER #Integer
     | value=ID #Identifier
     | 'this' #This
