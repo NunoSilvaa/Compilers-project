@@ -71,13 +71,16 @@ public class ImplementedSymbolTable implements SymbolTable {
         return List.copyOf(this.methods.keySet());
     }
 
-    public void addMethod(String name, Type returnType, List<Symbol> localVariables, List<Symbol> parameters) {
+    public void addMethod(String name, Type returnType, List<Symbol> localVariables, List<Symbol> parameters, List<Symbol> assignments){
         this.current = new Method(name);
         for(Symbol localVariable : localVariables){
             current.setLocalVariable(localVariable);
         }
         for(Symbol parameter: parameters){
             current.setParameters(parameter);
+        }
+        for(Symbol assignment: assignments){
+            current.setAssignment(assignment);
         }
         current.setReturnType(returnType);
         this.methods.put(name, current);
@@ -100,6 +103,10 @@ public class ImplementedSymbolTable implements SymbolTable {
     @Override
     public List<Symbol> getLocalVariables(String s) {
         return this.methods.get(s).getLocalVariables();
+    }
+
+    public List<Symbol> getAssignments(String s) {
+        return this.methods.get(s).getAssignments();
     }
 
     public Type getVariableType(String method, String variable){

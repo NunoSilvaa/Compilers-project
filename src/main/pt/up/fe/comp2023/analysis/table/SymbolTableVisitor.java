@@ -68,7 +68,8 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
             this.scope = "MAIN";
             List<Symbol> localVariables = new ArrayList<>();
             List<Symbol> parameters = new ArrayList<>();
-            this.symbolTable.addMethod("main", new Type("void", false), localVariables, parameters);
+            List<Symbol> assignments = new ArrayList<>();
+            this.symbolTable.addMethod("main", new Type("void", false), localVariables, parameters, assignments);
         } else { // MethodDeclaration
             String methodName = (String) jmmNode.getObject("methodName");
             Method method = new Method(methodName);
@@ -91,8 +92,6 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                     Type type = ImplementedSymbolTable.getType(parameterType, "ty");
                     var parameterValue = (String) parameterNode.getObject("parameterName");
 
-                    //var name = this.symbolTable.getCurrentMethod().getName();
-                    //System.out.println("Current " + this.symbolTable.getCurrentMethod().getName());
                     Symbol parameterSymbol = new Symbol(type, parameterValue);
                     method.setParameters(parameterSymbol);
                 } else if(parameterNode.getKind().equals("Assignment")){
@@ -110,17 +109,13 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                         else if(assignmentNode.getKind().equals("Identifier")){
                             for (Symbol localVariable : method.getLocalVariables()) {
                                 if (localVariable.getName().equals(assignmentName)) {
-                                    var teste2 = assignmentNode.get("value");
                                     for(Symbol localVariable2 : method.getLocalVariables()){
-                                        if(localVariable2.getName().equals(teste2)){
-                                            var test3 =  localVariable2.getType().getName();
-                                            var tesd = symbolTable.getClassName();
+                                        if(localVariable2.getName().equals(assignmentNode.get("value"))){
                                             if(localVariable2.getType().getName().equals(symbolTable.getClassName()) && !localVariable.getType().getName().equals(symbolTable.getSuper()))
                                                 reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Class does not extendsuperclass"));
                                         }
 
                                     }
-                                    var teste134 = localVariable.getType();
                                     assignmentType = new Type(localVariable.getType().getName(), false);
                                 }
                             }
@@ -140,7 +135,11 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                     //var assignmentType = ImplementedSymbolTable.getType(parameterNode, "ty");
                 }
             }
-            this.symbolTable.addMethod(methodName, method.getReturnType(), method.getLocalVariables(), method.getParameters());
+            for(Symbol localVariable : method.getLocalVariables()){
+                if(!method.getAssignments().contains(localVariable))
+                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "variable not assigned"));
+            }
+            this.symbolTable.addMethod(methodName, method.getReturnType(), method.getLocalVariables(), method.getParameters(), method.getAssignments());
         }
         System.out.println("Methods" + this.symbolTable.getMethods());
         return s + "METHOD_DECLARATION";

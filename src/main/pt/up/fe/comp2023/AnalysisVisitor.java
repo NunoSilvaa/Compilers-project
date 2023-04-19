@@ -39,6 +39,7 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
         addVisit("IfElseStatement", this::visitIfElseStatement);
         addVisit("ArrayAccessChain", this::visitArrayAccessChain);
         addVisit("MethodCall", this::visitMethodCall);
+        addVisit("LocalVarsAndAssignment", this::visitLocalVarsAndAssignment);
         //addVisit("Assignment", this::visitAssignment);
         //addVisit("ClassDeclaration", this::visitClassDeclaration);
         //addVisit("ReturnStatement", this::visitReturnStatement);
@@ -154,7 +155,7 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
         for(Symbol localVariable : symbolTable.getLocalVariables(methodNode.get("methodName"))) {
             if(localVariable.getName().equals(node.getChildren().get(0).get("value"))){
                 if(!localVariable.getType().isArray()){
-                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Variable is not an array!"));
+                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colStart")), "Variable is not an array!"));
                 }
             }
         }
@@ -164,27 +165,26 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
         return s;
     }
 
-    public String visitMethodCall(JmmNode node, String s){
+    public String visitMethodCall(JmmNode node, String s) {
         JmmNode methodNode = node;
-        while (!methodNode.hasAttribute("methodName")){
+        while (!methodNode.hasAttribute("methodName")) {
             methodNode = methodNode.getJmmParent();
         }
         List<String> methodsss = symbolTable.getMethods();
-        if(!symbolTable.getMethods().contains(node.get("methodCallName"))){
+        if (!symbolTable.getMethods().contains(node.get("methodCallName"))) {
             var varValue = node.getChildren().get(0).get("value");
             var varKind = node.getChildren().get(0).getKind();
-            for(Symbol localVariable : symbolTable.getLocalVariables(methodNode.get("methodName"))){
-                if(localVariable.getName().equals(node.getChildren().get(0).get("value"))){
+            for (Symbol localVariable : symbolTable.getLocalVariables(methodNode.get("methodName"))) {
+                if (localVariable.getName().equals(node.getChildren().get(0).get("value"))) {
                     var localVariableTypeName = localVariable.getType().getName();
                     var teste2 = node.getChildren().get(0).get("value");
                     var teste3 = symbolTable.getClassName();
                     var teste4 = symbolTable.getSuper();
-                    if(symbolTable.getImports().contains(localVariableTypeName)){
+                    if (symbolTable.getImports().contains(localVariableTypeName)) {
                         break;
-                    }
-                    else if(symbolTable.getSuper() != null && symbolTable.getClassName().equals(localVariable.getType().getName()))
+                    } else if (symbolTable.getSuper() != null && symbolTable.getClassName().equals(localVariable.getType().getName()))
                         break;
-                    else{
+                    else {
                         reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Method not declared!"));
                     }
                     //symbolTable.getImports();
@@ -194,6 +194,15 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
             }
             //if(node.getChildren().get(0).get("value"))
             //reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Method not declared!"));
+        }
+        return s;
+    }
+
+    public String visitLocalVarsAndAssignment(JmmNode node, String s){
+        for(Symbol localVariable : symbolTable.getLocalVariables(node.get("methodName"))){
+            var teste = symbolTable.getAssignments(node.get("methodName"));
+            var teste2 = localVariable.getName();
+            var teste3= 2;
         }
         return s;
     }
