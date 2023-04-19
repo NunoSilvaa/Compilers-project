@@ -155,7 +155,7 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
         for(Symbol localVariable : symbolTable.getLocalVariables(methodNode.get("methodName"))) {
             if(localVariable.getName().equals(node.getChildren().get(0).get("value"))){
                 if(!localVariable.getType().isArray()){
-                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colStart")), "Variable is not an array!"));
+                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Variable is not an array!"));
                 }
             }
         }
