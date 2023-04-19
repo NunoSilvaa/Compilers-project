@@ -39,7 +39,8 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
         addVisit("IfElseStatement", this::visitIfElseStatement);
         addVisit("ArrayAccessChain", this::visitArrayAccessChain);
         addVisit("MethodCall", this::visitMethodCall);
-        addVisit("LocalVarsAndAssignment", this::visitLocalVarsAndAssignment);
+        addVisit("While", this::visitWhileStatement);
+        //addVisit("LocalVarsAndAssignment", this::visitLocalVarsAndAssignment);
         //addVisit("Assignment", this::visitAssignment);
         //addVisit("ClassDeclaration", this::visitClassDeclaration);
         //addVisit("ReturnStatement", this::visitReturnStatement);
@@ -91,7 +92,7 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
         //Type rhsType = getType(node.getChildren().get(1), "ty");
 
         if(!lhsType.equals(rhsType)){
-            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Both operands must be integers!"));
+            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Both operands must be integers!"));
         }
         return s;
     }
@@ -114,11 +115,11 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
         //var teste4 = node.getJmmParent().get("assignmentName");
         if(node.getJmmParent().getKind().equals("Assignment")){
             if (!localVariableNames.contains(node.getJmmParent().get("assignmentName"))) {
-                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Variable not declared!"));
+                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Variable not declared!"));
             }
         }else {
             if(!localVariableNames.contains(node.get("value"))){
-                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Variable not declared!"));
+                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Variable not declared!"));
             }
         }
 
@@ -137,7 +138,7 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
             for(Symbol s1 : symbolTable.getLocalVariables(methodNode.get("methodName"))){
                 if(s1.getName().equals(node.getChildren().get(0).get("value"))){
                     if(!s1.getType().equals(new Type("boolean", false))){
-                        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Condition must be a boolean!"));
+                        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Condition must be a boolean!"));
                     }
                 }
             }
@@ -156,6 +157,11 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
             if(localVariable.getName().equals(node.getChildren().get(0).get("value"))){
                 if(!localVariable.getType().isArray()){
                     reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Variable is not an array!"));
+                }
+                else{
+                    if(!node.getChildren().get(1).getKind().equals("Integer")){
+                        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Index must be an integer!"));
+                    }
                 }
             }
         }
@@ -185,7 +191,7 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
                     } else if (symbolTable.getSuper() != null && symbolTable.getClassName().equals(localVariable.getType().getName()))
                         break;
                     else {
-                        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Method not declared!"));
+                        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Method not declared!"));
                     }
                     //symbolTable.getImports();
                     //var teste = 1;
@@ -194,6 +200,23 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
             }
             //if(node.getChildren().get(0).get("value"))
             //reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Method not declared!"));
+        }
+        return s;
+    }
+
+    public String visitWhileStatement(JmmNode node, String s){
+        JmmNode methodNode = node;
+        while (!methodNode.hasAttribute("methodName")){
+            methodNode = methodNode.getJmmParent();
+        }
+        if(node.getChildren().get(0).getKind().equals(("Identifier"))){
+            for(Symbol s1 : symbolTable.getLocalVariables(methodNode.get("methodName"))){
+                if(s1.getName().equals(node.getChildren().get(0).get("value"))){
+                    if(!s1.getType().equals(new Type("boolean", false))){
+                        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Condition must be a boolean!"));
+                    }
+                }
+            }
         }
         return s;
     }
