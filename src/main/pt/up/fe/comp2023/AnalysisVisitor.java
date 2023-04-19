@@ -35,6 +35,7 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
         addVisit("Type", this::visitType);
         addVisit("Identifier", this::visitVariable);
         addVisit("IfElseStatement", this::visitIfElseStatement);
+        addVisit("ArrayAccessChain", this::visitArrayAccessChain);
         //addVisit("Assignment", this::visitAssignment);
         //addVisit("ClassDeclaration", this::visitClassDeclaration);
         //addVisit("ReturnStatement", this::visitReturnStatement);
@@ -92,14 +93,34 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
     }
 
     private String visitVariable(JmmNode node, String s){
+        List<String> localVariableNames = new ArrayList<>();
         JmmNode methodNode = node;
         while (!methodNode.hasAttribute("methodName")){
             methodNode = methodNode.getJmmParent();
         }
+        List<Symbol> teste = symbolTable.getLocalVariables(methodNode.get("methodName"));
+        //var teste2 = node.getJmmParent().get("assignmentName");
 
-        if(!symbolTable.getLocalVariables(methodNode.get("methodName")).contains(node.get("value"))){
-            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Variable not declared!"));
+        for(Symbol localVariable : symbolTable.getLocalVariables(methodNode.get("methodName"))) {
+            var teste3 = localVariable.getName();
+            localVariableNames.add(localVariable.getName());
         }
+        var teste2 = node.get("value");
+        var teste4 = node.getKind();
+        //var teste4 = node.getJmmParent().get("assignmentName");
+        if(node.getJmmParent().getKind().equals("Assignment")){
+            if (!localVariableNames.contains(node.getJmmParent().get("assignmentName"))) {
+                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Variable not declared!"));
+            }
+        }else {
+            if(!localVariableNames.contains(node.get("value"))){
+                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Variable not declared!"));
+            }
+        }
+
+        /*if(!symbolTable.getLocalVariables(methodNode.get("methodName")).contains(node.getJmmParent().get("assignmentName"))){
+            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Variable not declared!"));
+        }*/
 
         return s;}
 
@@ -118,6 +139,25 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
             }
         }
         reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Condition must be a boolean!"));
+        return s;
+    }
+
+    public String visitArrayAccessChain(JmmNode node, String s){
+        JmmNode methodNode = node;
+        while (!methodNode.hasAttribute("methodName")){
+            methodNode = methodNode.getJmmParent();
+        }
+
+        for(Symbol localVariable : symbolTable.getLocalVariables(methodNode.get("methodName"))) {
+            if(localVariable.getName().equals(node.getChildren().get(0).get("value"))){
+                if(!localVariable.getType().isArray()){
+                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Variable is not an array!"));
+                }
+            }
+        }
+        /*if(symbolTable.getLocalVariables("methodName").contains(node.getChildren().get(0).get("value"))){
+            sy
+        }*/
         return s;
     }
 

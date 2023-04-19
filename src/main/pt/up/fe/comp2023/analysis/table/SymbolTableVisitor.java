@@ -101,10 +101,17 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                         var assignmentName = (String) parameterNode.getObject("assignmentName");
                         if(assignmentNode.getKind().equals("Integer"))
                             assignmentType = new Type("int", false);
+                        else if(assignmentNode.getKind().equals("NewObject")) {
+                            for (Symbol localVariable : method.getLocalVariables()) {
+                                if (localVariable.getName().equals(assignmentName))
+                                    assignmentType = new Type(localVariable.getType().getName(), false);
+                            }
+                        }
                         for(Symbol localVariable : method.getLocalVariables()){
-                            if(localVariable.getName().equals(assignmentName))
-                                if(!localVariable.getType().getName().equals(assignmentType.getName()))
+                            if(localVariable.getName().equals(assignmentName)) {
+                                if (!localVariable.getType().getName().equals(assignmentType.getName()))
                                     reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Assignment type mismatch"));
+                            }
                         }
                         Symbol assignmentSymbol = new Symbol(assignmentType, assignmentName);
                         method.setAssignment(assignmentSymbol);
