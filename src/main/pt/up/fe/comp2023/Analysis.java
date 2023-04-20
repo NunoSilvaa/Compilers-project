@@ -10,6 +10,7 @@ import pt.up.fe.comp2023.analysis.table.SymbolTableVisitor;
 import pt.up.fe.specs.util.collections.SpecsCollection;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -43,7 +44,8 @@ public class Analysis implements JmmAnalysis {
 
         List<Report> symbolTableReports = new SymbolTableVisitor().visit(jmmParserResult.getRootNode(), symbolTable);*/
 
-
+        if(reports.isEmpty())
+            return new JmmSemanticsResult(jmmParserResult, symbolTable, Collections.emptyList());
         return new JmmSemanticsResult(jmmParserResult, symbolTable, reports);
     }
 }
