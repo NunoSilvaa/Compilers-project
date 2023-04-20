@@ -53,24 +53,23 @@ public class Launcher {
 
         /* ollir ollir = new ollir();
 
-        if (config.get("optimize") != null && config.get("optimize").equals("true")) {
-            semanticsResult = ollir.optimize(semanticsResult);
-        }
+        semanticsResult = ollir.optimize(semanticsResult);
+
         TestUtils.noErrors(semanticsResult);
 
         OllirResult ollirResult = ollir.toOllir(semanticsResult);
         TestUtils.noErrors(ollirResult);
 
-        if (config.get("registerAllocation") != null) {
-            ollirResult = ollir.optimize(ollirResult);
-        }
+        ollirResult = ollir.optimize(ollirResult);
+
         TestUtils.noErrors(ollirResult);
 
         ImplementedJasminBackend implementedJasminBackend = new ImplementedJasminBackend();
         JasminResult jasminResult = implementedJasminBackend.toJasmin(ollirResult);
-
+        jasminResult.compile();
+        System.out.println("Execute code: \n");
+        jasminResult.run();
         TestUtils.noErrors(jasminResult);
-
          */
     }
 
