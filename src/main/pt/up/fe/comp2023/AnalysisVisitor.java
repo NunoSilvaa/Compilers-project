@@ -160,7 +160,13 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
                 }
                 else{
                     if(!node.getChildren().get(1).getKind().equals("Integer")){
-                        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Index must be an integer!"));
+                        for(Symbol localVariable2 : symbolTable.getLocalVariables(methodNode.get("methodName"))){
+                            if(localVariable2.getName().equals(node.getChildren().get(1).get("value"))){
+                                if(!localVariable2.getType().equals(new Type("int", false))){
+                                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Index must be an integer!"));
+                                }
+                            }
+                        }
                     }
                 }
             }
