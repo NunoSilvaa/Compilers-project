@@ -100,7 +100,7 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                         for(JmmNode assignmentNode : parameterNode.getChildren()){
                             Type assignmentType = new Type("boolean", false);
                             var assignmentName = (String) parameterNode.getObject("assignmentName");
-                            if(assignmentNode.getKind().equals("Integer") || assignmentNode.getKind().equals("BinaryOp"))
+                            if(assignmentNode.getKind().equals("Integer"))
                                 assignmentType = new Type("int", false);
                             else if(assignmentNode.getKind().equals("NewObject")) {
                                 for (Symbol localVariable : method.getLocalVariables()) {
@@ -127,6 +127,14 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                                         }
                                         assignmentType = new Type(localVariable.getType().getName(), false);
                                     }
+                                }
+                            }
+                            else if(assignmentNode.getKind().equals(("BinaryOp"))){
+                                if(assignmentNode.get("op").equals("&&") || assignmentNode.get("op").equals("||")){
+                                    assignmentType = new Type("boolean", false);
+                                }
+                                else{
+                                    assignmentType = new Type("int", false);
                                 }
                             }
                             for(Symbol localVariable : method.getLocalVariables()){
