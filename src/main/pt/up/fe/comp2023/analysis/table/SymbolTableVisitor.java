@@ -122,10 +122,13 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                                             if(localVariable2.getName().equals(assignmentNode.get("value"))){
                                                 if(localVariable2.getType().getName().equals(symbolTable.getClassName()) && !localVariable.getType().getName().equals(symbolTable.getSuper()))
                                                     reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(assignmentNode.get("lineStart")), Integer.parseInt(assignmentNode.get("colEnd")), "Class does not extendsuperclass"));
+                                                /*else if(!localVariable2.getType().getName().equals(localVariable.getType().getName())){
+                                                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(assignmentNode.get("lineStart")), Integer.parseInt(assignmentNode.get("colEnd")), "Assignment type mismatch"));
+                                                }*/
                                             }
-
+                                            assignmentType = new Type(localVariable2.getType().getName(), false);
                                         }
-                                        assignmentType = new Type(localVariable.getType().getName(), false);
+                                        //assignmentType = new Type(localVariable.getType().getName(), false);
                                     }
                                 }
                             }
@@ -157,7 +160,12 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                     var methodAssignments = method.getAssignments();
                 /*if(localVariable.getType().isArray() && !method.getAssignments().contains(localVariable))
                     reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Assignment is not an array!"));*/
-                    if(!method.getAssignments().contains(localVariable))
+                    List<String> assignmentNames = new ArrayList<>();
+                    for(Symbol assignment : method.getAssignments()){
+                        assignmentNames.add(assignment.getName());
+                    }
+
+                    if(!assignmentNames.contains(localVariable.getName()))
                         reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "variable not assigned"));
                 }
                 this.symbolTable.addMethod("main", new Type("void", false), method.getLocalVariables(), method.getParameters(), method.getAssignments());
