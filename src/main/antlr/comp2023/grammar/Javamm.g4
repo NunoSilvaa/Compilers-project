@@ -48,7 +48,7 @@ type
 statement
     : expression ';' #ExpressionStatement
     | assignmentName=ID '=' expression ';' #Assignment
-    | ID '[' expression ']' '=' expression ';' #BracketsAssignment
+    | bracketsAssignmentName = ID '[' expression ']' '=' expression ';' #BracketsAssignment
     | 'if' '(' expression ')' statement 'else' statement #IfElseStatement
     | 'while' '(' expression ')' statement #While
     | '{' ( statement )* '}' #CurlyBracesStatement

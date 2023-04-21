@@ -35,6 +35,7 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
     @Override
     protected void buildVisitor() {
         addVisit("Type", this::visitType);
+        addVisit("BracketsAssignment", this::visitBracketsAssignment);
         addVisit("Identifier", this::visitVariable);
         addVisit("IfElseStatement", this::visitIfElseStatement);
         addVisit("ArrayAccessChain", this::visitArrayAccessChain);
@@ -80,15 +81,30 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
     }
 
     private String visitBinaryOp(JmmNode node, String s){
-        node.getChildren().get(0);
+        List<String> localVariableNames = new ArrayList<>();
         JmmNode methodNode = node;
-        while (!methodNode.hasAttribute("methodName")){
+        var methodNodeName =  "";
+        while (!methodNode.hasAttribute("methodName") && (!methodNode.getKind().equals("MainDeclaration"))){
+            var teste = methodNode.getKind().equals("MainDeclaration");
             methodNode = methodNode.getJmmParent();
         }
-        Type lhsType = symbolTable.getVariableType(methodNode.get("methodName"), node.getChildren().get(0).get("value"));
+        //List<Symbol> teste = symbolTable.getLocalVariables(methodNode.get("methodName"));
+        if(methodNode.getKind().equals("MainDeclaration")){
+            methodNodeName = "main";
+        }
+        else{
+            methodNodeName = methodNode.get("methodName");
+        }
+        if(node.getChildren().get(1).getKind().equals("ArrayAccessChain")){
+            var t1 = symbolTable.getAssignments(methodNodeName);
+            for(Symbol assignment : symbolTable.getAssignments(methodNodeName)){
+                var t = 1;
+            }
+        }
+        Type lhsType = symbolTable.getVariableType(methodNodeName, node.getChildren().get(0).get("value"));
         //Type lhsType = getType(node.getChildren().get(0), "ty");
         //Type lhsType = getType(node.getChildren().get(0), "ty");
-        Type rhsType = symbolTable.getVariableType(methodNode.get("methodName"), node.getChildren().get(1).get("value"));
+        Type rhsType = symbolTable.getVariableType(methodNodeName, node.getChildren().get(1).get("value"));
         //Type rhsType = getType(node.getChildren().get(1), "ty");
 
         if(!lhsType.equals(rhsType)){
@@ -100,13 +116,21 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
     private String visitVariable(JmmNode node, String s){
         List<String> localVariableNames = new ArrayList<>();
         JmmNode methodNode = node;
-        while (!methodNode.hasAttribute("methodName")){
+        var methodNodeName =  "";
+        while (!methodNode.hasAttribute("methodName") && (!methodNode.getKind().equals("MainDeclaration"))){
+            var teste = methodNode.getKind().equals("MainDeclaration");
             methodNode = methodNode.getJmmParent();
         }
-        List<Symbol> teste = symbolTable.getLocalVariables(methodNode.get("methodName"));
+        //List<Symbol> teste = symbolTable.getLocalVariables(methodNode.get("methodName"));
+        if(methodNode.getKind().equals("MainDeclaration")){
+            methodNodeName = "main";
+        }
+        else{
+            methodNodeName = methodNode.get("methodName");
+        }
         //var teste2 = node.getJmmParent().get("assignmentName");
 
-        for(Symbol localVariable : symbolTable.getLocalVariables(methodNode.get("methodName"))) {
+        for(Symbol localVariable : symbolTable.getLocalVariables(methodNodeName)) {
             var teste3 = localVariable.getName();
             localVariableNames.add(localVariable.getName());
         }
@@ -130,9 +154,19 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
         return s;}
 
     private String visitIfElseStatement(JmmNode node, String s){
+        List<String> localVariableNames = new ArrayList<>();
         JmmNode methodNode = node;
-        while (!methodNode.hasAttribute("methodName")){
+        var methodNodeName =  "";
+        while (!methodNode.hasAttribute("methodName") && (!methodNode.getKind().equals("MainDeclaration"))){
+            var teste = methodNode.getKind().equals("MainDeclaration");
             methodNode = methodNode.getJmmParent();
+        }
+        //List<Symbol> teste = symbolTable.getLocalVariables(methodNode.get("methodName"));
+        if(methodNode.getKind().equals("MainDeclaration")){
+            methodNodeName = "main";
+        }
+        else{
+            methodNodeName = methodNode.get("methodName");
         }
         if(node.getChildren().get(0).getKind().equals(("Identifier"))){
             for(Symbol s1 : symbolTable.getLocalVariables(methodNode.get("methodName"))){
@@ -148,9 +182,19 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
     }
 
     public String visitArrayAccessChain(JmmNode node, String s){
+        List<String> localVariableNames = new ArrayList<>();
         JmmNode methodNode = node;
-        while (!methodNode.hasAttribute("methodName")){
+        var methodNodeName =  "";
+        while (!methodNode.hasAttribute("methodName") && (!methodNode.getKind().equals("MainDeclaration"))){
+            var teste = methodNode.getKind().equals("MainDeclaration");
             methodNode = methodNode.getJmmParent();
+        }
+        //List<Symbol> teste = symbolTable.getLocalVariables(methodNode.get("methodName"));
+        if(methodNode.getKind().equals("MainDeclaration")){
+            methodNodeName = "main";
+        }
+        else{
+            methodNodeName = methodNode.get("methodName");
         }
 
         for(Symbol localVariable : symbolTable.getLocalVariables(methodNode.get("methodName"))) {
@@ -178,9 +222,19 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
     }
 
     public String visitMethodCall(JmmNode node, String s) {
+        List<String> localVariableNames = new ArrayList<>();
         JmmNode methodNode = node;
-        while (!methodNode.hasAttribute("methodName")) {
+        var methodNodeName =  "";
+        while (!methodNode.hasAttribute("methodName") && (!methodNode.getKind().equals("MainDeclaration"))){
+            var teste = methodNode.getKind().equals("MainDeclaration");
             methodNode = methodNode.getJmmParent();
+        }
+        //List<Symbol> teste = symbolTable.getLocalVariables(methodNode.get("methodName"));
+        if(methodNode.getKind().equals("MainDeclaration")){
+            methodNodeName = "main";
+        }
+        else{
+            methodNodeName = methodNode.get("methodName");
         }
         List<String> methodsss = symbolTable.getMethods();
         if (!symbolTable.getMethods().contains(node.get("methodCallName"))) {
@@ -211,9 +265,19 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
     }
 
     public String visitWhileStatement(JmmNode node, String s){
+        List<String> localVariableNames = new ArrayList<>();
         JmmNode methodNode = node;
-        while (!methodNode.hasAttribute("methodName")){
+        var methodNodeName =  "";
+        while (!methodNode.hasAttribute("methodName") && (!methodNode.getKind().equals("MainDeclaration"))){
+            var teste = methodNode.getKind().equals("MainDeclaration");
             methodNode = methodNode.getJmmParent();
+        }
+        //List<Symbol> teste = symbolTable.getLocalVariables(methodNode.get("methodName"));
+        if(methodNode.getKind().equals("MainDeclaration")){
+            methodNodeName = "main";
+        }
+        else{
+            methodNodeName = methodNode.get("methodName");
         }
         if(node.getChildren().get(0).getKind().equals(("Identifier"))){
             for(Symbol s1 : symbolTable.getLocalVariables(methodNode.get("methodName"))){
@@ -224,6 +288,42 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
                 }
             }
         }
+        return s;
+    }
+
+    public String visitBracketsAssignment(JmmNode node, String s){
+        List<String> localVariableNames = new ArrayList<>();
+        JmmNode methodNode = node;
+        var methodNodeName =  "";
+        while (!methodNode.hasAttribute("methodName") && (!methodNode.getKind().equals("MainDeclaration"))){
+            var teste = methodNode.getKind().equals("MainDeclaration");
+            methodNode = methodNode.getJmmParent();
+        }
+        //List<Symbol> teste = symbolTable.getLocalVariables(methodNode.get("methodName"));
+        if(methodNode.getKind().equals("MainDeclaration")){
+            methodNodeName = "main";
+        }
+        else{
+            methodNodeName = methodNode.get("methodName");
+        }
+
+        if(node.getChildren().get(0).getKind().equals("Integer")){
+            return s;
+        } else if (node.getChildren().get(0).getKind().equals("Identifier")) {
+            if(node.getChildren().get(0).get("value").equals("true") || node.getChildren().get(0).get("value").equals("false")){
+                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Index must be an integer!"));
+            } else {
+                for (Symbol localVariable : symbolTable.getLocalVariables(methodNodeName)) {
+                    if (localVariable.getName().equals(node.getChildren().get(0).get("value"))) {
+                        if (!localVariable.getType().equals(new Type("int", false))) {
+                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Index must be an integer!"));
+                        }
+                    }
+                }
+            }
+
+        }
+
         return s;
     }
 

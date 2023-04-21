@@ -6,10 +6,10 @@ class ArrayIndexNotInt {
 
     public int foo() {
         int[] a;
-        int b;
+        boolean b;
 
         a = new int[2];
-        b = 1;
+        b = true;
 
         return a[b];
     }

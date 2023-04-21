@@ -44,8 +44,8 @@ public class Analysis implements JmmAnalysis {
 
         List<Report> symbolTableReports = new SymbolTableVisitor().visit(jmmParserResult.getRootNode(), symbolTable);*/
 
-        if(reports.isEmpty())
-            return new JmmSemanticsResult(jmmParserResult, symbolTable, Collections.emptyList());
+        /*if(reports.isEmpty())
+            return new JmmSemanticsResult(jmmParserResult, symbolTable, Collections.emptyList());*/
         return new JmmSemanticsResult(jmmParserResult, symbolTable, reports);
     }
 }
