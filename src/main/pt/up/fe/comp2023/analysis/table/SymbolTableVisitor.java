@@ -127,9 +127,7 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                                                 }*/
                                                 assignmentType = new Type(localVariable2.getType().getName(), false);
                                             }
-                                            //assignmentType = new Type(localVariable2.getType().getName(), false);
                                         }
-                                        //assignmentType = new Type(localVariable.getType().getName(), false);
                                     }
                                 }
                             }
