@@ -118,15 +118,16 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                             else if(assignmentNode.getKind().equals("Identifier")){
                                 for (Symbol localVariable : method.getLocalVariables()) {
                                     if (localVariable.getName().equals(assignmentName)) {
-                                        for(Symbol localVariable2 : method.getLocalVariables()){
-                                            if(localVariable2.getName().equals(assignmentNode.get("value"))){
-                                                if(localVariable2.getType().getName().equals(symbolTable.getClassName()) && !localVariable.getType().getName().equals(symbolTable.getSuper()))
+                                        for(Symbol localVariable2 : method.getLocalVariables()) {
+                                            if (localVariable2.getName().equals(assignmentNode.get("value"))) {
+                                                if (localVariable2.getType().getName().equals(symbolTable.getClassName()) && !localVariable.getType().getName().equals(symbolTable.getSuper()))
                                                     reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(assignmentNode.get("lineStart")), Integer.parseInt(assignmentNode.get("colEnd")), "Class does not extendsuperclass"));
                                                 /*else if(!localVariable2.getType().getName().equals(localVariable.getType().getName())){
                                                     reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(assignmentNode.get("lineStart")), Integer.parseInt(assignmentNode.get("colEnd")), "Assignment type mismatch"));
                                                 }*/
+                                                assignmentType = new Type(localVariable2.getType().getName(), false);
                                             }
-                                            assignmentType = new Type(localVariable2.getType().getName(), false);
+                                            //assignmentType = new Type(localVariable2.getType().getName(), false);
                                         }
                                         //assignmentType = new Type(localVariable.getType().getName(), false);
                                     }
