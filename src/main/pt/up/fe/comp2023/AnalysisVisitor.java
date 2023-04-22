@@ -159,12 +159,12 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
             rhsType = new Type("int", false);
         }else if(node.getChildren().get(1).getKind().equals("Identifier")){
             if(node.getChildren().get(1).get("value").equals("true") || node.getChildren().get(1).get("value").equals("false")){
-                lhsType = new Type("boolean", false);
+                rhsType = new Type("boolean", false);
             }
             else{
                 for(Symbol assignment : symbolTable.getAssignments(methodNodeName)){
                     if(assignment.getName().equals(node.getChildren().get(1).get("value"))){
-                        lhsType = assignment.getType();
+                        rhsType = assignment.getType();
                         var t = 1;
                     }
                 }
