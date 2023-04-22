@@ -91,7 +91,8 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
 
                         Symbol parameterSymbol = new Symbol(type, parameterValue);
                         method.setParameters(parameterSymbol);
-                    } else if(parameterNode.getKind().equals("Assignment")){
+                    }
+                    else if(parameterNode.getKind().equals("Assignment")){
                         for(JmmNode assignmentNode : parameterNode.getChildren()){
                             Type assignmentType = new Type("boolean", false);
                             var assignmentName = (String) parameterNode.getObject("assignmentName");

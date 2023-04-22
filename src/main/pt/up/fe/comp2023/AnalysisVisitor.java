@@ -41,6 +41,7 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
         addVisit("ArrayAccessChain", this::visitArrayAccessChain);
         addVisit("MethodCall", this::visitMethodCall);
         addVisit("While", this::visitWhileStatement);
+        addVisit("ExpressionStatement", this::visitExpressionStatement);
         //addVisit("LocalVarsAndAssignment", this::visitLocalVarsAndAssignment);
         //addVisit("Assignment", this::visitAssignment);
         //addVisit("ClassDeclaration", this::visitClassDeclaration);
@@ -413,6 +414,35 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
 
         }*/
 
+        return s;
+    }
+
+    public String visitExpressionStatement(JmmNode node, String s){
+        List<String> localVariableNames = new ArrayList<>();
+        JmmNode methodNode = node;
+        var methodNodeName =  "";
+        while (!methodNode.hasAttribute("methodName") && (!methodNode.getKind().equals("MainDeclaration"))){
+            var teste = methodNode.getKind().equals("MainDeclaration");
+            methodNode = methodNode.getJmmParent();
+        }
+        //List<Symbol> teste = symbolTable.getLocalVariables(methodNode.get("methodName"));
+        if(methodNode.getKind().equals("MainDeclaration")){
+            methodNodeName = "main";
+        }
+        else{
+            methodNodeName = methodNode.get("methodName");
+        }
+        if(methodNodeName.equals("main")){
+            if(node.getChildren().get(0).getKind().equals("MethodCall")){
+                if(node.getChildren().get(0).getChildren().get(0).getKind().equals("This"))
+                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "This cannot be used in the Main method"));
+            }
+            else if(node.getChildren().get(0).getKind().equals("MemberAccess")){
+                if(node.getChildren().get(0).getChildren().get(0).getKind().equals("This")) {
+                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "This cannot be used in the Main method"));
+                }
+            }
+        }
         return s;
     }
 
