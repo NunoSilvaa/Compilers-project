@@ -246,7 +246,7 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
             methodNodeName = methodNode.get("methodName");
         }
         if(node.getChildren().get(0).getKind().equals(("Identifier"))){
-            for(Symbol s1 : symbolTable.getLocalVariables(methodNode.get("methodName"))){
+            for(Symbol s1 : symbolTable.getLocalVariables(methodNodeName)){
                 if(s1.getName().equals(node.getChildren().get(0).get("value"))){
                     if(!s1.getType().equals(new Type("boolean", false))){
                         reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Condition must be a boolean!"));

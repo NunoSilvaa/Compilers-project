@@ -76,12 +76,7 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
             else{
                 Method method = new Method("main");
                 for (JmmNode parameterNode : jmmNode.getChildren()) {
-                    if (parameterNode.getKind().equals("RetType")) {
-                        Type retType = ImplementedSymbolTable.getType(parameterNode.getChildren().get(0), "ty");
-                        method.setReturnType(retType);
-                    } else if (parameterNode.getKind().equals("RetExpr")) {
-                        continue; // ignore
-                    } else if (parameterNode.getKind().equals("LocalVariables")) {
+                    if (parameterNode.getKind().equals("LocalVariables")) {
                         for (JmmNode localVariable : parameterNode.getChildren()) {
                             Type variableType = ImplementedSymbolTable.getType(localVariable, "ty");
                             String variableName = (String) parameterNode.getObject("varName");
@@ -142,8 +137,13 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                             for(Symbol localVariable : method.getLocalVariables()){
                                 if(localVariable.getName().equals(assignmentName)) {
                                     var localVariableType = localVariable.getType();
-                                    if (!localVariable.getType().getName().equals(assignmentType.getName()))
-                                        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(assignmentNode.get("lineStart")), Integer.parseInt(assignmentNode.get("colEnd")), "Assignment type mismatch"));
+                                    if (!localVariable.getType().getName().equals(assignmentType.getName())){
+                                        if (symbolTable.getImports().contains(localVariable.getType().getName()) || (assignmentType.getName().equals(symbolTable.getClassName()) && localVariable.getType().getName().equals(symbolTable.getSuper())))
+                                            continue;
+                                        else
+                                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(assignmentNode.get("lineStart")), Integer.parseInt(assignmentNode.get("colEnd")), "Assignment type mismatch"));
+                                    }
+                                        //reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(assignmentNode.get("lineStart")), Integer.parseInt(assignmentNode.get("colEnd")), "Assignment type mismatch"));
 
                                 }
                             }
@@ -178,7 +178,95 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                     method.setReturnType(retType);
                 } else if (parameterNode.getKind().equals("RetExpr")) {
                     continue; // ignore
-                } else if (parameterNode.getKind().equals("LocalVariables")) {
+                }else if (parameterNode.getKind().equals("LocalVariables")) {
+                        for (JmmNode localVariable : parameterNode.getChildren()) {
+                            Type variableType = ImplementedSymbolTable.getType(localVariable, "ty");
+                            String variableName = (String) parameterNode.getObject("varName");
+                            Symbol variableSymbol = new Symbol(variableType, variableName);
+                            method.setLocalVariable(variableSymbol);
+                        }
+                    } else if(parameterNode.getKind().equals("Parameter")){
+                        var parameterType = parameterNode.getChildren().get(0);
+
+                        Type type = ImplementedSymbolTable.getType(parameterType, "ty");
+                        var parameterValue = (String) parameterNode.getObject("parameterName");
+
+                        Symbol parameterSymbol = new Symbol(type, parameterValue);
+                        method.setParameters(parameterSymbol);
+                    } else if(parameterNode.getKind().equals("Assignment")){
+                        for(JmmNode assignmentNode : parameterNode.getChildren()){
+                            Type assignmentType = new Type("boolean", false);
+                            var assignmentName = (String) parameterNode.getObject("assignmentName");
+                            if(assignmentNode.getKind().equals("Integer"))
+                                assignmentType = new Type("int", false);
+                            else if(assignmentNode.getKind().equals("NewObject")) {
+                                for (Symbol localVariable : method.getLocalVariables()) {
+                                    if (localVariable.getName().equals(assignmentName))
+                                        assignmentType = new Type(localVariable.getType().getName(), false);
+                                }
+                            }
+                            else if(assignmentNode.getKind().equals("NewArray")){
+                                for(Symbol localVariable : method.getLocalVariables()){
+                                    if(localVariable.getName().equals(assignmentName))
+                                        assignmentType = new Type(localVariable.getType().getName(), true);
+                                }
+                                assignmentType = new Type("int", true);
+                            }
+                            else if(assignmentNode.getKind().equals("Identifier")){
+                                for (Symbol localVariable : method.getLocalVariables()) {
+                                    if (localVariable.getName().equals(assignmentName)) {
+                                        for(Symbol localVariable2 : method.getLocalVariables()) {
+                                            if (localVariable2.getName().equals(assignmentNode.get("value"))) {
+                                                if (localVariable2.getType().getName().equals(symbolTable.getClassName()) && !localVariable.getType().getName().equals(symbolTable.getSuper()))
+                                                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(assignmentNode.get("lineStart")), Integer.parseInt(assignmentNode.get("colEnd")), "Class does not extendsuperclass"));
+                                                /*else if(!localVariable2.getType().getName().equals(localVariable.getType().getName())){
+                                                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(assignmentNode.get("lineStart")), Integer.parseInt(assignmentNode.get("colEnd")), "Assignment type mismatch"));
+                                                }*/
+                                                assignmentType = new Type(localVariable2.getType().getName(), false);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            else if(assignmentNode.getKind().equals(("BinaryOp"))){
+                                if(assignmentNode.get("op").equals("&&") || assignmentNode.get("op").equals("||")){
+                                    assignmentType = new Type("boolean", false);
+                                }
+                                else{
+                                    assignmentType = new Type("int", false);
+                                }
+                            }
+                            for(Symbol localVariable : method.getLocalVariables()){
+                                if(localVariable.getName().equals(assignmentName)) {
+                                    if (!localVariable.getType().getName().equals(assignmentType.getName())) {
+                                        if (symbolTable.getImports().contains(localVariable.getType().getName()) || (assignmentType.getName().equals(symbolTable.getClassName()) && localVariable.getType().getName().equals(symbolTable.getSuper())))
+                                            continue;
+                                        else
+                                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(assignmentNode.get("lineStart")), Integer.parseInt(assignmentNode.get("colEnd")), "Assignment type mismatch"));
+                                    }
+                                }
+                            }
+                            Symbol assignmentSymbol = new Symbol(assignmentType, assignmentName);
+                            method.setAssignment(assignmentSymbol);
+
+                        }
+                        //var assignmentType = ImplementedSymbolTable.getType(parameterNode, "ty");
+                    }
+                }
+                for(Symbol localVariable : method.getLocalVariables()){
+                    var localVariableName = localVariable.getType().isArray();
+                    var methodAssignments = method.getAssignments();
+                /*if(localVariable.getType().isArray() && !method.getAssignments().contains(localVariable))
+                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Assignment is not an array!"));*/
+                    List<String> assignmentNames = new ArrayList<>();
+                    for(Symbol assignment : method.getAssignments()){
+                        assignmentNames.add(assignment.getName());
+                    }
+
+                    if(!assignmentNames.contains(localVariable.getName()))
+                        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "variable not assigned"));
+                }
+               /* } else if (parameterNode.getKind().equals("LocalVariables")) {
                     for (JmmNode localVariable : parameterNode.getChildren()) {
                         Type variableType = ImplementedSymbolTable.getType(localVariable, "ty");
                         String variableName = (String) parameterNode.getObject("varName");
@@ -245,10 +333,10 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                 var localVariableName = localVariable.getType().isArray();
                 var methodAssignments = method.getAssignments();
                 /*if(localVariable.getType().isArray() && !method.getAssignments().contains(localVariable))
-                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Assignment is not an array!"));*/
+                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Assignment is not an array!"));
                 if(!method.getAssignments().contains(localVariable))
                     reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "variable not assigned"));
-            }
+            }*/
             this.symbolTable.addMethod(methodName, method.getReturnType(), method.getLocalVariables(), method.getParameters(), method.getAssignments());
         }
         System.out.println("Methods" + this.symbolTable.getMethods());
