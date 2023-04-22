@@ -8,7 +8,7 @@ public class Optimizer implements JmmOptimization {
     @Override
     public OllirResult toOllir(JmmSemanticsResult jmmSemanticsResult) {
 
-        var ollirGenerator = new OllirGenerator((ImplementedSymbolTable) jmmSemanticsResult.getSymbolTable());
+        var ollirGenerator = new OllirGenerator(jmmSemanticsResult.getSymbolTable());
         ollirGenerator.visit(jmmSemanticsResult.getRootNode());
 
         var ollirCode = ollirGenerator.getCode();
