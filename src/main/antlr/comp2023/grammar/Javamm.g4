@@ -57,7 +57,7 @@ statement
 expression
     : '(' expression ')' #Parenthesis
     | expression '[' expression ']' #ArrayAccessChain
-    | '!' expression #BinaryOp
+    | '!' expression #Negation
     | expression op=('*' | '/') expression #BinaryOp
     | expression op=('+' | '-') expression #BinaryOp
     | expression op=('<' | '>') expression #BinaryOp
@@ -69,6 +69,8 @@ expression
     | expression '.' ID  #MemberAccess
     | expression '.' methodCallName=ID '(' (expression (',' expression)*)? ')' #MethodCall
     | value=INTEGER #Integer
+    | value='true' #Boolean
+    | value='false' #Boolean
     | value=ID #Identifier
     | 'this' #This
     ;

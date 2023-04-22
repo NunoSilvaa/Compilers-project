@@ -253,8 +253,9 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
                     }
                 }
             }
+        }else {
+            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Condition must be a boolean!"));
         }
-        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Condition must be a boolean!"));
         return s;
     }
 
