@@ -220,7 +220,8 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
                 reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Variable not declared!"));
             }
         }else {
-            if(!localVariableNames.contains(node.get("value"))){
+            var ge = symbolTable.getParameters(methodNodeName);
+            if(!localVariableNames.contains(node.get("value")) && !symbolTable.getParametersNames(methodNodeName).contains(node.get("value"))){
                 reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Variable not declared!"));
             }
         }
@@ -436,6 +437,11 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
             if(node.getChildren().get(0).getKind().equals("MethodCall")){
                 if(node.getChildren().get(0).getChildren().get(0).getKind().equals("This"))
                     reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "This cannot be used in the Main method"));
+                else{
+                    /*for(String method : symbolTable.getMethods()){
+
+                    }*/
+                }
             }
             else if(node.getChildren().get(0).getKind().equals("MemberAccess")){
                 if(node.getChildren().get(0).getChildren().get(0).getKind().equals("This")) {

@@ -135,6 +135,12 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                                     assignmentType = new Type("int", false);
                                 }
                             }
+                            else if(assignmentNode.getKind().equals("MethodCall")){
+                                for(Symbol localVariable : method.getLocalVariables()){
+                                    if(localVariable.getName().equals(assignmentName))
+                                        assignmentType = new Type(localVariable.getType().getName(), localVariable.getType().isArray());
+                                }
+                            }
                             for(Symbol localVariable : method.getLocalVariables()){
                                 if(localVariable.getName().equals(assignmentName)) {
                                     var localVariableType = localVariable.getType();
