@@ -318,24 +318,48 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
         }
         List<String> methodsss = symbolTable.getMethods();
         if (!symbolTable.getMethods().contains(node.get("methodCallName"))) {
-            var varValue = node.getChildren().get(0).get("value");
-            var varKind = node.getChildren().get(0).getKind();
-            for (Symbol localVariable : symbolTable.getLocalVariables(methodNodeName)) {
-                if (localVariable.getName().equals(node.getChildren().get(0).get("value"))) {
-                    var localVariableTypeName = localVariable.getType().getName();
-                    var teste2 = node.getChildren().get(0).get("value");
-                    var teste3 = symbolTable.getClassName();
-                    var teste4 = symbolTable.getSuper();
-                    if (symbolTable.getImports().contains(localVariableTypeName)) {
-                        break;
-                    } else if (symbolTable.getSuper() != null && symbolTable.getClassName().equals(localVariable.getType().getName()))
-                        break;
-                    else {
-                        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Method not declared!"));
+            if(node.getChildren().get(0).getKind().equals("This")){
+                var varValue = node.getChildren().get(1).get("value");
+                var varKind = node.getChildren().get(0).getKind();
+                for (Symbol localVariable : symbolTable.getLocalVariables(methodNodeName)) {
+                    if (localVariable.getName().equals(node.getChildren().get(1).get("value"))) {
+                        var localVariableTypeName = localVariable.getType().getName();
+                        var teste2 = node.getChildren().get(1).get("value");
+                        var teste3 = symbolTable.getClassName();
+                        var teste4 = symbolTable.getSuper();
+                        if (symbolTable.getImports().contains(localVariableTypeName)) {
+                            break;
+                        } else if (symbolTable.getSuper() != null && symbolTable.getClassName().equals(localVariable.getType().getName()))
+                            break;
+                        else {
+                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Method not declared!"));
+                        }
+                        //symbolTable.getImports();
+                        //var teste = 1;
+                        //if(localVariable.getType(). )
                     }
-                    //symbolTable.getImports();
-                    //var teste = 1;
-                    //if(localVariable.getType(). )
+                }
+            }
+            else {
+                var varValue = node.getChildren().get(0).get("value");
+                var varKind = node.getChildren().get(0).getKind();
+                for (Symbol localVariable : symbolTable.getLocalVariables(methodNodeName)) {
+                    if (localVariable.getName().equals(node.getChildren().get(0).get("value"))) {
+                        var localVariableTypeName = localVariable.getType().getName();
+                        var teste2 = node.getChildren().get(0).get("value");
+                        var teste3 = symbolTable.getClassName();
+                        var teste4 = symbolTable.getSuper();
+                        if (symbolTable.getImports().contains(localVariableTypeName)) {
+                            break;
+                        } else if (symbolTable.getSuper() != null && symbolTable.getClassName().equals(localVariable.getType().getName()))
+                            break;
+                        else {
+                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Method not declared!"));
+                        }
+                        //symbolTable.getImports();
+                        //var teste = 1;
+                        //if(localVariable.getType(). )
+                    }
                 }
             }
             //if(node.getChildren().get(0).get("value"))
