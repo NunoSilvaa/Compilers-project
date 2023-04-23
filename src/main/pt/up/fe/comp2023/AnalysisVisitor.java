@@ -419,9 +419,7 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
             }
         }
 
-        if(node.getChildren().get(0).getKind().equals("Integer")){
-            return s;
-        } else if (node.getChildren().get(0).getKind().equals("Identifier")) {
+        if (node.getChildren().get(0).getKind().equals("Identifier")) {
             if(node.getChildren().get(0).get("value").equals("true") || node.getChildren().get(0).get("value").equals("false")){
                 reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Index must be an integer!"));
             } else {
@@ -429,6 +427,20 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
                     if (localVariable.getName().equals(node.getChildren().get(0).get("value"))) {
                         if (!localVariable.getType().equals(new Type("int", false))) {
                             reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Index must be an integer!"));
+                        }
+                    }
+                }
+            }
+        }
+
+        if (node.getChildren().get(1).getKind().equals("Identifier")) {
+            if(node.getChildren().get(1).get("value").equals("true") || node.getChildren().get(1).get("value").equals("false")){
+                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Value assigned must be an integer!"));
+            } else {
+                for (Symbol localVariable : symbolTable.getLocalVariables(methodNodeName)) {
+                    if (localVariable.getName().equals(node.getChildren().get(1).get("value"))) {
+                        if (!localVariable.getType().equals(new Type("int", false))) {
+                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Value assigned must be an integer!"));
                         }
                     }
                 }
