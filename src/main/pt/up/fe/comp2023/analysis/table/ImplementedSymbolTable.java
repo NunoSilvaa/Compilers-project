@@ -56,6 +56,7 @@ public class ImplementedSymbolTable implements SymbolTable {
         return new ArrayList<>(this.fields.keySet());
     }
 
+
     public void setField(Symbol field, boolean isStatic) {
         this.fields.put(field, isStatic);
     }
