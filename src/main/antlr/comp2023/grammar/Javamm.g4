@@ -66,7 +66,7 @@ expression
     | 'new' type '[' expression ']' #NewArray
     | 'new' ID '(' (expression (',' expression)*)? ')' #NewObject
     | classDeclaration #ClassExpression
-    | expression '.' ID  #MemberAccess
+    | expression '.' accessName=ID  #MemberAccess
     | expression '.' methodCallName=ID '(' (expression (',' expression)*)? ')' #MethodCall
     | value=INTEGER #Integer
     | value='true' #Boolean

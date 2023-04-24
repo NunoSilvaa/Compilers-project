@@ -255,7 +255,48 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
                     }
                 }
             }
-        }else {
+        }else if(node.getChildren().get(0).getKind().equals("BinaryOp")){
+            if(node.getChildren().get(0).get("op").equals("+") || node.getChildren().get(0).get("op").equals("-") || node.getChildren().get(0).get("op").equals("*") || node.getChildren().get(0).get("op").equals("/")){
+                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Condition must be a boolean!"));
+            }else if(node.getChildren().get(0).get("op").equals("<") || node.getChildren().get(0).get("op").equals(">")){
+                for(Symbol assignment : symbolTable.getAssignments(methodNodeName)){
+                    if(assignment.getName().equals(node.getChildren().get(0).getChildren().get(0).get("value"))){
+                        if(!assignment.getType().equals(new Type("int", false))){
+                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Both operands must be integers!"));
+                        }
+                    }
+                }
+                for(Symbol assignment : symbolTable.getAssignments(methodNodeName)){
+                    if(assignment.getName().equals(node.getChildren().get(0).getChildren().get(1).get("value"))){
+                        if(!assignment.getType().equals(new Type("int", false))){
+                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Both operands must be integers!"));
+                        }
+                    }
+                }
+            }else if(node.getChildren().get(0).get("op").equals("&&") || node.getChildren().get(0).get("op").equals("||")){
+                for(Symbol assignment : symbolTable.getAssignments(methodNodeName)){
+                    if(assignment.getName().equals(node.getChildren().get(0).getChildren().get(0).get("value"))){
+                        if(!assignment.getType().equals(new Type("boolean", false))){
+                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Both operands must be booleans!"));
+                        }
+                    }
+                }
+                for(Symbol assignment : symbolTable.getAssignments(methodNodeName)){
+                    if(assignment.getName().equals(node.getChildren().get(0).getChildren().get(1).get("value"))){
+                        if(!assignment.getType().equals(new Type("boolean", false))){
+                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Both operands must be booleans!"));
+                        }
+                    }
+                }
+                /*var lhsType = getType(node.getChildren().get(0).getChildren().get(0), "ty");
+                var rhsType = getType(node.getChildren().get(0).getChildren().get(1), "ty");
+                if(!lhsType.equals(new Type("boolean", false)) || !rhsType.equals(new Type("boolean", false))){
+                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Both operands must be booleans!"));
+                }*/
+            }
+
+        }
+        else {
             reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Condition must be a boolean!"));
         }
         return s;
@@ -391,7 +432,45 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
                     }
                 }
             }
+        }else if(node.getChildren().get(0).get("op").equals("<") || node.getChildren().get(0).get("op").equals(">")){
+            for(Symbol assignment : symbolTable.getAssignments(methodNodeName)){
+                if(assignment.getName().equals(node.getChildren().get(0).getChildren().get(0).get("value"))){
+                    if(!assignment.getType().equals(new Type("int", false))){
+                        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Both operands must be integers!"));
+                    }
+                }
+            }
+            for(Symbol assignment : symbolTable.getAssignments(methodNodeName)){
+                if(assignment.getName().equals(node.getChildren().get(0).getChildren().get(1).get("value"))){
+                    if(!assignment.getType().equals(new Type("int", false))){
+                        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Both operands must be integers!"));
+                    }
+                }
+            }
+        }else if(node.getChildren().get(0).get("op").equals("&&") || node.getChildren().get(0).get("op").equals("||")){
+            for(Symbol assignment : symbolTable.getAssignments(methodNodeName)){
+                if(assignment.getName().equals(node.getChildren().get(0).getChildren().get(0).get("value"))){
+                    if(!assignment.getType().equals(new Type("boolean", false))){
+                        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Both operands must be booleans!"));
+                    }
+                }
+            }
+            for(Symbol assignment : symbolTable.getAssignments(methodNodeName)){
+                if(assignment.getName().equals(node.getChildren().get(0).getChildren().get(1).get("value"))){
+                    if(!assignment.getType().equals(new Type("boolean", false))){
+                        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Both operands must be booleans!"));
+                    }
+                }
+            }
+                /*var lhsType = getType(node.getChildren().get(0).getChildren().get(0), "ty");
+                var rhsType = getType(node.getChildren().get(0).getChildren().get(1), "ty");
+                if(!lhsType.equals(new Type("boolean", false)) || !rhsType.equals(new Type("boolean", false))){
+                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Both operands must be booleans!"));
+                }*/
         }
+        else {
+            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Condition must be a boolean!"));
+    }
         return s;
     }
 

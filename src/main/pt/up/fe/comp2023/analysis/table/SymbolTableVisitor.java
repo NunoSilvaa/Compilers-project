@@ -75,6 +75,7 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
             }
             else{
                 Method method = new Method("main");
+                var gg = symbolTable.getFields();
                 for (JmmNode parameterNode : jmmNode.getChildren()) {
                     if (parameterNode.getKind().equals("LocalVariables")) {
                         for (JmmNode localVariable : parameterNode.getChildren()) {
