@@ -57,8 +57,8 @@ public class ExprToOllir extends PreorderJmmVisitor<Void, ExprCodeResult> {
         //var type = getOllirStringType(getType(jmmNode, jmmNode.get("name")));
         //System.out.println("value: " + getOllirStringType(value));
         var op = OllirUtils.getReturnType(jmmNode.get("op"));
-        code.append("\t\t").append(value).append(op).append(":=").append(op)
-                .append(lhsres.value()).append(op).append(jmmNode.get("op")).append(op).append(rhsres.value()).append(op).append(";\n");
+        code.append("\t\t").append(value).append(op).append(" ").append(":=").append(op).append(" ")
+                .append(lhsres.value()).append(op).append(" ").append(jmmNode.get("op")).append(op).append(" ").append(rhsres.value()).append(op).append(";\n");
 
         return new ExprCodeResult(code.toString(), value);
     }
