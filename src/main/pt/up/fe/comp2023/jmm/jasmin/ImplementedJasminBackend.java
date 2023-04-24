@@ -168,7 +168,7 @@ public class ImplementedJasminBackend implements JasminBackend {
             }
         }
 
-        if (!((instructions.get(instructions.size() - 1).getInstType() == InstructionType.RETURN) && (instructions.size() > 0)))
+        if (!((instructions.size() > 0) && (instructions.get(instructions.size() - 1).getInstType() == InstructionType.RETURN)))
         {
             if (method.getReturnType().getTypeOfElement() == ElementType.VOID) met.append("\treturn\n");
         }
