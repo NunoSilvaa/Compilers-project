@@ -57,4 +57,12 @@ public class OllirUtils {
         };
     }
 
+    public static String getReturnType(String operator) {
+        return switch (operator) {
+            case "+", "-", "*", "/" -> ".i32 ";
+            case "&&", "<" -> ".bool";
+            default -> "// invalid operator\n";
+        };
+    }
+
 }
