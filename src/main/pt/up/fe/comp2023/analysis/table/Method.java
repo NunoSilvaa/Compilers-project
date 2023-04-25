@@ -17,6 +17,8 @@ public class Method {
 
     private final Map<String, Symbol> assignments;
 
+    //private final List<String> assignmentNames;
+
     private final Map<String, String> assignmentValues;
 
     public Method(String name) {
@@ -65,6 +67,7 @@ public class Method {
         return new ArrayList<>(this.assignmentValues.values());
     }
 
+
     public void setLocalVariable(Symbol variable) {
         this.localVariables.put(variable.getName(), variable);
     }
@@ -72,6 +75,10 @@ public class Method {
     public void setAssignment(Symbol symbol){
         this.assignments.put(symbol.getName(), symbol);
     }
+
+    /*public void setUsedVariable(String name){
+        this.usedVariables.add(name);
+    }*/
 
     public void setAssignmentValues(String name, String value){
         this.assignmentValues.put(name, value);

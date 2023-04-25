@@ -109,6 +109,14 @@ public class ImplementedSymbolTable implements SymbolTable {
         return parametersNames;
     }
 
+    public List<String> getAssignmentNames(String s) {
+        List<String> assignmentNames = new ArrayList<>();
+        for(Symbol parameter : this.methods.get(s).getAssignments()){
+            assignmentNames.add(parameter.getName());
+        }
+        return assignmentNames;
+    }
+
     @Override
     public List<Symbol> getLocalVariables(String s) {
         return this.methods.get(s).getLocalVariables();

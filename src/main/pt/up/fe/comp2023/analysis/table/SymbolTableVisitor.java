@@ -186,6 +186,12 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                     Type retType = ImplementedSymbolTable.getType(parameterNode.getChildren().get(0), "ty");
                     method.setReturnType(retType);
                 } else if (parameterNode.getKind().equals("RetExpr")) {
+                    //var ff = method.getUsedVariables();
+                    if(parameterNode.getChildren().get(0).getKind().equals("Identifier")){
+                        /*for(JmmNode retExprNode : parameterNode.getChildren()){
+                            method.setUsedVariable(retExprNode.get("value"));
+                        }*/
+                    }
                     continue; // ignore
                 }else if (parameterNode.getKind().equals("LocalVariables")) {
                         for (JmmNode localVariable : parameterNode.getChildren()) {
@@ -275,19 +281,24 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                         //var assignmentType = ImplementedSymbolTable.getType(parameterNode, "ty");
                     }
                 }
-                for(Symbol localVariable : method.getLocalVariables()){
+               /* for(Symbol localVariable : method.getLocalVariables()){
                     var localVariableName = localVariable.getType().isArray();
                     var methodAssignments = method.getAssignments();
                 /*if(localVariable.getType().isArray() && !method.getAssignments().contains(localVariable))
-                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Assignment is not an array!"));*/
+                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Assignment is not an array!"));
                     List<String> assignmentNames = new ArrayList<>();
                     for(Symbol assignment : method.getAssignments()){
                         assignmentNames.add(assignment.getName());
                     }
-
+                    var ff = method.getUsedVariables();
                     if(!assignmentNames.contains(localVariable.getName()))
                         reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "variable not assigned"));
-                }
+                }*/
+
+
+
+
+
                /* } else if (parameterNode.getKind().equals("LocalVariables")) {
                     for (JmmNode localVariable : parameterNode.getChildren()) {
                         Type variableType = ImplementedSymbolTable.getType(localVariable, "ty");

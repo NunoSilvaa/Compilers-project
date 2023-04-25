@@ -23,8 +23,9 @@ public class Analysis implements JmmAnalysis {
         List<Report> reports = new ArrayList<Report>();
 
         JmmNode node = jmmParserResult.getRootNode();
-        SymbolTableVisitor visitor = new SymbolTableVisitor();
         AnalysisVisitor analysisVisitor = new AnalysisVisitor();
+        SymbolTableVisitor visitor = new SymbolTableVisitor();
+        //AnalysisVisitor analysisVisitor = new AnalysisVisitor();
         Map<ImplementedSymbolTable, List<Report>> symbolTableAndReports = visitor.getSymbolTableAndReports(node);
         ImplementedSymbolTable symbolTable = symbolTableAndReports.entrySet().iterator().next().getKey();
         List<Report> symbolTableReports = symbolTableAndReports.entrySet().iterator().next().getValue();
