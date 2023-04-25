@@ -8,10 +8,10 @@ import java.util.Map;
 
 import pt.up.fe.comp.TestUtils;
 import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
-import pt.up.fe.comp.jmm.jasmin.JasminResult;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
 import pt.up.fe.comp.jmm.parser.JmmParserResult;
 import pt.up.fe.comp2023.jmm.jasmin.ImplementedJasminBackend;
+import pt.up.fe.comp2023.jmm.ollir.Optimizer;
 import pt.up.fe.specs.util.SpecsIo;
 import pt.up.fe.specs.util.SpecsLogs;
 import pt.up.fe.specs.util.SpecsSystem;
@@ -46,19 +46,20 @@ public class Launcher {
         TestUtils.noErrors(parserResult.getReports());
         // ... add remaining stages
         Analysis analysis = new Analysis();
-        //analysis.semanticAnalysis(parserResult);
+        analysis.semanticAnalysis(parserResult);
+
         JmmSemanticsResult semanticsResult = analysis.semanticAnalysis(parserResult);
-        System.out.println(semanticsResult.getSymbolTable().print());
-        System.out.println(semanticsResult.getReports());
+        System.out.println(semanticsResult.getRootNode().toTree());
+        Optimizer optimizer = new Optimizer();
+        OllirResult ollirResult = optimizer.toOllir(semanticsResult);
+        System.out.println(ollirResult.getOllirCode());
 
-        TestUtils.noErrors(semanticsResult.getReports());
+        //String ollirCode = SpecsIo.read("../test/pt/up/fe/comp/cp2/jasmin/OllirToJasminBasic.ollir");
+        //OllirResult ollirResult = new OllirResult(code, Collections.emptyMap());
+        //ImplementedJasminBackend implementedJasminBackend = new ImplementedJasminBackend();
+        //JasminResult jasminResult = implementedJasminBackend.toJasmin(ollirResult);
 
-        String ollirCode = SpecsIo.read("../test/pt/up/fe/comp/cp2/jasmin/OllirToJasminBasic.ollir");
-        OllirResult ollirResult = new OllirResult(code, Collections.emptyMap());
-        ImplementedJasminBackend implementedJasminBackend = new ImplementedJasminBackend();
-        JasminResult jasminResult = implementedJasminBackend.toJasmin(ollirResult);
-
-        TestUtils.noErrors(jasminResult);
+        //TestUtils.noErrors(jasminResult);
     }
 
     private static Map<String, String> parseArgs(String[] args) {

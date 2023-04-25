@@ -6,6 +6,7 @@ grammar Javamm;
 
 SLC : '//' ~[\n]* -> skip;
 MLC : '/*' .*? '*/' -> skip;
+BOOLEAN : ('true' | 'false') ;
 INTEGER : [0] | [1-9][0-9]* ;
 ID : [a-zA-Z$_][a-zA-Z0-9_]*;
 WS : [ \n\t\r\f]+ -> skip ;
@@ -28,7 +29,7 @@ methodDeclaration
 
 localVariables
     : type varName=ID ';'
-    | varName=ID ('=' (ID | INT)) ';'
+    | varName=ID ('=' (ID | INT )) ';'
     ;
 
 parameter: type parameterName=ID;
@@ -69,8 +70,7 @@ expression
     | expression '.' accessName=ID  #MemberAccess
     | expression '.' methodCallName=ID '(' (expression (',' expression)*)? ')' #MethodCall
     | value=INTEGER #Integer
-    | value='true' #Boolean
-    | value='false' #Boolean
+    | value=BOOLEAN #Boolean
     | value=ID #Identifier
     | 'this' #This
     ;
