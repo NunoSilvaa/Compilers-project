@@ -17,11 +17,14 @@ public class Method {
 
     private final Map<String, Symbol> assignments;
 
+    private final Map<String, String> assignmentValues;
+
     public Method(String name) {
         this.name = name;
         this.parameters = new HashMap<String, Symbol>();
         this.localVariables = new HashMap<String, Symbol>();
         this.assignments = new HashMap<String, Symbol>();
+        this.assignmentValues = new HashMap<String, String>();
     }
 
     public List<String> getParameterTypes() {
@@ -58,12 +61,20 @@ public class Method {
         return new ArrayList<>(this.assignments.values());
     }
 
+    public List<String> getAssignmentValues() {
+        return new ArrayList<>(this.assignmentValues.values());
+    }
+
     public void setLocalVariable(Symbol variable) {
         this.localVariables.put(variable.getName(), variable);
     }
 
     public void setAssignment(Symbol symbol){
         this.assignments.put(symbol.getName(), symbol);
+    }
+
+    public void setAssignmentValues(String name, String value){
+        this.assignmentValues.put(name, value);
     }
 
     public String getName(){
