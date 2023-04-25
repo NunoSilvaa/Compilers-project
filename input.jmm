@@ -1,27 +1,23 @@
+import io;
+import Quicksort;
 
-class MethodsAndFields{
-	int field1;
-	boolean field2;
-	MethodsAndFields field3;
+class CompileBasic extends Quicksort {
 
-	public int getField1(){
-		return field1;
-	}
+    int intField;
+    boolean boolField;
 
-	public boolean getField2(){
-		return field2;
-	}
+    public int method1() {
+        int intLocal1;
+        boolean boolLocal1;
 
-	public MethodsAndFields getField3(){
-		return field3;
-	}
+        return 0;
+    }
 
-	public int[] all(int a, boolean b, MethodsAndFields maf){
-		int[] c;
-		return c;
-	}
+    public boolean method2(int intParam1, boolean boolParam1) {
+        return boolParam1;
+    }
 
-	public static void main(String[] args){
 
-	}
+    public static void main(String[] args) {
+    }
 }

@@ -21,6 +21,7 @@ public class ExprToOllir extends PreorderJmmVisitor<Void, ExprCodeResult> {
         addVisit("Assignment", this::dealWithVarDecl);
         addVisit("Integer", this::dealWithInteger);
         addVisit("Identifier",this::dealWithIdentifier);
+        addVisit("NewObject", this::dealWithNewObject);
         setDefaultValue(() -> new ExprCodeResult("", ""));
     }
 
@@ -61,6 +62,18 @@ public class ExprToOllir extends PreorderJmmVisitor<Void, ExprCodeResult> {
                 .append(lhsres.value()).append(op).append(" ").append(jmmNode.get("op")).append(op).append(" ").append(rhsres.value()).append(op).append(";\n");
 
         return new ExprCodeResult(code.toString(), value);
+    }
+
+    private ExprCodeResult dealWithNewObject(JmmNode jmmNode, Void unused) {
+        String value = nextTempVar();
+        value = value.substring(0,value.length()-4);
+        value += "." + jmmNode.get("value");
+
+        String code = value + " :=." + jmmNode.get("value") + " new(" + jmmNode.get("value") + ")." + jmmNode.get("value") + ";\n";
+
+        code += "invokespecial(" + value + ",\"<init>\").V;\n";
+
+        return new ExprCodeResult(code, value);
     }
 
 }
