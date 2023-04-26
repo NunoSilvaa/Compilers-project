@@ -123,22 +123,6 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
             }
         }
 
-        /*System.out.println("name:" + jmmNode.get("assignmentName"));
-        System.out.println("code: " + exprCode.visit(jmmNode.getJmmChild(0)));
-        Type rawVarType = symbolTable.getFieldType(jmmNode.get("value"));
-        var varType = (rawVarType != null ? typeToOllir(rawVarType.getName(), rawVarType.isArray()) : typeToOllir(getLocalVarType(jmmNode, jmmNode.get("value")),false));
-        var lhsCode = new ExprCodeResult("", jmmNode.get("value") + varType);
-        var rhsCode = exprCode.visit(jmmNode.getJmmChild(0));
-
-        var code = new StringBuilder();
-        code.append(lhsCode.prefixCode());
-        code.append(rhsCode.prefixCode());
-
-        if(rawVarType != null) code.append("putfield(this, " + lhsCode.value() + ", " + rhsCode.value() + ").V;\n");
-        else code.append(lhsCode.value()).append(" :=").append(varType).append(" ").append(rhsCode.value()).append(";\n");
-
-        ollirCode.append(code);*/
-
         return ollirCode.toString();
     }
 
@@ -231,7 +215,7 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
 
         if (params.size() != 0) {
 
-            Collections.reverse(params);
+            //Collections.reverse(params);
             var paramCode = params.stream()
                     .map(OllirUtils::getCode).
                     collect(Collectors.joining(", "));
