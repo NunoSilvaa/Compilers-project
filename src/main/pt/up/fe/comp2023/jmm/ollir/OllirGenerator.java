@@ -1,11 +1,8 @@
 package pt.up.fe.comp2023.jmm.ollir;
-import org.stringtemplate.v4.ST;
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.SymbolTable;
-import pt.up.fe.comp.jmm.analysis.table.Type;
 import pt.up.fe.comp.jmm.ast.AJmmVisitor;
 import pt.up.fe.comp.jmm.ast.JmmNode;
-import pt.up.fe.comp2023.analysis.table.ImplementedSymbolTable;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -86,37 +83,50 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
                         break;
                 }
         } else {
-            if(!(jmmNode.getJmmChild(0).getKind().equals("MethodCall"))){
-                switch (jmmNode.getJmmChild(0).getKind()){
+            if (!(jmmNode.getJmmChild(0).getKind().equals("MethodCall"))) {
+                switch (jmmNode.getJmmChild(0).getKind()) {
                     case ("Boolean"):
                         ollirCode.append(getIndentation()).append(jmmNode.get("assignmentName"))
-                        .append(".bool :=.bool ")
-                        .append(getBooleanValue(jmmNode.getJmmChild(0).get("value")))
-                        .append(".bool;\n");
+                                .append(".bool :=.bool ")
+                                .append(getBooleanValue(jmmNode.getJmmChild(0).get("value")))
+                                .append(".bool;\n");
                         break;
                     default:
                         var type = getOllirStringType(getType(jmmNode, jmmNode.get("assignmentName")));
                         ollirCode.append(getIndentation()).append(jmmNode.get("assignmentName")).
-                        append(type).append(" :=").append(type).append(" ").
-                        append(jmmNode.getJmmChild(0).get("value")).append(type).append(";\n");
+                                append(type).append(" :=").append(type).append(" ").
+                                append(jmmNode.getJmmChild(0).get("value")).append(type).append(";\n");
                         break;
-                    }
                 }
+
             }
 
-        System.out.println("assignament" + jmmNode.getJmmChild(0));
+            System.out.println("assignament" + jmmNode.getJmmChild(0));
 
-        if(jmmNode.getJmmChild(0).getKind().equals("MethodCall")){
+            if (jmmNode.getJmmChild(0).getKind().equals("MethodCall")) {
 
-            System.out.println("kxdhjgfdsjkl");
-
-            ollirCode.append("\t\t" + "invokespecial(").append(jmmNode.getJmmChild(0).get("methodCallName")).append(" ")
-                    .append(getOllirStringType(jmmNode.getJmmChild(0).get("methodCallName")))
-                    .append(", \"<init>\").V;\n");
+                ollirCode.append("\t\t" + "invokevirtual(").append(jmmNode.getJmmChild(0).get("methodCallName")).append(" ")
+                        .append(getOllirStringType(jmmNode.getJmmChild(0).get("methodCallName")))
+                        .append(", \"<init>\");\n");
+            }
         }
 
-        System.out.println("name:" + jmmNode.get("assignmentName"));
+        /*System.out.println("name:" + jmmNode.get("assignmentName"));
         System.out.println("code: " + exprCode.visit(jmmNode.getJmmChild(0)));
+        Type rawVarType = symbolTable.getFieldType(jmmNode.get("value"));
+        var varType = (rawVarType != null ? typeToOllir(rawVarType.getName(), rawVarType.isArray()) : typeToOllir(getLocalVarType(jmmNode, jmmNode.get("value")),false));
+        var lhsCode = new ExprCodeResult("", jmmNode.get("value") + varType);
+        var rhsCode = exprCode.visit(jmmNode.getJmmChild(0));
+
+        var code = new StringBuilder();
+        code.append(lhsCode.prefixCode());
+        code.append(rhsCode.prefixCode());
+
+        if(rawVarType != null) code.append("putfield(this, " + lhsCode.value() + ", " + rhsCode.value() + ").V;\n");
+        else code.append(lhsCode.value()).append(" :=").append(varType).append(" ").append(rhsCode.value()).append(";\n");
+
+        ollirCode.append(code);*/
+
         return ollirCode.toString();
     }
 
@@ -143,16 +153,27 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
         }
 
         ollirCode.append(jmmNode.getJmmChild(0).get("value")).append(" , \"").append(methodName).append("\"");
+        if(jmmNode.getNumChildren() > 1) {
+            int i = 0;
+            //JmmNode params = jmmNode.getJmmChild(1);
+            for (var child : jmmNode.getChildren()) {
+                if(i == 0) {
+                    i++;
+                    continue;
+                }
+                ollirCode.append(" , ");
+                var param = exprCode.visit(child);
+                ollirCode.append(param.value()).append(getOllirStringType(getType(jmmNode,param.value())));
 
-        JmmNode params = jmmNode.getJmmChild(1);
-        for (var child : params.getChildren()) {
-            ollirCode.append(" , ");
-            visit(child);
+            }
         }
 
+        //System.out.println("identifier:" + jmmNode.getJmmChild(0).get("value"));
         ollirCode.append(")").append(returnType).append(";\n");
         return "";
     }
+
+
 
     public String getType(JmmNode jmmNode, String var) {
         JmmNode node = jmmNode;
@@ -276,6 +297,8 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
 
 
     private String dealWithImport(JmmNode jmmNode, String s){
+
+        System.out.println(symbolTable.getImports());
         for(String a : symbolTable.getImports()){
             ollirCode.append("import ").append(a).append(";\n");
         }
