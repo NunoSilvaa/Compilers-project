@@ -395,6 +395,7 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
                                     reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "variable not assigned"));
                                 }
                                 if(!localVariable2.getType().equals(new Type("int", false))){
+                                    //if(me)
                                     reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Index must be an integer!"));
                                 }
 
@@ -594,6 +595,13 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
 
                                 }
                             }
+                        }
+                    }
+                }
+                for(Symbol parameter : symbolTable.getParameters(methodNodeName)){
+                    if(parameter.getName().equals(node.getChildren().get(0).get("value"))){
+                        if(!parameter.getType().equals(new Type("int", false))){
+                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Index must be an integer!"));
                         }
                     }
                 }
