@@ -136,7 +136,7 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
 
         if (symbolTable.getMethods().contains(methodName))
             for (String m : symbolTable.getMethods())
-                if (m == methodName)
+                if (m.equals(methodName))
                     returnType = OllirUtils.getOllirType(symbolTable.getReturnType(m));
                 else
                     returnType = ".V";
@@ -179,7 +179,7 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
         JmmNode node = jmmNode;
 
         while (!node.getKind().equals("MetDeclaration")){
-            if (node.getKind().equals("MainMethod")) {
+            if (node.getKind().equals("MainDeclaration")) {
                 for(Symbol varType : symbolTable.getLocalVariables("main")){
                     if (varType.getName().equals(var)) return varType.getType().getName();
                 }
@@ -205,7 +205,7 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
         if (isMain) {
             methodName = "main";
             ollirCode.append(getIndentation()).append(".method public static ").append(methodName).append("(").append("args.array.String");
-            if (!jmmNode.getChildren().isEmpty()) statements = jmmNode.getJmmChild(0).getChildren();
+            if (!jmmNode.getChildren().isEmpty()) statements = jmmNode.getChildren();
 
         } else {
             methodName = jmmNode.get("methodName");

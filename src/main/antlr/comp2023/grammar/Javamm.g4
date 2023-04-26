@@ -23,7 +23,7 @@ classDeclaration: 'class' className=ID ('extends' superClassName=ID)? '{' (varDe
 varDeclaration: type varName=ID ';';
 
 methodDeclaration
-    : ('public')? 'static' 'void' 'main' '(' 'String' '[' ']' parameterName=ID ')' '{' ( localVariables )* ( statement )* '}' #MainDeclaration
+    : ('public')? 'static' 'void' 'main' '(' 'String' '[' ']' methodName=ID ')' '{' ( localVariables )* ( statement )* '}' #MainDeclaration
     | ('public')? retType methodName=ID '(' ( parameter ( ',' parameter )* )? ')' '{' ( localVariables )* ( statement )* 'return' retExpr ';' '}'#MetDeclaration
     ;
 
