@@ -65,7 +65,7 @@ expression
     | expression op=('&&' | '||') expression #BinaryOp
     | expression '.' 'length' #Length
     | 'new' type '[' expression ']' #NewArray
-    | 'new' ID '(' (expression (',' expression)*)? ')' #NewObject
+    | 'new' value=ID '(' (expression (',' expression)*)? ')' #NewObject
     | classDeclaration #ClassExpression
     | expression '.' accessName=ID  #MemberAccess
     | expression '.' methodCallName=ID '(' (expression (',' expression)*)? ')' #MethodCall

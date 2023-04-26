@@ -23,8 +23,6 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
         this.indentationLevel = 0;
         this.exprCode = new ExprToOllir();
         this.counter = 0;
-        this.code = new ExprToOllir();
-
     }
 
     @Override
@@ -83,6 +81,7 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
                         break;
                 }
         } else {
+            System.out.println("node: " + jmmNode.getJmmChild(0));
             if (!(jmmNode.getJmmChild(0).getKind().equals("MethodCall"))) {
                 switch (jmmNode.getJmmChild(0).getKind()) {
                     case ("Boolean"):
@@ -92,16 +91,29 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
                                 .append(".bool;\n");
                         break;
                     default:
+                        var value = jmmNode.getJmmChild(0).get("value");
                         var type = getOllirStringType(getType(jmmNode, jmmNode.get("assignmentName")));
-                        ollirCode.append(getIndentation()).append(jmmNode.get("assignmentName")).
-                                append(type).append(" :=").append(type).append(" ").
-                                append(jmmNode.getJmmChild(0).get("value")).append(type).append(";\n");
+                        if(jmmNode.getJmmChild(0).getKind().equals("NewObject")) {
+                            var expr = exprCode.visit(jmmNode.getJmmChild(0));
+                            ollirCode.append(getIndentation()).append(expr.prefixCode());
+                            type = "." + type;
+                            value = expr.value();
+
+                            ollirCode.append(getIndentation()).append(jmmNode.get("assignmentName")).
+                                    append(type).append(" :=").append(type).append(" ").
+                                    append(value).append(";\n");
+
+                        }else {
+                            ollirCode.append(getIndentation()).append(jmmNode.get("assignmentName")).
+                                    append(type).append(" :=").append(type).append(" ").
+                                    append(value).append(type).append(";\n");
+                        }
                         break;
                 }
 
             }
 
-            System.out.println("assignament" + jmmNode.getJmmChild(0));
+            //System.out.println("assignament" + jmmNode.getJmmChild(0));
 
             if (jmmNode.getJmmChild(0).getKind().equals("MethodCall")) {
 
