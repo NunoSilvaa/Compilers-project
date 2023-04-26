@@ -267,13 +267,19 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
                 }
             }
 
-        }
-        else {
+        }else if(!symbolTable.getFieldNames().contains(node.get("value"))){
+            var ggf = symbolTable.getFieldNames();
             var ge = symbolTable.getParameters(methodNodeName);
             if(!localVariableNames.contains(node.get("value")) && !symbolTable.getParametersNames(methodNodeName).contains(node.get("value"))){
                 reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Variable not declared!"));
             }
         }
+        /*else {
+            var ge = symbolTable.getParameters(methodNodeName);
+            if(!localVariableNames.contains(node.get("value")) && !symbolTable.getParametersNames(methodNodeName).contains(node.get("value"))){
+                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Variable not declared!"));
+            }
+        }*/
 
         /*if(!symbolTable.getLocalVariables(methodNode.get("methodName")).contains(node.getJmmParent().get("assignmentName"))){
             reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Variable not declared!"));
