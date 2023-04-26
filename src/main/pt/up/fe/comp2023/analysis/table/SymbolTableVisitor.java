@@ -192,11 +192,37 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                 } else if (parameterNode.getKind().equals("RetExpr")) {
                     //var ff = method.getUsedVariables();
                     if(parameterNode.getChildren().get(0).getKind().equals("Identifier")){
+                        for(Symbol localVariable : method.getLocalVariables()){
+                            if(localVariable.getName().equals(parameterNode.getChildren().get(0).get("value")))
+                                if(!localVariable.getType().equals(method.getReturnType())){
+                                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(parameterNode.get("lineStart")), Integer.parseInt(parameterNode.get("colEnd")), "Return type mismatch"));
+                                }
+                        }
+                        var tt = 1;
+                        //parameterNode.getChildren().get(0).get
                         /*for(JmmNode retExprNode : parameterNode.getChildren()){
                             method.setUsedVariable(retExprNode.get("value"));
                         }*/
                     }
-                    continue; // ignore
+                    if(parameterNode.getChildren().get(0).getKind().equals("BinaryOp")){
+                        if(parameterNode.getChildren().get(0).get("op").equals("&&") || parameterNode.getChildren().get(0).get("op").equals("||") || parameterNode.getChildren().get(0).get("op").equals("<") || parameterNode.getChildren().get(0).get("op").equals(">")){
+                            if(!method.getReturnType().getName().equals("boolean"))
+                                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(parameterNode.get("lineStart")), Integer.parseInt(parameterNode.get("colEnd")), "Return type mismatch"));
+                        } else if (parameterNode.getChildren().get(0).get("op").equals("+") || parameterNode.getChildren().get(0).get("op").equals("-") || parameterNode.getChildren().get(0).get("op").equals("*") || parameterNode.getChildren().get(0).get("op").equals("/")){
+                            if(!method.getReturnType().getName().equals("int"))
+                                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(parameterNode.get("lineStart")), Integer.parseInt(parameterNode.get("colEnd")), "Return type mismatch"));
+                        }
+
+                    }
+                    if(parameterNode.getChildren().get(0).getKind().equals("MethodCall")){
+                        var yy = symbolTable.getMethods().contains(parameterNode.getChildren().get(0).get("methodCallName"));
+var xx = symbolTable.getImports().contains(parameterNode.getChildren().get(0).get("methodCallName"));
+                        if(symbolTable.getMethods().contains(parameterNode.getChildren().get(0).get("methodCallName")) || symbolTable.getImports().contains(parameterNode.getChildren().get(0).get("methodCallName"))) {
+                            if (!method.getReturnType().equals(symbolTable.getReturnType(parameterNode.getChildren().get(0).get("methodCallName")))) {
+                                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(parameterNode.get("lineStart")), Integer.parseInt(parameterNode.get("colEnd")), "Return type mismatch"));
+                            }
+                        }
+                    }
                 }else if (parameterNode.getKind().equals("LocalVariables")) {
                         for (JmmNode localVariable : parameterNode.getChildren()) {
                             Type variableType = ImplementedSymbolTable.getType(localVariable, "ty");

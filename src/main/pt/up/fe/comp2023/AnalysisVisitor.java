@@ -137,6 +137,15 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
                     }
 
                 }
+                for(Symbol parameter : symbolTable.getParameters(methodNodeName)){
+                    if(parameter.getName().equals(node.getChildren().get(0).get("value"))){
+                        if(parameter.getType().isArray()){
+                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "array not indexed"));
+                        }
+                        lhsType = parameter.getType();
+                        var t = 1;
+                    }
+                }
             //lhsType = symbolTable.getVariableType(methodNodeName, node.getChildren().get(0).get("value"));
         }
         }
@@ -184,6 +193,15 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
                         }
                         //method.setUsedVariable(node.getChildren().get(1).get("value"));
                         rhsType = localVariable.getType();
+                        var t = 1;
+                    }
+                }
+                for(Symbol parameter : symbolTable.getParameters(methodNodeName)){
+                    if(parameter.getName().equals(node.getChildren().get(1).get("value"))){
+                        if(parameter.getType().isArray()){
+                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "array not indexed"));
+                        }
+                        rhsType = parameter.getType();
                         var t = 1;
                     }
                 }
@@ -445,9 +463,19 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
                         //if(localVariable.getType(). )
                     }
                 }
+                //if()
             }
             //if(node.getChildren().get(0).get("value"))
             //reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Method not declared!"));
+        }
+        if(symbolTable.getMethods().contains(node.get("methodCallName")) || symbolTable.getImports().contains(node.get("methodCallName"))) {
+            for(Symbol localVariable : symbolTable.getLocalVariables(methodNodeName)){
+                if(localVariable.getName().equals(node.getChildren().get(1).get("value"))){
+                        if (!symbolTable.getParameters(node.get("methodCallName")).contains(localVariable)) {
+                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Incompatible arguments type!"));
+                    }
+                }
+            }
         }
         return s;
     }
