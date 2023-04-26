@@ -183,6 +183,7 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
         } else { // MethodDeclaration
             String methodName = (String) jmmNode.getObject("methodName");
             Method method = new Method(methodName);
+            //var ggd = symbolTable.getSuper();
             for (JmmNode parameterNode : jmmNode.getChildren()) {
                 if (parameterNode.getKind().equals("RetType")) {
                     Type retType = ImplementedSymbolTable.getType(parameterNode.getChildren().get(0), "ty");
@@ -215,7 +216,13 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                     if (parameterNode.getChildren().get(0).getKind().equals("MethodCall")) {
                         var yy = symbolTable.getMethods().contains(parameterNode.getChildren().get(0).get("methodCallName"));
                         var xx = symbolTable.getImports().contains(parameterNode.getChildren().get(0).get("methodCallName"));
-                        if (symbolTable.getMethods().contains(parameterNode.getChildren().get(0).get("methodCallName")) || symbolTable.getImports().contains(parameterNode.getChildren().get(0).get("methodCallName"))) {
+                        if(parameterNode.getChildren().get(0).getChildren().get(0).getKind().equals("This")){
+                            if(symbolTable.getSuper().equals(null)){
+                                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(parameterNode.get("lineStart")), Integer.parseInt(parameterNode.get("colEnd")), "Class doesn't extend inherited method"));
+                            }
+                            //if(symbolTable.getMethods().contains(parameterNode.getChildren().get(0)))
+                        }
+                        else if (symbolTable.getMethods().contains(parameterNode.getChildren().get(0).get("methodCallName")) || symbolTable.getImports().contains(parameterNode.getChildren().get(0).get("methodCallName"))) {
                             if (!method.getReturnType().equals(symbolTable.getReturnType(parameterNode.getChildren().get(0).get("methodCallName")))) {
                                 reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(parameterNode.get("lineStart")), Integer.parseInt(parameterNode.get("colEnd")), "Return type mismatch"));
                             }

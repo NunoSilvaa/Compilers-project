@@ -468,14 +468,16 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
             //if(node.getChildren().get(0).get("value"))
             //reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Method not declared!"));
         }
+        if(!node.getJmmParent().getKind().equals("ExpressionStatement")){
         if(symbolTable.getMethods().contains(node.get("methodCallName")) || symbolTable.getImports().contains(node.get("methodCallName"))) {
-            for(Symbol localVariable : symbolTable.getLocalVariables(methodNodeName)){
-                if(localVariable.getName().equals(node.getChildren().get(1).get("value"))){
-                        if (!symbolTable.getParameters(node.get("methodCallName")).contains(localVariable)) {
-                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Incompatible arguments type!"));
+            for (Symbol localVariable : symbolTable.getLocalVariables(methodNodeName)) {
+                if (localVariable.getName().equals(node.getChildren().get(1).get("value"))) {
+                    if (!symbolTable.getParameters(node.get("methodCallName")).contains(localVariable)) {
+                        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Incompatible arguments type!"));
                     }
                 }
             }
+        }
         }
         return s;
     }
