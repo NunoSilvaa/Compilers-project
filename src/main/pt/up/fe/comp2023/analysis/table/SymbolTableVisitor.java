@@ -356,6 +356,18 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                                                 assignmentType = new Type(localVariable2.getType().getName(), false);
                                             }
                                         }
+                                        for(Symbol parameter : method.getParameters()){
+                                            if(parameter.getName().equals(assignmentNode.get("value"))){
+                                                assignmentType = new Type(parameter.getType().getName(), false);
+                                            }
+                                        }
+                                        /*if(method.getParameterTypes().contains(assignmentNode.get("value"))){
+                                            var hj = method.getParameters().getTypes();
+                                            var ggdj = 1;
+                                            //assignmentType = new Type(method.getParameters(), method.getParameters().isArray());
+
+
+                                        }*/
                                     }
                                 }
                             } else if (assignmentNode.getKind().equals(("BinaryOp"))) {
