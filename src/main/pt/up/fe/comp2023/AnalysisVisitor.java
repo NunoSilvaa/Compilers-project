@@ -124,10 +124,13 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
             else{
                 for(Symbol localVariable : symbolTable.getLocalVariables(methodNodeName)){
                     if(localVariable.getName().equals(node.getChildren().get(0).get("value"))){
+                        if(localVariable.getType().isArray()){
+                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "array not indexed"));
+                        }
                        /* var yyu = symbolTable.getMethods();
                         method.setUsedVariable(node.getChildren().get(0).get("value"));*/
                         if(!symbolTable.getAssignmentNames(methodNodeName).contains(node.getChildren().get(0).get("value"))){
-                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "variable not assigned"));
+                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "variable not assigned"));
                         }
                         lhsType = localVariable.getType();
                         var t = 1;
@@ -155,18 +158,14 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
                 var te = 1;
             }else {
                 var tete = symbolTable.getAssignments(methodNodeName);
-                for(Symbol localVariable : symbolTable.getLocalVariables(methodNodeName)){
-                    if(localVariable.getName().equals(node.getChildren().get(1).get("value"))){
-                       /* var yyu = symbolTable.getMethods();
-                        method.setUsedVariable(node.getChildren().get(0).get("value"));*/
-                        if(!symbolTable.getAssignmentNames(methodNodeName).contains(node.getChildren().get(1).get("value"))){
-                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "variable not assigned"));
-                        }
-                        lhsType = localVariable.getType();
+                for (Symbol assignment : symbolTable.getAssignments(methodNodeName)) {
+                    if (assignment.getName().equals(node.getChildren().get(1).getChildren().get(1).get("value"))) {
+                        rhsType = assignment.getType();
                         var t = 1;
                     }
-
+                    var t = 1;
                 }
+
             }
         }else if(node.getChildren().get(1).getKind().equals("Integer")){
             rhsType = new Type("int", false);
@@ -175,10 +174,16 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
                 rhsType = new Type("boolean", false);
             }
             else{
-                for(Symbol assignment : symbolTable.getAssignments(methodNodeName)){
-                    if(assignment.getName().equals(node.getChildren().get(1).get("value"))){
+                for(Symbol localVariable : symbolTable.getAssignments(methodNodeName)){
+                    if(localVariable.getName().equals(node.getChildren().get(1).get("value"))){
+                        if(!symbolTable.getAssignmentNames(methodNodeName).contains(node.getChildren().get(1).get("value"))){
+                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "variable not assigned"));
+                        }
+                        if(localVariable.getType().isArray()){
+                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "array not indexed"));
+                        }
                         //method.setUsedVariable(node.getChildren().get(1).get("value"));
-                        rhsType = assignment.getType();
+                        rhsType = localVariable.getType();
                         var t = 1;
                     }
                 }
@@ -278,7 +283,7 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
             //method.setUsedVariable(node.getChildren().get(0).get("value"));
             for(Symbol s1 : symbolTable.getLocalVariables(methodNodeName)){
                 if(s1.getName().equals(node.getChildren().get(0).get("value"))){
-                    if(!symbolTable.getAssignments(methodNodeName).contains(node.getChildren().get(0).get("value"))){
+                    if(!symbolTable.getAssignmentNames(methodNodeName).contains(node.getChildren().get(0).get("value"))){
                         reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "variable not assigned"));
                     }
                     if(!s1.getType().equals(new Type("boolean", false))){
@@ -402,22 +407,21 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
                 var varValue = node.getChildren().get(1).get("value");
                 var varKind = node.getChildren().get(0).getKind();
                 for (Symbol localVariable : symbolTable.getLocalVariables(methodNodeName)) {
-                    if (localVariable.getName().equals(node.getChildren().get(1).get("value"))) {
+                    /*if (localVariable.getName().equals(node.getChildren().get(1).get("value"))) {*/
+                    if(!symbolTable.getMethods().contains(node.get("methodCallName"))) {
                         var localVariableTypeName = localVariable.getType().getName();
                         var teste2 = node.getChildren().get(1).get("value");
                         var teste3 = symbolTable.getClassName();
+                        var fjfj = symbolTable.getMethods();
                         var teste4 = symbolTable.getSuper();
-                        if (symbolTable.getImports().contains(localVariableTypeName)) {
-                            break;
-                        } else if (symbolTable.getSuper() != null && symbolTable.getClassName().equals(localVariable.getType().getName()))
-                            break;
-                        else {
-                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Method not declared!"));
-                        }
+
+                        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Method not declared!"));
+
+                    }
                         //symbolTable.getImports();
                         //var teste = 1;
                         //if(localVariable.getType(). )
-                    }
+                    //}
                 }
             }
             else {
@@ -466,7 +470,7 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
         if(node.getChildren().get(0).getKind().equals(("Identifier"))){
             for(Symbol s1 : symbolTable.getLocalVariables(methodNodeName)){
                 if(s1.getName().equals(node.getChildren().get(0).get("value"))){
-                    if(!symbolTable.getAssignments(methodNodeName).contains(node.getChildren().get(0).get("value"))){
+                    if(!symbolTable.getAssignmentNames(methodNodeName).contains(node.getChildren().get(0).get("value"))){
                         reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "variable not assigned"));
                     }
                     if(!s1.getType().equals(new Type("boolean", false))){

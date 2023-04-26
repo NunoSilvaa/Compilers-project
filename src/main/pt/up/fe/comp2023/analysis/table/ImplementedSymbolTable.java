@@ -117,6 +117,14 @@ public class ImplementedSymbolTable implements SymbolTable {
         return assignmentNames;
     }
 
+    public List<String> getFieldNames() {
+        List<String> fieldNames = new ArrayList<>();
+        for(Symbol field : this.fields.keySet()){
+            fieldNames.add(field.getName());
+        }
+        return fieldNames;
+    }
+
     @Override
     public List<Symbol> getLocalVariables(String s) {
         return this.methods.get(s).getLocalVariables();
