@@ -163,11 +163,11 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                         //var assignmentType = ImplementedSymbolTable.getType(parameterNode, "ty");
                     }
                 }
-                for(Symbol localVariable : method.getLocalVariables()){
+                /*for(Symbol localVariable : method.getLocalVariables()){
                     var localVariableName = localVariable.getType().isArray();
                     var methodAssignments = method.getAssignments();
                 /*if(localVariable.getType().isArray() && !method.getAssignments().contains(localVariable))
-                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Assignment is not an array!"));*/
+                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Assignment is not an array!"));
                     List<String> assignmentNames = new ArrayList<>();
                     for(Symbol assignment : method.getAssignments()){
                         assignmentNames.add(assignment.getName());
@@ -175,7 +175,7 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
 
                     if(!assignmentNames.contains(localVariable.getName()))
                         reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "variable not assigned"));
-                }
+                }*/
                 this.symbolTable.addMethod("main", new Type("void", false), method.getLocalVariables(), method.getParameters(), method.getAssignments());
             }
         } else { // MethodDeclaration

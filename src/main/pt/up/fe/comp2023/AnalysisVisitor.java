@@ -124,10 +124,13 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
             else{
                 for(Symbol localVariable : symbolTable.getLocalVariables(methodNodeName)){
                     if(localVariable.getName().equals(node.getChildren().get(0).get("value"))){
+                        if(localVariable.getType().isArray()){
+                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "array not indexed"));
+                        }
                        /* var yyu = symbolTable.getMethods();
                         method.setUsedVariable(node.getChildren().get(0).get("value"));*/
                         if(!symbolTable.getAssignmentNames(methodNodeName).contains(node.getChildren().get(0).get("value"))){
-                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "variable not assigned"));
+                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "variable not assigned"));
                         }
                         lhsType = localVariable.getType();
                         var t = 1;
@@ -171,10 +174,16 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
                 rhsType = new Type("boolean", false);
             }
             else{
-                for(Symbol assignment : symbolTable.getAssignments(methodNodeName)){
-                    if(assignment.getName().equals(node.getChildren().get(1).get("value"))){
+                for(Symbol localVariable : symbolTable.getAssignments(methodNodeName)){
+                    if(localVariable.getName().equals(node.getChildren().get(1).get("value"))){
+                        if(!symbolTable.getAssignmentNames(methodNodeName).contains(node.getChildren().get(1).get("value"))){
+                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "variable not assigned"));
+                        }
+                        if(localVariable.getType().isArray()){
+                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "array not indexed"));
+                        }
                         //method.setUsedVariable(node.getChildren().get(1).get("value"));
-                        rhsType = assignment.getType();
+                        rhsType = localVariable.getType();
                         var t = 1;
                     }
                 }
