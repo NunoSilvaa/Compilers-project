@@ -95,70 +95,74 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                         method.setParameters(parameterSymbol);
                     }
                     else if(parameterNode.getKind().equals("Assignment")){
-                        for(JmmNode assignmentNode : parameterNode.getChildren()){
-                            Type assignmentType = new Type("boolean", false);
-                            var assignmentName = (String) parameterNode.getObject("assignmentName");
-                            if(assignmentNode.getKind().equals("Integer"))
-                                assignmentType = new Type("int", false);
-                            else if(assignmentNode.getKind().equals("NewObject")) {
-                                for (Symbol localVariable : method.getLocalVariables()) {
-                                    if (localVariable.getName().equals(assignmentName))
-                                        assignmentType = new Type(localVariable.getType().getName(), false);
-                                }
-                            }
-                            else if(assignmentNode.getKind().equals("NewArray")){
-                                for(Symbol localVariable : method.getLocalVariables()){
-                                    if(localVariable.getName().equals(assignmentName))
-                                        assignmentType = new Type(localVariable.getType().getName(), true);
-                                }
-                                assignmentType = new Type("int", true);
-                            }
-                            else if(assignmentNode.getKind().equals("Identifier")){
-                                for (Symbol localVariable : method.getLocalVariables()) {
-                                    if (localVariable.getName().equals(assignmentName)) {
-                                        for(Symbol localVariable2 : method.getLocalVariables()) {
-                                            if (localVariable2.getName().equals(assignmentNode.get("value"))) {
-                                                if (localVariable2.getType().getName().equals(symbolTable.getClassName()) && !localVariable.getType().getName().equals(symbolTable.getSuper()))
-                                                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(assignmentNode.get("lineStart")), Integer.parseInt(assignmentNode.get("colEnd")), "Class does not extends superclass"));
+                        var hdhh = symbolTable.getFields();
+                        if(symbolTable.getFieldNames().contains(parameterNode.get("assignmentName"))){
+                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(parameterNode.get("lineStart")), Integer.parseInt(parameterNode.get("colEnd")), "a field can not be used in a static method"));
+                        }else {
+                            for (JmmNode assignmentNode : parameterNode.getChildren()) {
+                                Type assignmentType = new Type("boolean", false);
+                                var assignmentName = (String) parameterNode.getObject("assignmentName");
+                                if (assignmentNode.getKind().equals("Integer"))
+                                    assignmentType = new Type("int", false);
+                                else if (assignmentNode.getKind().equals("NewObject")) {
+                                    for (Symbol localVariable : method.getLocalVariables()) {
+                                        if (localVariable.getName().equals(assignmentName))
+                                            assignmentType = new Type(localVariable.getType().getName(), false);
+                                    }
+                                } else if (assignmentNode.getKind().equals("NewArray")) {
+                                    for (Symbol localVariable : method.getLocalVariables()) {
+                                        if (localVariable.getName().equals(assignmentName))
+                                            assignmentType = new Type(localVariable.getType().getName(), true);
+                                    }
+                                    assignmentType = new Type("int", true);
+                                } else if (assignmentNode.getKind().equals("Identifier")) {
+                                    if(symbolTable.getFieldNames().contains(assignmentNode.get("value"))){
+                                        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(parameterNode.get("lineStart")), Integer.parseInt(parameterNode.get("colEnd")), "a field can not be used in a static method"));
+                                    }else {
+                                        for (Symbol localVariable : method.getLocalVariables()) {
+                                            if (localVariable.getName().equals(assignmentName)) {
+                                                for (Symbol localVariable2 : method.getLocalVariables()) {
+                                                    if (localVariable2.getName().equals(assignmentNode.get("value"))) {
+                                                        if (localVariable2.getType().getName().equals(symbolTable.getClassName()) && !localVariable.getType().getName().equals(symbolTable.getSuper()))
+                                                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(assignmentNode.get("lineStart")), Integer.parseInt(assignmentNode.get("colEnd")), "Class does not extends superclass"));
                                                 /*else if(!localVariable2.getType().getName().equals(localVariable.getType().getName())){
                                                     reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(assignmentNode.get("lineStart")), Integer.parseInt(assignmentNode.get("colEnd")), "Assignment type mismatch"));
                                                 }*/
-                                                assignmentType = new Type(localVariable2.getType().getName(), false);
+                                                        assignmentType = new Type(localVariable2.getType().getName(), false);
+                                                    }
+                                                }
                                             }
                                         }
                                     }
-                                }
-                            }
-                            else if(assignmentNode.getKind().equals(("BinaryOp"))){
-                                if(assignmentNode.get("op").equals("&&") || assignmentNode.get("op").equals("||")){
-                                    assignmentType = new Type("boolean", false);
-                                }
-                                else{
-                                    assignmentType = new Type("int", false);
-                                }
-                            }
-                            else if(assignmentNode.getKind().equals("MethodCall")){
-                                for(Symbol localVariable : method.getLocalVariables()){
-                                    if(localVariable.getName().equals(assignmentName))
-                                        assignmentType = new Type(localVariable.getType().getName(), localVariable.getType().isArray());
-                                }
-                            }
-                            for(Symbol localVariable : method.getLocalVariables()){
-                                if(localVariable.getName().equals(assignmentName)) {
-                                    var localVariableType = localVariable.getType();
-                                    if (!localVariable.getType().getName().equals(assignmentType.getName())){
-                                        if (symbolTable.getImports().contains(localVariable.getType().getName()) || (assignmentType.getName().equals(symbolTable.getClassName()) && localVariable.getType().getName().equals(symbolTable.getSuper())))
-                                            continue;
-                                        else
-                                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(assignmentNode.get("lineStart")), Integer.parseInt(assignmentNode.get("colEnd")), "Assignment type mismatch"));
+                                } else if (assignmentNode.getKind().equals(("BinaryOp"))) {
+                                    if (assignmentNode.get("op").equals("&&") || assignmentNode.get("op").equals("||")) {
+                                        assignmentType = new Type("boolean", false);
+                                    } else {
+                                        assignmentType = new Type("int", false);
                                     }
+                                } else if (assignmentNode.getKind().equals("MethodCall")) {
+                                    for (Symbol localVariable : method.getLocalVariables()) {
+                                        if (localVariable.getName().equals(assignmentName))
+                                            assignmentType = new Type(localVariable.getType().getName(), localVariable.getType().isArray());
+                                    }
+                                }
+                                for (Symbol localVariable : method.getLocalVariables()) {
+                                    if (localVariable.getName().equals(assignmentName)) {
+                                        var localVariableType = localVariable.getType();
+                                        if (!localVariable.getType().getName().equals(assignmentType.getName())) {
+                                            if (symbolTable.getImports().contains(localVariable.getType().getName()) || (assignmentType.getName().equals(symbolTable.getClassName()) && localVariable.getType().getName().equals(symbolTable.getSuper())))
+                                                continue;
+                                            else
+                                                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(assignmentNode.get("lineStart")), Integer.parseInt(assignmentNode.get("colEnd")), "Assignment type mismatch"));
+                                        }
                                         //reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(assignmentNode.get("lineStart")), Integer.parseInt(assignmentNode.get("colEnd")), "Assignment type mismatch"));
 
+                                    }
                                 }
-                            }
-                            Symbol assignmentSymbol = new Symbol(assignmentType, assignmentName);
-                            method.setAssignment(assignmentSymbol);
+                                Symbol assignmentSymbol = new Symbol(assignmentType, assignmentName);
+                                method.setAssignment(assignmentSymbol);
 
+                            }
                         }
                         //var assignmentType = ImplementedSymbolTable.getType(parameterNode, "ty");
                     }
