@@ -63,24 +63,24 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
     private String dealWithExpression(JmmNode jmmNode,  String s) {
 
         if(jmmNode.getJmmChild(0).getKind().equals("BinaryOp")){
-                var lhsCode = new ExprCodeResult("", jmmNode.get("assignmentName"));
-                var rhsCode = exprCode.visit(jmmNode.getJmmChild(0));
+            var lhsCode = new ExprCodeResult("", jmmNode.get("assignmentName"));
+            var rhsCode = exprCode.visit(jmmNode.getJmmChild(0));
 
-                ollirCode.append(lhsCode.prefixCode());
-                ollirCode.append(rhsCode.prefixCode());
+            ollirCode.append(lhsCode.prefixCode());
+            ollirCode.append(rhsCode.prefixCode());
 
-                switch (jmmNode.getJmmChild(0).getKind()) {
-                    case ("Boolean"):
-                        ollirCode.append(getIndentation()).append(jmmNode.get("assignmentName")).append(".bool :=.bool ")
-                                .append(getBooleanValue(rhsCode.value())).append(".bool;\n");
-                        break;
-                    default:
-                        var type = getOllirStringType(getType(jmmNode, jmmNode.get("assignmentName")));
-                        ollirCode.append(getIndentation()).append(jmmNode.get("assignmentName")).
-                                append(type).append(" :=").append(type).append(" ").
-                                append(rhsCode.value()).append(";\n");
-                        break;
-                }
+            switch (jmmNode.getJmmChild(0).getKind()) {
+                case ("Boolean"):
+                    ollirCode.append(getIndentation()).append(jmmNode.get("assignmentName")).append(".bool :=.bool ")
+                            .append(getBooleanValue(rhsCode.value())).append(".bool;\n");
+                    break;
+                default:
+                    var type = getOllirStringType(getType(jmmNode, jmmNode.get("assignmentName")));
+                    ollirCode.append(getIndentation()).append(jmmNode.get("assignmentName")).
+                            append(type).append(" :=").append(type).append(" ").
+                            append(rhsCode.value()).append(type).append(";\n");
+                    break;
+            }
         } else {
             //System.out.println("node: " + jmmNode.getJmmChild(0));
             if (!(jmmNode.getJmmChild(0).getKind().equals("MethodCall"))) {
@@ -97,7 +97,7 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
                         if(jmmNode.getJmmChild(0).getKind().equals("NewObject")) {
                             var expr = exprCode.visit(jmmNode.getJmmChild(0));
                             ollirCode.append(getIndentation()).append(expr.prefixCode());
-                            //type = "." + type;
+                            type = "." + type;
                             value = expr.value();
 
                             ollirCode.append(getIndentation()).append(jmmNode.get("assignmentName")).
@@ -122,19 +122,8 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
 
                 var code = exprCode.visit(jmmNode.getJmmChild(0));
                 ollirCode.append(code.prefixCode());
-                ollirCode.append(getIndentation()).append(jmmNode.get("assignmentName")).append(".i32").append(" :=.i32 ").append(code.value()).append(";\n");
+                ollirCode.append(getIndentation()).append(jmmNode.get("assignmentName")).append(".i32").append(" :=.i32 ").append(code.value()).append(".i32;\n");
             }
-
-            /*Type tyTy = ((ImplementedSymbolTable) symbolTable).getFieldType(jmmNode.get("assignmentName"));
-            var varType = (tyTy != null ? getOllirStringType(tyTy.getName()) : getOllirStringType(getType(jmmNode, jmmNode.get("assignmentName"))));
-            var lhsCode = new ExprCodeResult("", jmmNode.get("assignmentName") + ".i32");
-            var rhsCode = exprCode.visit(jmmNode.getJmmChild(0));
-
-            ollirCode.append("\t\t" + lhsCode.prefixCode());
-            ollirCode.append(rhsCode.prefixCode());
-
-            if(tyTy != null) ollirCode.append("\t\tputfield(this, " + lhsCode.value() + ", " + rhsCode.value() + ").V;\n");
-            else ollirCode.append(lhsCode.value()).append(" :=").append(varType).append(" ").append(rhsCode.value()).append(";\n");*/
 
         }
 
@@ -174,10 +163,7 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
                 }
                 ollirCode.append(", ");
                 var param = exprCode.visit(child);
-                var type = getType(jmmNode, param.value());
-                String ty = getOllirStringType(type);
-                //if(param.value().equals("")) ty = "." + ty;
-                ollirCode.append(param.value());//.append(ty);
+                ollirCode.append(param.value()).append(".i32");
                 //System.out.println("ty:" + getType(jmmNode,param.value()));
             }
         }
@@ -253,23 +239,23 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
         this.decrementIndentation();
 
         ollirCode.append(getIndentation()).append("}\n");
-        return methodName;
+        return "";
     }
 
     private String dealWithReturnStatements(JmmNode jmmNode, String methodName) {
 
         ExprCodeResult retStat = exprCode.visit(jmmNode.getJmmChild(0));
         var retType = getOllirType(symbolTable.getReturnType(methodName));
-        /*String val = retStat.value();
-        int index = val.indexOf(".");
-        String letters = val.substring(0, index);*/
         ollirCode.append(retStat.prefixCode()).append(getIndentation())
                 .append("ret").append(retType)
-                .append(" ").append(retStat.value()).append(";\n");
-
-        if(retStat.value().equals(" ")) ollirCode.append(retType).append(";\n");
-        System.out.println("lksl:" + retStat);
-        //System.out.println("ret" + retType);
+                .append(" ").append(retStat.value());
+        if(jmmNode.getJmmChild(0).getKind().equals("Integer")) {
+            retType = ".i32";
+            ollirCode.append(retType).append(";\n");
+        }
+        else
+            ollirCode.append(retType).append(";\n");
+        System.out.println("ret" + retType);
         return methodName;
     }
 
