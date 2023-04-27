@@ -761,6 +761,9 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
                                 if (fields.getName().equals(node.getChildren().get(0).getChildren().get(j).get("value"))) {
                                     if (!symbolTable.getParameters(node.getChildren().get(0).get("methodCallName")).get(i).getType().equals(fields.getType())) {
                                         reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Parameter type does not match the type of the variable!"));
+                                        i++;
+                                    }else{
+                                        i++;
                                     }
                                 }
                             }
@@ -770,6 +773,9 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
                                 if (fields.getName().equals(node.getChildren().get(0).getChildren().get(j).get("accessName"))) {
                                     if (!symbolTable.getParameters(node.getChildren().get(0).get("methodCallName")).get(i).getType().equals(fields.getType())) {
                                         reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Parameter type does not match the type of the variable!"));
+                                        i++;
+                                    }else{
+                                        i++;
                                     }
                                 }
                             }
