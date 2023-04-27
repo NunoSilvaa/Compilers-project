@@ -46,7 +46,7 @@ public class OllirUtils {
             case "boolean" -> ".bool";
             case "int" -> ".i32";
             case "Integer"  -> ".i32";
-            default -> "." + type;
+            default -> type;
         };
     }
 
