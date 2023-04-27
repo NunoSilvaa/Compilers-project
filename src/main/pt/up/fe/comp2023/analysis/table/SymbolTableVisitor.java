@@ -393,6 +393,18 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                                         }
                                     }
                                 }
+                            } else if(assignmentNode.getKind().equals("MethodCall")){
+                                var dhhdd = symbolTable.getMethods();
+                                for(Method method2 : symbolTable.getMethodsList()){
+                                    var hdh = method2.getName();
+                                    if(method2.getName().equals(assignmentNode.get("methodCallName"))){
+                    /*if(!method2.getReturnType().equals(new Type("int", false))){
+
+                    }*/
+                                        assignmentType = method.getReturnType();
+                                        var t = 1;
+                                    }
+                                }
                             }
                             for (Symbol localVariable : symbolTable.getFields()) {
                                 if (localVariable.getName().equals(assignmentName)) {
