@@ -153,7 +153,7 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
                 ollirCode.append("\t\tinvokevirtual(");
         }
 
-        ollirCode.append(jmmNode.getJmmChild(0).get("value")).append(" , \"").append(methodName).append("\"");
+        ollirCode.append(jmmNode.getJmmChild(0).get("value")).append(",\"").append(methodName).append("\"");
         if(jmmNode.getNumChildren() > 1) {
             int i = 0;
             //JmmNode params = jmmNode.getJmmChild(1);
@@ -162,14 +162,15 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
                     i++;
                     continue;
                 }
-                ollirCode.append(" , ");
+                ollirCode.append(", ");
                 var param = exprCode.visit(child);
                 ollirCode.append(param.value()).append(getOllirStringType(getType(jmmNode,param.value())));
-
+                //System.out.println("ty:" + getType(jmmNode,param.value()));
             }
         }
 
         //System.out.println("identifier:" + jmmNode.getJmmChild(0).get("value"));
+        //System.out.println("rettype:" + returnType);
         ollirCode.append(")").append(returnType).append(";\n");
         return "";
     }

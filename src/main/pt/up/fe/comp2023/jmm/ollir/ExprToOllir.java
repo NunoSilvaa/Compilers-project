@@ -39,7 +39,7 @@ public class ExprToOllir extends PreorderJmmVisitor<Void, ExprCodeResult> {
     }
 
     private ExprCodeResult dealWithInteger(JmmNode jmmNode, Void unused) {
-        return new ExprCodeResult("", jmmNode.get("value"));
+        return new ExprCodeResult("", jmmNode.get("value") + ".i32");
     }
 
     public String nextTempVar() {
