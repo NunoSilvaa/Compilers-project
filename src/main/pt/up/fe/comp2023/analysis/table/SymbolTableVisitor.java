@@ -238,6 +238,9 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                         method.setLocalVariable(variableSymbol);
                     }
                 } else if (parameterNode.getKind().equals("Parameter")) {
+                   /* for(JmmNode parameter : parameterNode.getChildren()){
+                        Type type = ImplementedSymbolTable.getType(parameter, "ty");
+                    }*/
                     var parameterType = parameterNode.getChildren().get(0);
 
                     Type type = ImplementedSymbolTable.getType(parameterType, "ty");
