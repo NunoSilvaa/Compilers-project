@@ -16,8 +16,8 @@ public class ImplementedJasminBackend implements JasminBackend {
     String superClass;
     int current;
 
-    int localLimit = 99;
-    int stackLimit = 99;
+    int localLimit;
+    int stackLimit;
 
     int countStack;
 
@@ -548,6 +548,8 @@ public class ImplementedJasminBackend implements JasminBackend {
 
             case invokestatic -> {
 
+                popper  = 0;
+
                 for (Element element : instruction.getListOfOperands()) {
                     strInst.append(this.loadStack(element, varTable));
                     popper++;
@@ -613,6 +615,7 @@ public class ImplementedJasminBackend implements JasminBackend {
     }
 
     private int updateLocalLimit(Method method) {
+        regs.clear();
         regs.add(0);
         for (Descriptor descriptor : method.getVarTable().values()) {
             regs.add(descriptor.getVirtualReg());
