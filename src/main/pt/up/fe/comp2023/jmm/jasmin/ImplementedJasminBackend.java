@@ -147,23 +147,22 @@ public class ImplementedJasminBackend implements JasminBackend {
         stackLimit = 0;
         localLimit = updateLocalLimit(method);
 
-        met.append("\t.limit stack " + stackLimit + "\n" + "\t.limit locals " +
-                localLimit + "\n");
+        StringBuilder strInst = new StringBuilder();
 
         List<Instruction> instructions = method.getInstructions();
 
         for (Instruction instruction : method.getInstructions()) {
             for (Map.Entry<String, Instruction> label : method.getLabels().entrySet()) {
-                if (label.getValue().equals(instruction)) met.append(label.getKey()).append(":\n");
+                if (label.getValue().equals(instruction)) strInst.append(label.getKey()).append(":\n");
             }
-            met.append(this.getInstruction(instruction, method.getVarTable()));
+            strInst.append(this.getInstruction(instruction, method.getVarTable()));
 
             if (instruction.getInstType() == InstructionType.CALL) {
                 CallInstruction inst = (CallInstruction) instruction;
                 ElementType ret = inst.getReturnType().getTypeOfElement();
 
                 if (ret != ElementType.VOID) {
-                    met.append("\tpop\n");
+                    strInst.append("\tpop\n");
                     updateStackLimit(-1);
                 }
 
@@ -172,8 +171,13 @@ public class ImplementedJasminBackend implements JasminBackend {
 
         if (!((instructions.size() > 0) && (instructions.get(instructions.size() - 1).getInstType() == InstructionType.RETURN)))
         {
-            if (method.getReturnType().getTypeOfElement() == ElementType.VOID) met.append("\treturn\n");
+            if (method.getReturnType().getTypeOfElement() == ElementType.VOID) strInst.append("\treturn\n");
         }
+
+        met.append("\t.limit stack " + stackLimit + "\n" + "\t.limit locals " +
+                localLimit + "\n");
+
+        met.append(strInst);
 
         met.append(".end method\n\n");
         return met.toString();
