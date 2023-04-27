@@ -258,7 +258,9 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
         //var teste4 = node.getJmmParent().get("assignmentName");
         if(node.getJmmParent().getKind().equals("Assignment")) {
             if (!localVariableNames.contains(node.getJmmParent().get("assignmentName"))) {
-                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Variable not declared!"));
+                if (!symbolTable.getFieldNames().contains(node.getJmmParent().get("assignmentName"))) {
+                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Variable not declared!"));
+                }
             }
         }else if(node.getJmmParent().getKind().equals("MethodCall")){
             if(!localVariableNames.contains(node.get("value")) && !symbolTable.getParametersNames(methodNodeName).contains(node.get("value"))){
