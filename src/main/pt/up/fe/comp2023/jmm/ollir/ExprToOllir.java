@@ -40,7 +40,7 @@ public class ExprToOllir extends PreorderJmmVisitor<Void, ExprCodeResult> {
         JmmNode node = jmmNode;
         while (!(node.getKind().equals("MetDeclaration"))){
             if (node.getKind().equals("MainDeclaration")) {
-                return node.get("methodName");
+                return "main";
             }
             node = node.getJmmParent();
         }
@@ -66,6 +66,7 @@ public class ExprToOllir extends PreorderJmmVisitor<Void, ExprCodeResult> {
                 else val = "$" + paramPair.b  + "." + jmmNode.get("value") + varType;
             } else {
                 type = ((ImplementedSymbolTable) symbolTable).getLocalVarType(jmmNode.get("value"), methodName);
+                //System.out.println("123" + methodName);
                 if (type != null){
                     varType = getOllirStringType(type.getName());
                     val = jmmNode.get("value") + varType;
@@ -156,9 +157,11 @@ public class ExprToOllir extends PreorderJmmVisitor<Void, ExprCodeResult> {
         // Check if virtual or static with identifier
         // If import or superclass -> static / else virtual
         // Get parameters
+        var returnType = ".i32";
 
         if(symbolTable.getImports().contains(identifierName)){
             code.append(identifierCode.prefixCode()).append("\t\tinvokestatic(").append(identifierName).append(", \"").append(jmmNode.get("methodCallName")).append("\"");
+            returnType = ".V";
         } else {
             // Because it's virtual, he have to get the type of the identifier
             String type = "";
@@ -176,11 +179,11 @@ public class ExprToOllir extends PreorderJmmVisitor<Void, ExprCodeResult> {
             var param = visit(child);
             //change type later;
             var type = getType(jmmNode, param.value());
-            type = "int";
+            //type = "int";
             code.append(", ").append(param.value()).append(getOllirStringType(type));
         }
             //System.out.println("type: " + getOllirStringType(type));
-        code.append(")").append(".i32;\n");
+        code.append(")").append(returnType).append(";\n");
 
         return new ExprCodeResult(code.toString(),value + ".i32");
     }

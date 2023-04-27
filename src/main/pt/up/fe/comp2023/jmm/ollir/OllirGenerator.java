@@ -97,7 +97,7 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
                         if(jmmNode.getJmmChild(0).getKind().equals("NewObject")) {
                             var expr = exprCode.visit(jmmNode.getJmmChild(0));
                             ollirCode.append(getIndentation()).append(expr.prefixCode());
-                            type = "." + type;
+                            //type = "." + type;
                             value = expr.value();
 
                             ollirCode.append(getIndentation()).append(jmmNode.get("assignmentName")).
@@ -174,7 +174,10 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
                 }
                 ollirCode.append(", ");
                 var param = exprCode.visit(child);
-                ollirCode.append(param.value()).append(".i32");
+                var type = getType(jmmNode, param.value());
+                String ty = getOllirStringType(type);
+                //if(param.value().equals("")) ty = "." + ty;
+                ollirCode.append(param.value());//.append(ty);
                 //System.out.println("ty:" + getType(jmmNode,param.value()));
             }
         }
