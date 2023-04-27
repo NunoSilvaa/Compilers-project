@@ -72,6 +72,10 @@ public class ImplementedSymbolTable implements SymbolTable {
         return List.copyOf(this.methods.keySet());
     }
 
+    public List<Method> getMethodsList() {
+        return new ArrayList<>(this.methods.values());
+    }
+
     public void addMethod(String name, Type returnType, List<Symbol> localVariables, List<Symbol> parameters, List<Symbol> assignments){
         this.current = new Method(name);
         for(Symbol localVariable : localVariables){
