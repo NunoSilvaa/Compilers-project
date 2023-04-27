@@ -8,6 +8,7 @@ import java.util.Map;
 
 import pt.up.fe.comp.TestUtils;
 import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
+import pt.up.fe.comp.jmm.jasmin.JasminResult;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
 import pt.up.fe.comp.jmm.parser.JmmParserResult;
 import pt.up.fe.comp2023.jmm.jasmin.ImplementedJasminBackend;
@@ -49,17 +50,31 @@ public class Launcher {
         analysis.semanticAnalysis(parserResult);
 
         JmmSemanticsResult semanticsResult = analysis.semanticAnalysis(parserResult);
-        System.out.println(semanticsResult.getRootNode().toTree());
+        //System.out.println(semanticsResult.getRootNode().toTree());
+        TestUtils.noErrors(semanticsResult);
+
         Optimizer optimizer = new Optimizer();
+        semanticsResult = optimizer.optimize(semanticsResult);
+
+        TestUtils.noErrors(semanticsResult);
+
         OllirResult ollirResult = optimizer.toOllir(semanticsResult);
+
+        TestUtils.noErrors(ollirResult);
+
         System.out.println(ollirResult.getOllirCode());
 
-        //String ollirCode = SpecsIo.read("../test/pt/up/fe/comp/cp2/jasmin/OllirToJasminBasic.ollir");
-        //OllirResult ollirResult = new OllirResult(code, Collections.emptyMap());
-        //ImplementedJasminBackend implementedJasminBackend = new ImplementedJasminBackend();
-        //JasminResult jasminResult = implementedJasminBackend.toJasmin(ollirResult);
+        ollirResult = optimizer.optimize(ollirResult);
 
-        //TestUtils.noErrors(jasminResult);
+        TestUtils.noErrors(ollirResult);
+
+
+        ImplementedJasminBackend implementedJasminBackend = new ImplementedJasminBackend();
+        JasminResult jasminResult = implementedJasminBackend.toJasmin(ollirResult);
+        jasminResult.compile();
+        System.out.println("Execute code: \n");
+        jasminResult.run();
+        TestUtils.noErrors(jasminResult);
     }
 
     private static Map<String, String> parseArgs(String[] args) {

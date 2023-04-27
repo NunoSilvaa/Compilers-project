@@ -37,12 +37,10 @@ public class ImplementedJasminBackend implements JasminBackend {
 
         String code = builder();
 
-        if (ollirResult.getConfig().getOrDefault("debug", "false").equals("true")) {
+        if (ollirResult.getConfig().get("debug") != null && ollirResult.getConfig().get("debug").equals("true")) {
             System.out.println("JASMIN CODE:");
             System.out.println(code);
         }
-
-        //System.out.println(code);
 
 
         return new JasminResult(ollirResult, code, Collections.emptyList());
@@ -168,7 +166,7 @@ public class ImplementedJasminBackend implements JasminBackend {
             }
         }
 
-        if (!((instructions.get(instructions.size() - 1).getInstType() == InstructionType.RETURN) && (instructions.size() > 0)))
+        if (!((instructions.size() > 0) && (instructions.get(instructions.size() - 1).getInstType() == InstructionType.RETURN)))
         {
             if (method.getReturnType().getTypeOfElement() == ElementType.VOID) met.append("\treturn\n");
         }
