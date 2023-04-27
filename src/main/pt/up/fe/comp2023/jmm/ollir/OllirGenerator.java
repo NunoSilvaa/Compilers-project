@@ -1,8 +1,10 @@
 package pt.up.fe.comp2023.jmm.ollir;
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.SymbolTable;
+import pt.up.fe.comp.jmm.analysis.table.Type;
 import pt.up.fe.comp.jmm.ast.AJmmVisitor;
 import pt.up.fe.comp.jmm.ast.JmmNode;
+import pt.up.fe.comp2023.analysis.table.ImplementedSymbolTable;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -111,7 +113,6 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
                 }
 
             }
-
             //System.out.println("assignament" + jmmNode.getJmmChild(0));
 
             if (jmmNode.getJmmChild(0).getKind().equals("MethodCall")) {
@@ -126,6 +127,19 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
                 ollirCode.append(code.prefixCode());
                 ollirCode.append(getIndentation()).append(jmmNode.get("assignmentName")).append(".i32").append(" :=.i32 ").append(code.value()).append(".i32;\n");
             }
+
+            Type tyTy = ((ImplementedSymbolTable) symbolTable).getFieldType(jmmNode.get("assignmentName"));
+            var varType = (tyTy != null ? getOllirStringType(tyTy.getName()) : getOllirStringType(getType(jmmNode, jmmNode.get("assignmentName"))));
+            var lhsCode = new ExprCodeResult("", jmmNode.get("assignmentName") + ".i32");
+            var rhsCode = exprCode.visit(jmmNode.getJmmChild(0));
+
+            var code = new StringBuilder();
+            code.append("\t\t" + lhsCode.prefixCode());
+            code.append(rhsCode.prefixCode());
+
+            if(tyTy != null) code.append("\t\tputfield(this, " + lhsCode.value() + ", " + rhsCode.value() + ").V;\n");
+            else code.append(lhsCode.value()).append(" :=").append(varType).append(" ").append(rhsCode.value()).append(";\n");
+
         }
 
         return ollirCode.toString();
@@ -164,7 +178,7 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
                 }
                 ollirCode.append(", ");
                 var param = exprCode.visit(child);
-                ollirCode.append(param.value()).append(getOllirStringType(getType(jmmNode,param.value())));
+                ollirCode.append(param.value()).append(".i32");
                 //System.out.println("ty:" + getType(jmmNode,param.value()));
             }
         }
@@ -215,18 +229,14 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
             statements = jmmNode.getChildren();
         }
 
-        //System.out.println(symbolTable.getLocalVariables(methodName));
-        //System.out.println("statements" + jmmNode.getJmmChild(0));
         var params = symbolTable.getParameters(methodName);
 
         if (params.size() != 0) {
 
-            //Collections.reverse(params);
             var paramCode = params.stream()
                     .map(OllirUtils::getCode).
                     collect(Collectors.joining(", "));
 
-            //System.out.println("params" + params);
             ollirCode.append(paramCode);
         }
         ollirCode.append(")").append(getOllirType(symbolTable.getReturnType(methodName)));
@@ -314,7 +324,6 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
     }
 
     private String defaultVisit(JmmNode jmmNode, String s){
-        //System.out.println("visiting: " + jmmNode.getKind());
         if(jmmNode.getNumChildren() == 0){
             return "";
         }

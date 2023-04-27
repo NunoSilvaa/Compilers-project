@@ -1,5 +1,6 @@
 package pt.up.fe.comp2023.analysis.table;
 
+import org.antlr.v4.runtime.misc.Pair;
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.SymbolTable;
 import pt.up.fe.comp.jmm.analysis.table.Type;
@@ -98,6 +99,7 @@ public class ImplementedSymbolTable implements SymbolTable {
 
     @Override
     public List<Symbol> getParameters(String s) {
+        if(this.methods.get(s) == null) return new ArrayList<>();
         return this.methods.get(s).getParameters();
     }
 
@@ -127,6 +129,7 @@ public class ImplementedSymbolTable implements SymbolTable {
 
     @Override
     public List<Symbol> getLocalVariables(String s) {
+        if(this.methods.get(s) == null) return new ArrayList<>();
         return this.methods.get(s).getLocalVariables();
     }
 
@@ -134,16 +137,33 @@ public class ImplementedSymbolTable implements SymbolTable {
         return this.methods.get(s).getAssignments();
     }
 
-    public Type getVariableType(String method, String variable){
-        if(getLocalVariables(method).isEmpty()) {
-            return new Type("impossible", false);
+    public boolean isParameter(String var, String method){
+        for (Symbol param: this.getParameters(method)) {
+            if (param.getName().equals(var)) return true;
         }
-        for(Symbol symbol : getLocalVariables(method)){
-            if(symbol.getName().equals(variable)){
-                return symbol.getType();
-            }
-        }
-        return new Type("impossible",false);
+        return false;
     }
 
+    public Type getFieldType(String var){
+        for (Symbol f: fields.keySet()){
+            if(f.getName().equals(var)) return f.getType();
+        }
+        return null;
+    }
+
+    public Pair<Type, Integer> getParameterType(String var, String method){
+        int i=1;
+        for (Symbol p: getParameters(method)){
+            if(p.getName().equals(var)) return new Pair<>(p.getType(), i);
+            i++;
+        }
+        return null;
+    }
+
+    public Type getLocalVarType(String var, String method){
+        for (Symbol v: getLocalVariables(method)){
+            if (v.getName().equals(var)) return v.getType();
+        }
+        return null;
+    }
 }
