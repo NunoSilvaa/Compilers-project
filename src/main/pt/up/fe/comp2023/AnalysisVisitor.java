@@ -668,6 +668,41 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
                 }
             }
         }
+        if(node.getChildren().get(0).getKind().equals("MethodCall")){
+            if(symbolTable.getMethods().contains(node.getChildren().get(0).get("methodCallName"))){
+                for(Symbol parameter : symbolTable.getParameters(node.getChildren().get(0).get("methodCallName"))) {
+                    if (!node.getChildren().get(0).getChildren().get(1).getKind().equals("MemberAccess")) {
+                        for (Symbol localVariable : symbolTable.getLocalVariables(methodNodeName)) {
+                            if (!node.getChildren().get(0).getChildren().get(1).getKind().equals("MemberAccess")) {
+                                if (localVariable.getName().equals(node.getChildren().get(0).getChildren().get(1).get("value"))) {
+                                    if (!parameter.getType().equals(localVariable.getType())) {
+                                        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Parameter type does not match the type of the variable!"));
+                                    }
+                                }
+                            }
+
+                        }
+                        for (Symbol fields : symbolTable.getFields()) {
+                            if (fields.getName().equals(node.getChildren().get(0).getChildren().get(1).get("value"))) {
+                                if (!parameter.getType().equals(fields.getType())) {
+                                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Parameter type does not match the type of the variable!"));
+                                }
+                            }
+                        }
+                    } else {
+                        for (Symbol fields : symbolTable.getFields()) {
+                            if (fields.getName().equals(node.getChildren().get(0).getChildren().get(1).get("accessName"))) {
+                                if (!parameter.getType().equals(fields.getType())) {
+                                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Parameter type does not match the type of the variable!"));
+                                }
+                            }
+                        }
+                    }
+                }
+
+
+            }
+        }
         return s;
     }
 
