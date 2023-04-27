@@ -148,6 +148,19 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
                 }
             //lhsType = symbolTable.getVariableType(methodNodeName, node.getChildren().get(0).get("value"));
         }
+        }else if(node.getChildren().get(0).getKind().equals("MethodCall")){
+            var jdjj = symbolTable.getMethodsList();
+            for(Method method2 : symbolTable.getMethodsList()){
+                var hdh = method2.getName();
+                if(method2.getName().equals(node.getChildren().get(0).get("methodCallName"))){
+                    /*if(!method2.getReturnType().equals(new Type("int", false))){
+
+                    }*/
+                    lhsType = method.getReturnType();
+                    var t = 1;
+                }
+            }
+            var sh = 1;
         }
         else{
             for (Symbol assignment : symbolTable.getAssignments(methodNodeName)) {
@@ -207,6 +220,19 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
                 }
                 //lhsType = symbolTable.getVariableType(methodNodeName, node.getChildren().get(0).get("value"));
             }
+        }else if(node.getChildren().get(1).getKind().equals("MethodCall")){
+            var jdjj = symbolTable.getMethodsList();
+            for(Method method2 : symbolTable.getMethodsList()){
+                var hdh = method2.getName();
+                if(method2.getName().equals(node.getChildren().get(1).get("methodCallName"))){
+                    /*if(!method2.getReturnType().equals(new Type("int", false))){
+
+                    }*/
+                    rhsType = method.getReturnType();
+                    var t = 1;
+                }
+            }
+            var sh = 1;
         }
         else {
             for (Symbol assignment : symbolTable.getAssignments(methodNodeName)) {
@@ -259,7 +285,9 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
         if(node.getJmmParent().getKind().equals("Assignment")) {
             if (!localVariableNames.contains(node.getJmmParent().get("assignmentName"))) {
                 if (!symbolTable.getFieldNames().contains(node.getJmmParent().get("assignmentName"))) {
-                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Variable not declared!"));
+                    if(!symbolTable.getParametersNames(methodNodeName).contains(node.getJmmParent().get("assignmentName"))){
+                        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Variable not declared!"));
+                    }
                 }
             }
         }else if(node.getJmmParent().getKind().equals("MethodCall")){
@@ -482,9 +510,11 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
         if(!node.getJmmParent().getKind().equals("ExpressionStatement")){
         if(symbolTable.getMethods().contains(node.get("methodCallName")) || symbolTable.getImports().contains(node.get("methodCallName"))) {
             for (Symbol localVariable : symbolTable.getLocalVariables(methodNodeName)) {
-                if (localVariable.getName().equals(node.getChildren().get(1).get("value"))) {
-                    if (!symbolTable.getParameters(node.get("methodCallName")).contains(localVariable)) {
-                        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Incompatible arguments type!"));
+                if(node.getChildren().size() > 1) {
+                    if (localVariable.getName().equals(node.getChildren().get(1).get("value"))) {
+                        if (!symbolTable.getParameters(node.get("methodCallName")).contains(localVariable)) {
+                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Incompatible arguments type!"));
+                        }
                     }
                 }
             }
