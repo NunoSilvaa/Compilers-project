@@ -254,8 +254,9 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
         var retType = getOllirType(symbolTable.getReturnType(methodName));
         ollirCode.append(retStat.prefixCode()).append(getIndentation())
                 .append("ret").append(retType)
-                .append(" ").append(retStat.value())
-                .append(retType).append(";\n");
+                .append(" ").append(retStat.value());
+        if(jmmNode.getJmmChild(0).getKind().equals("Integer")) ollirCode.append(";\n");
+        else ollirCode.append(retType).append(";\n");
 
         return methodName;
     }
