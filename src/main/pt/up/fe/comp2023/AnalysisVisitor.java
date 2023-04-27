@@ -700,30 +700,115 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
         }
         if(node.getChildren().get(0).getKind().equals("MethodCall")){
             if(symbolTable.getMethods().contains(node.getChildren().get(0).get("methodCallName"))){
-                for(Symbol parameter : symbolTable.getParameters(node.getChildren().get(0).get("methodCallName"))) {
-                    if (!node.getChildren().get(0).getChildren().get(1).getKind().equals("MemberAccess")) {
-                        for (Symbol localVariable : symbolTable.getLocalVariables(methodNodeName)) {
-                            if (!node.getChildren().get(0).getChildren().get(1).getKind().equals("MemberAccess")) {
-                                if (localVariable.getName().equals(node.getChildren().get(0).getChildren().get(1).get("value"))) {
-                                    if (!parameter.getType().equals(localVariable.getType())) {
+                   /* for (JmmNode child : node.getChildren().get(0).getChildren()) {
+                        if (!child.equals(node.getChildren().get(0).getChildren().get(0))) {
+                            if (!child.getKind().equals("MemberAccess")) {
+                                //for (Symbol parameter : symbolTable.getParameters(node.getChildren().get(0).get("methodCallName"))) {
+                                for (Symbol localVariable : symbolTable.getLocalVariables(methodNodeName)) {
+                                    if (localVariable.getName().equals(child.get("value"))) {
+                                        for (Symbol parameter : symbolTable.getParameters(node.getChildren().get(0).get("methodCallName"))) {
+                                            if (!child.getKind().equals("MemberAccess")) {
+                                                if (localVariable.getName().equals(child.get("value"))) {
+                                                    child++;
+                                                    if (!parameter.getType().equals(localVariable.getType())) {
+                                                        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Parameter type does not match the type of the variable!"));
+                                                        //break;
+                                                    }
+                                                    // var jj =1;
+                                                    // break;
+                                                }
+
+                                            } else {
+                                                for (Symbol fields : symbolTable.getFields()) {
+                                                    if (fields.getName().equals(child.get("accessName"))) {
+                                                        if (!parameter.getType().equals(fields.getType())) {
+                                                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Parameter type does not match the type of the variable!"));
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            for (Symbol fields : symbolTable.getFields()) {
+                                                if (fields.getName().equals(child.get("value"))) {
+                                                    if (!parameter.getType().equals(fields.getType())) {
+                                                        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Parameter type does not match the type of the variable!"));
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+            }*/
+                for(int i = 0; i < symbolTable.getParameters(node.getChildren().get(0).get("methodCallName")).size(); i++){
+                    for(int j = 1; j < node.getChildren().get(0).getChildren().size(); j++){
+                        if(!node.getChildren().get(0).getChildren().get(j).getKind().equals("MemberAccess")) {
+                            for (int k = 0; k < symbolTable.getLocalVariables(methodNodeName).size(); k++) {
+                                if (!node.getChildren().get(0).getChildren().get(j).getKind().equals("MemberAccess")) {
+                                    if (symbolTable.getLocalVariables(methodNodeName).get(k).getName().equals(node.getChildren().get(0).getChildren().get(j).get("value"))) {
+                                        if (!symbolTable.getParameters(node.getChildren().get(0).get("methodCallName")).get(i).getType().equals(symbolTable.getLocalVariables(methodNodeName).get(k).getType())) {
+                                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Parameter type does not match the type of the variable!"));
+                                            i++;
+                                        }else {
+                                            i++;
+                                        }
+                                    }
+                                }
+                            }
+                            for (Symbol fields : symbolTable.getFields()) {
+                                if (fields.getName().equals(node.getChildren().get(0).getChildren().get(j).get("value"))) {
+                                    if (!symbolTable.getParameters(node.getChildren().get(0).get("methodCallName")).get(i).getType().equals(fields.getType())) {
                                         reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Parameter type does not match the type of the variable!"));
                                     }
                                 }
                             }
-
                         }
-                        for (Symbol fields : symbolTable.getFields()) {
-                            if (fields.getName().equals(node.getChildren().get(0).getChildren().get(1).get("value"))) {
-                                if (!parameter.getType().equals(fields.getType())) {
-                                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Parameter type does not match the type of the variable!"));
+                         else {
+                            for (Symbol fields : symbolTable.getFields()) {
+                                if (fields.getName().equals(node.getChildren().get(0).getChildren().get(j).get("accessName"))) {
+                                    if (!symbolTable.getParameters(node.getChildren().get(0).get("methodCallName")).get(i).getType().equals(fields.getType())) {
+                                        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Parameter type does not match the type of the variable!"));
+                                    }
                                 }
                             }
                         }
-                    } else {
-                        for (Symbol fields : symbolTable.getFields()) {
-                            if (fields.getName().equals(node.getChildren().get(0).getChildren().get(1).get("accessName"))) {
-                                if (!parameter.getType().equals(fields.getType())) {
-                                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Parameter type does not match the type of the variable!"));
+                        }
+                    }
+                }
+
+                /*for(Symbol parameter : symbolTable.getParameters(node.getChildren().get(0).get("methodCallName"))) {
+                    for (JmmNode child : node.getChildren().get(0).getChildren()) {
+                        if (!child.equals(node.getChildren().get(0).getChildren().get(0))) {
+                            if (!child.getKind().equals("MemberAccess")) {
+                                for (Symbol localVariable : symbolTable.getLocalVariables(methodNodeName)) {
+                                    if (!child.getKind().equals("MemberAccess")) {
+                                        if (localVariable.getName().equals(child.get("value"))) {
+                                            if (!parameter.getType().equals(localVariable.getType())) {
+                                                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Parameter type does not match the type of the variable!"));
+                                                //break;
+                                            }
+                                           // var jj =1;
+                                           // break;
+                                        }
+                                    }
+
+                                }
+                                for (Symbol fields : symbolTable.getFields()) {
+                                    if (fields.getName().equals(child.get("value"))) {
+                                        if (!parameter.getType().equals(fields.getType())) {
+                                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Parameter type does not match the type of the variable!"));
+                                        }
+                                    }
+                                }
+                            } else {
+                                for (Symbol fields : symbolTable.getFields()) {
+                                    if (fields.getName().equals(child.get("accessName"))) {
+                                        if (!parameter.getType().equals(fields.getType())) {
+                                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Parameter type does not match the type of the variable!"));
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -731,7 +816,7 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
                 }
 
 
-            }
+            }*/
         }
         return s;
     }
