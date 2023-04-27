@@ -230,6 +230,10 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                             }
                         }
                     }
+                    if(parameterNode.getChildren().get(0).getKind().equals("Boolean")){
+                        if(!method.getReturnType().equals("boolean"))
+                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(parameterNode.get("lineStart")), Integer.parseInt(parameterNode.get("colEnd")), "Return type mismatch"));
+                    }
                 } else if (parameterNode.getKind().equals("LocalVariables")) {
                     for (JmmNode localVariable : parameterNode.getChildren()) {
                         Type variableType = ImplementedSymbolTable.getType(localVariable, "ty");
