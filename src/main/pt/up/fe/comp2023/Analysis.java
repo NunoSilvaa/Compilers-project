@@ -47,7 +47,7 @@ public class Analysis implements JmmAnalysis {
 
         /*if(reports.isEmpty())
             return new JmmSemanticsResult(jmmParserResult, symbolTable, Collections.emptyList());*/
-        return  new JmmSemanticsResult(jmmParserResult, symbolTable, jmmParserResult.getReports());
-        //return new JmmSemanticsResult(jmmParserResult, symbolTable, reports);
+        //return  new JmmSemanticsResult(jmmParserResult, symbolTable, jmmParserResult.getReports());
+        return new JmmSemanticsResult(jmmParserResult, symbolTable, reports);
     }
 }
