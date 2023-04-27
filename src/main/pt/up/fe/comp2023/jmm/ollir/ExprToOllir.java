@@ -1,17 +1,24 @@
 package pt.up.fe.comp2023.jmm.ollir;
 
+import pt.up.fe.comp.jmm.analysis.table.Symbol;
+import pt.up.fe.comp.jmm.analysis.table.SymbolTable;
+import pt.up.fe.comp.jmm.analysis.table.Type;
 import pt.up.fe.comp.jmm.ast.JmmNode;
 import pt.up.fe.comp.jmm.ast.PreorderJmmVisitor;
 import pt.up.fe.comp2023.JavammBaseListener;
 
+import java.util.List;
+
 import static pt.up.fe.comp2023.analysis.table.ImplementedSymbolTable.getType;
+import static pt.up.fe.comp2023.jmm.ollir.OllirUtils.getCode;
 import static pt.up.fe.comp2023.jmm.ollir.OllirUtils.getOllirStringType;
 
 public class ExprToOllir extends PreorderJmmVisitor<Void, ExprCodeResult> {
     private int counter;
+    private SymbolTable symbolTable;
 
-    public ExprToOllir(){
-
+    public ExprToOllir(SymbolTable symbolTable){
+        this.symbolTable = symbolTable;
         this.counter = 0;
     }
 
@@ -22,6 +29,8 @@ public class ExprToOllir extends PreorderJmmVisitor<Void, ExprCodeResult> {
         addVisit("Integer", this::dealWithInteger);
         addVisit("Identifier",this::dealWithIdentifier);
         addVisit("NewObject", this::dealWithNewObject);
+        addVisit("This", this::dealWithThis);
+        addVisit("MethodCall", this::dealWithCallMethod);
         setDefaultValue(() -> new ExprCodeResult("", ""));
     }
 
@@ -73,6 +82,68 @@ public class ExprToOllir extends PreorderJmmVisitor<Void, ExprCodeResult> {
         code += "\t\tinvokespecial(" + value + ",\"<init>\").V;\n";
 
         return new ExprCodeResult(code, value);
+    }
+
+    public String getType(JmmNode jmmNode, String var) {
+        JmmNode node = jmmNode;
+
+        while (!node.getKind().equals("MetDeclaration")){
+            if (node.getKind().equals("MainDeclaration")) {
+                for(Symbol varType : symbolTable.getLocalVariables("main")){
+                    if (varType.getName().equals(var)) return varType.getType().getName();
+                }
+                return "";
+            }
+            node = node.getJmmParent();
+        }
+        String methodName = node.get("methodName");
+
+        for(Symbol varType : symbolTable.getLocalVariables(methodName)){
+            if (varType.getName().equals(var))
+                return varType.getType().getName();
+        }
+        return "";
+    }
+
+    public ExprCodeResult dealWithCallMethod(JmmNode jmmNode, Void unused){
+        var code = new StringBuilder();
+        String value = nextTempVar();
+        // Get identifier --> this, import ou outro qql
+        var identifierCode = visit(jmmNode.getJmmChild(0));
+        String identifierName = identifierCode.value();
+        // Check if virtual or static with identifier
+        // If import or superclass -> static / else virtual
+        // Get parameters
+
+        if(symbolTable.getImports().contains(identifierName)){
+            code.append(identifierCode.prefixCode()).append("\t\tinvokestatic(").append(identifierName).append(", \"").append(jmmNode.get("methodCallName")).append("\"");
+        } else {
+            // Because it's virtual, he have to get the type of the identifier
+            String type = "";
+            if (!identifierName.equals("this")) type = "." + getType(jmmNode,identifierName);
+            //if (jmmNode.getJmmChild(0).equals("this")) type = " ";
+            code.append(identifierCode.prefixCode()).append("\t\t"+ value).append(".i32").append(" :=.i32 ").append("invokevirtual(").append(identifierName).append(type).append(",\"").append(jmmNode.get("methodCallName")).append("\"");
+        }
+        int i = 0;
+        for (var child : jmmNode.getChildren()) {
+            if(i == 0) {
+                i++;
+                continue;
+            }
+            var param = visit(child);
+            //change type later;
+            var type =  getType(jmmNode,param.value());
+            code.append(", ").append(param.value()).append(getOllirStringType(type));
+        }
+
+        code.append(")").append(".i32;\n");
+
+
+        return new ExprCodeResult(code.toString(),value);
+    }
+
+    public ExprCodeResult dealWithThis(JmmNode jmmNode, Void unused){
+        return new ExprCodeResult("", "this");
     }
 
 }
