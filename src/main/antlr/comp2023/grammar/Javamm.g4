@@ -59,6 +59,7 @@ statement
 expression
     : '(' expression ')' #Parenthesis
     | expression '[' expression ']' #ArrayAccessChain
+    | expression '.' methodCallName=ID '(' (expression (',' expression)*)? ')' #MethodCall
     | '!' expression #Negation
     | expression op=('*' | '/') expression #BinaryOp
     | expression op=('+' | '-') expression #BinaryOp
@@ -69,7 +70,6 @@ expression
     | 'new' value=ID '(' (expression (',' expression)*)? ')' #NewObject
     | classDeclaration #ClassExpression
     | expression '.' accessName=ID  #MemberAccess
-    | expression '.' methodCallName=ID '(' (expression (',' expression)*)? ')' #MethodCall
     | value=INTEGER #Integer
     | value=BOOLEAN #Boolean
     | value=ID #Identifier
