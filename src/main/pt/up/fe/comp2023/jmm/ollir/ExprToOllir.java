@@ -8,11 +8,6 @@ import pt.up.fe.comp.jmm.ast.JmmNode;
 import pt.up.fe.comp.jmm.ast.PreorderJmmVisitor;
 import pt.up.fe.comp2023.JavammBaseListener;
 import pt.up.fe.comp2023.analysis.table.ImplementedSymbolTable;
-
-import java.util.List;
-
-import static pt.up.fe.comp2023.analysis.table.ImplementedSymbolTable.getType;
-import static pt.up.fe.comp2023.jmm.ollir.OllirUtils.getCode;
 import static pt.up.fe.comp2023.jmm.ollir.OllirUtils.getOllirStringType;
 
 public class ExprToOllir extends PreorderJmmVisitor<Void, ExprCodeResult> {

@@ -113,29 +113,13 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
                 }
 
             }
-            //System.out.println("assignament" + jmmNode.getJmmChild(0));
 
             if (jmmNode.getJmmChild(0).getKind().equals("MethodCall")) {
-
-
-                //System.out.println(exprCode.visit(jmmNode.getJmmChild(0)));
 
                 var code = exprCode.visit(jmmNode.getJmmChild(0));
                 ollirCode.append(code.prefixCode());
                 ollirCode.append(getIndentation()).append(jmmNode.get("assignmentName")).append(".i32").append(" :=.i32 ").append(code.value()).append(".i32;\n");
             }
-
-            /*Type tyTy = ((ImplementedSymbolTable) symbolTable).getFieldType(jmmNode.get("assignmentName"));
-            var varType = (tyTy != null ? getOllirStringType(tyTy.getName()) : getOllirStringType(getType(jmmNode, jmmNode.get("assignmentName"))));
-            var lhsCode = new ExprCodeResult("", jmmNode.get("assignmentName") + ".i32");
-            var rhsCode = exprCode.visit(jmmNode.getJmmChild(0));
-
-            ollirCode.append("\t\t" + lhsCode.prefixCode());
-            ollirCode.append(rhsCode.prefixCode());
-
-            if(tyTy != null) ollirCode.append("\t\tputfield(this, " + lhsCode.value() + ", " + rhsCode.value() + ").V;\n");
-            else ollirCode.append(lhsCode.value()).append(" :=").append(varType).append(" ").append(rhsCode.value()).append(";\n");*/
-
         }
 
         return ollirCode.toString();
@@ -175,12 +159,9 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
                 ollirCode.append(", ");
                 var param = exprCode.visit(child);
                 ollirCode.append(param.value()).append(".i32");
-                //System.out.println("ty:" + getType(jmmNode,param.value()));
             }
         }
 
-        //System.out.println("identifier:" + jmmNode.getJmmChild(0).get("value"));
-        //System.out.println("rettype:" + returnType);
         ollirCode.append(")").append(returnType).append(";\n");
         return "";
     }
