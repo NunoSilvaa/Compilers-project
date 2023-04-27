@@ -288,11 +288,16 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                                 for (Symbol field : symbolTable.getFields()) {
                                     if (field.getName().equals(assignmentNode.get("accessName"))) {
                                         assignmentType = new Type(field.getType().getName(), field.getType().isArray());
-                                        var aggag = method.getParameterTypes();
+                                        var aggag = method.getParameters();
                                         if(method.getParameterTypes().contains(assignmentName)){
-                                            if(!method.getParameters().equals(assignmentType)){
-                                                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(assignmentNode.get("lineStart")), Integer.parseInt(assignmentNode.get("colEnd")), "Assignment type mismatch"));
+                                            for(Symbol parameter : method.getParameters()){
+                                                if(!parameter.getType().equals(assignmentType)){
+                                                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(assignmentNode.get("lineStart")), Integer.parseInt(assignmentNode.get("colEnd")), "Assignment type mismatch"));
+                                                }
                                             }
+                                            /*if(!method.getParameters().equals(assignmentType)){
+                                                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(assignmentNode.get("lineStart")), Integer.parseInt(assignmentNode.get("colEnd")), "Assignment type mismatch"));
+                                            }*/
 
                                         }
                                         for(Symbol localVariable : method.getLocalVariables()){
