@@ -118,27 +118,23 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
             if (jmmNode.getJmmChild(0).getKind().equals("MethodCall")) {
 
 
-                System.out.println(exprCode.visit(jmmNode.getJmmChild(0)));
+                //System.out.println(exprCode.visit(jmmNode.getJmmChild(0)));
 
-                /*ollirCode.append("\t\t" + "invokevirtual(").append(jmmNode.getJmmChild(0).get("methodCallName")).append(" ")
-                        .append(getOllirStringType(jmmNode.getJmmChild(0).get("methodCallName")))
-                        .append(", \"<init>\");\n");*/
                 var code = exprCode.visit(jmmNode.getJmmChild(0));
                 ollirCode.append(code.prefixCode());
                 ollirCode.append(getIndentation()).append(jmmNode.get("assignmentName")).append(".i32").append(" :=.i32 ").append(code.value()).append(".i32;\n");
             }
 
-            Type tyTy = ((ImplementedSymbolTable) symbolTable).getFieldType(jmmNode.get("assignmentName"));
+            /*Type tyTy = ((ImplementedSymbolTable) symbolTable).getFieldType(jmmNode.get("assignmentName"));
             var varType = (tyTy != null ? getOllirStringType(tyTy.getName()) : getOllirStringType(getType(jmmNode, jmmNode.get("assignmentName"))));
             var lhsCode = new ExprCodeResult("", jmmNode.get("assignmentName") + ".i32");
             var rhsCode = exprCode.visit(jmmNode.getJmmChild(0));
 
-            var code = new StringBuilder();
-            code.append("\t\t" + lhsCode.prefixCode());
-            code.append(rhsCode.prefixCode());
+            ollirCode.append("\t\t" + lhsCode.prefixCode());
+            ollirCode.append(rhsCode.prefixCode());
 
-            if(tyTy != null) code.append("\t\tputfield(this, " + lhsCode.value() + ", " + rhsCode.value() + ").V;\n");
-            else code.append(lhsCode.value()).append(" :=").append(varType).append(" ").append(rhsCode.value()).append(";\n");
+            if(tyTy != null) ollirCode.append("\t\tputfield(this, " + lhsCode.value() + ", " + rhsCode.value() + ").V;\n");
+            else ollirCode.append(lhsCode.value()).append(" :=").append(varType).append(" ").append(rhsCode.value()).append(";\n");*/
 
         }
 
@@ -265,9 +261,13 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
         ollirCode.append(retStat.prefixCode()).append(getIndentation())
                 .append("ret").append(retType)
                 .append(" ").append(retStat.value());
-        if(jmmNode.getJmmChild(0).getKind().equals("Integer")) ollirCode.append(";\n");
-        else ollirCode.append(retType).append(";\n");
-
+        if(jmmNode.getJmmChild(0).getKind().equals("Integer")) {
+            retType = ".i32";
+            ollirCode.append(retType).append(";\n");
+        }
+        else
+            ollirCode.append(retType).append(";\n");
+        System.out.println("ret" + retType);
         return methodName;
     }
 

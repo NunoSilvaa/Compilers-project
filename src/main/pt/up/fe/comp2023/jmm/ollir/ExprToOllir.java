@@ -45,7 +45,7 @@ public class ExprToOllir extends PreorderJmmVisitor<Void, ExprCodeResult> {
             node = node.getJmmParent();
         }
 
-        return node.getJmmChild(0).getJmmChild(0).get("ty");
+        return node.get("methodName");
     }
 
 
@@ -62,7 +62,7 @@ public class ExprToOllir extends PreorderJmmVisitor<Void, ExprCodeResult> {
             if (paramPair != null) {
                 type = paramPair.a;
                 varType = getOllirStringType(type.getName());
-                val = "$" + paramPair.b  + "." + jmmNode.get("value") + varType;
+                val = "$" + paramPair.b  + "." + jmmNode.get("value") ;
             } else {
                 type = ((ImplementedSymbolTable) symbolTable).getLocalVarType(jmmNode.get("value"), methodName);
                 if (type != null){
@@ -80,7 +80,7 @@ public class ExprToOllir extends PreorderJmmVisitor<Void, ExprCodeResult> {
 
 
     private ExprCodeResult dealWithInteger(JmmNode jmmNode, Void unused) {
-        return new ExprCodeResult("", jmmNode.get("value") + ".i32");
+        return new ExprCodeResult("", jmmNode.get("value"));
     }
 
     public String nextTempVar() {
