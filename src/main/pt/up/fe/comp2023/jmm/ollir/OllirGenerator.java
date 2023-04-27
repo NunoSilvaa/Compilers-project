@@ -178,7 +178,6 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
                 //System.out.println("ty:" + getType(jmmNode,param.value()));
             }
         }
-
         //System.out.println("identifier:" + jmmNode.getJmmChild(0).get("value"));
         //System.out.println("rettype:" + returnType);
         ollirCode.append(")").append(returnType).append(";\n");
