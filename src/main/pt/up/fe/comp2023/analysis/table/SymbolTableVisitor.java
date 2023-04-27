@@ -130,7 +130,7 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                                         }
                                     }
                                 } else if (assignmentNode.getKind().equals(("BinaryOp"))) {
-                                    if (assignmentNode.get("op").equals("&&") || assignmentNode.get("op").equals("||") || assignmentNode.get("op").equals("<") || assignmentNode.get("op").equals(">")) {
+                                    if (assignmentNode.get("op").equals("&&") || assignmentNode.get("op").equals("||") || assignmentNode.get("op").equals("<") || assignmentNode.get("op").equals(">") || assignmentNode.get("op").equals("==") || assignmentNode.get("op").equals("<=") || assignmentNode.get("op").equals(">=")) {
                                         assignmentType = new Type("boolean", false);
                                     } else {
                                         assignmentType = new Type("int", false);
@@ -181,7 +181,7 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                         }
                     }
                     if (parameterNode.getChildren().get(0).getKind().equals("BinaryOp")) {
-                        if (parameterNode.getChildren().get(0).get("op").equals("&&") || parameterNode.getChildren().get(0).get("op").equals("||") || parameterNode.getChildren().get(0).get("op").equals("<") || parameterNode.getChildren().get(0).get("op").equals(">")) {
+                        if (parameterNode.getChildren().get(0).get("op").equals("&&") || parameterNode.getChildren().get(0).get("op").equals("||") || parameterNode.getChildren().get(0).get("op").equals("<") || parameterNode.getChildren().get(0).get("op").equals(">") || parameterNode.getChildren().get(0).get("op").equals("==") || parameterNode.getChildren().get(0).get("op").equals("<=") || parameterNode.getChildren().get(0).get("op").equals(">=")){
                             if (!method.getReturnType().getName().equals("boolean"))
                                 reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(parameterNode.get("lineStart")), Integer.parseInt(parameterNode.get("colEnd")), "Return type mismatch"));
                         } else if (parameterNode.getChildren().get(0).get("op").equals("+") || parameterNode.getChildren().get(0).get("op").equals("-") || parameterNode.getChildren().get(0).get("op").equals("*") || parameterNode.getChildren().get(0).get("op").equals("/")) {
@@ -251,7 +251,7 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                                 }
                             }
                         } else if (assignmentNode.getKind().equals(("BinaryOp"))) {
-                            if (assignmentNode.get("op").equals("&&") || assignmentNode.get("op").equals("||") || assignmentNode.get("op").equals("<") || assignmentNode.get("op").equals(">")) {
+                    if (assignmentNode.get("op").equals("&&") || assignmentNode.get("op").equals("||") || assignmentNode.get("op").equals("<") || assignmentNode.get("op").equals(">") || assignmentNode.get("op").equals("==") || assignmentNode.get("op").equals("<=") || assignmentNode.get("op").equals(">=")) {
                                 assignmentType = new Type("boolean", false);
                             } else {
                                 assignmentType = new Type("int", false);
@@ -278,7 +278,7 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                                     }
                                 }
                             }else if(assignmentNode.getChildren().get(0).getKind().equals("BinaryOp")){
-                                if (assignmentNode.getChildren().get(0).get("op").equals("&&") || assignmentNode.getChildren().get(0).get("op").equals("||") || assignmentNode.getChildren().get(0).get("op").equals("<") || assignmentNode.getChildren().get(0).get("op").equals(">")) {
+                                if (assignmentNode.getChildren().get(0).get("op").equals("&&") || assignmentNode.getChildren().get(0).get("op").equals("||") || assignmentNode.getChildren().get(0).get("op").equals("<") || assignmentNode.getChildren().get(0).get("op").equals(">") || assignmentNode.getChildren().get(0).get("op").equals("==") || assignmentNode.getChildren().get(0).get("op").equals("<=") || assignmentNode.getChildren().get(0).get("op").equals(">=")) {
                                     assignmentType = new Type("boolean", false);
                                 } else {
                                     assignmentType = new Type("int", false);
@@ -339,7 +339,7 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                                     }
                                 }
                             } else if (assignmentNode.getKind().equals(("BinaryOp"))) {
-                                if (assignmentNode.get("op").equals("&&") || assignmentNode.get("op").equals("||") || assignmentNode.get("op").equals("<") || assignmentNode.get("op").equals(">")) {
+                                if (assignmentNode.get("op").equals("&&") || assignmentNode.get("op").equals("||") || assignmentNode.get("op").equals("<") || assignmentNode.get("op").equals(">") || assignmentNode.get("op").equals("==") || assignmentNode.get("op").equals("<=") || assignmentNode.get("op").equals(">=")){
                                     assignmentType = new Type("boolean", false);
                                 } else {
                                     assignmentType = new Type("int", false);

@@ -63,7 +63,7 @@ expression
     | '!' expression #Negation
     | expression op=('*' | '/') expression #BinaryOp
     | expression op=('+' | '-') expression #BinaryOp
-    | expression op=('<' | '>') expression #BinaryOp
+    | expression op=('<' | '>' | '<=' | '>=' | '==') expression #BinaryOp
     | expression op=('&&' | '||') expression #BinaryOp
     | expression '.' 'length' #Length
     | 'new' type '[' expression ']' #NewArray

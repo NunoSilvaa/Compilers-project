@@ -125,6 +125,8 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
                     lhsType = method.getReturnType();
                 }
             }
+        }else if(node.getChildren().get(0).getKind().equals("Boolean")){
+            lhsType = new Type("boolean", false);
         }
         else{
             for (Symbol assignment : symbolTable.getAssignments(methodNodeName)) {
@@ -184,6 +186,8 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
                     rhsType = field.getType();
                 }
             }
+        }else if(node.getChildren().get(1).getKind().equals("Boolean")){
+            rhsType = new Type("boolean", false);
         }
         else {
             for (Symbol assignment : symbolTable.getAssignments(methodNodeName)) {
@@ -268,7 +272,7 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
         }else if(node.getChildren().get(0).getKind().equals("BinaryOp")){
             if(node.getChildren().get(0).get("op").equals("+") || node.getChildren().get(0).get("op").equals("-") || node.getChildren().get(0).get("op").equals("*") || node.getChildren().get(0).get("op").equals("/")){
                 reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Condition must be a boolean!"));
-            }else if(node.getChildren().get(0).get("op").equals("<") || node.getChildren().get(0).get("op").equals(">")){
+            }else if(node.getChildren().get(0).get("op").equals("<") || node.getChildren().get(0).get("op").equals(">") || node.getChildren().get(0).get("op").equals("<=") || node.getChildren().get(0).get("op").equals(">=")){
                 for(Symbol assignment : symbolTable.getAssignments(methodNodeName)){
                     if(assignment.getName().equals(node.getChildren().get(0).getChildren().get(0).get("value"))){
                         if(!assignment.getType().equals(new Type("int", false))){
@@ -301,7 +305,7 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
             }
 
         }
-        else {
+        else if(!node.getChildren().get(0).get("op").equals("==")) {
             reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Condition must be a boolean!"));
         }
         return s;
@@ -430,7 +434,7 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
                     }
                 }
             }
-        }else if(node.getChildren().get(0).get("op").equals("<") || node.getChildren().get(0).get("op").equals(">")){
+        }else if(node.getChildren().get(0).get("op").equals("<") || node.getChildren().get(0).get("op").equals(">") || node.getChildren().get(0).get("op").equals("<=") || node.getChildren().get(0).get("op").equals(">=")){
             for(Symbol assignment : symbolTable.getAssignments(methodNodeName)){
                 if(assignment.getName().equals(node.getChildren().get(0).getChildren().get(0).get("value"))){
                     if(!assignment.getType().equals(new Type("int", false))){
@@ -461,7 +465,7 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
                 }
             }
         }
-        else {
+        else if(!node.getChildren().get(0).get("op").equals("==")) {
             reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, -1, -1, "Condition must be a boolean!"));
     }
         return s;
