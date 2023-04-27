@@ -11,6 +11,7 @@ import pt.up.fe.comp.jmm.report.ReportType;
 import pt.up.fe.comp.jmm.report.Stage;
 import pt.up.fe.comp2023.analysis.table.ImplementedSymbolTable;
 import pt.up.fe.comp2023.analysis.table.Method;
+import pt.up.fe.comp2023.analysis.table.SymbolTableVisitor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -233,6 +234,12 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
                 }
             }
             var sh = 1;
+        }else if(node.getChildren().get(1).getKind().equals("This")){
+            for(Symbol field : symbolTable.getFields()){
+                if(field.getName().equals(node.getJmmParent().get("accessName"))){
+                    rhsType = field.getType();
+                }
+            }
         }
         else {
             for (Symbol assignment : symbolTable.getAssignments(methodNodeName)) {

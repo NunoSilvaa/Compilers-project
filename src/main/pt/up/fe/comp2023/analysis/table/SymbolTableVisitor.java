@@ -317,6 +317,12 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                                         //if(assignmentType.equals())
                                     }
                                 }
+                            }else if(assignmentNode.getChildren().get(0).getKind().equals("BinaryOp")){
+                                if (assignmentNode.getChildren().get(0).get("op").equals("&&") || assignmentNode.getChildren().get(0).get("op").equals("||") || assignmentNode.getChildren().get(0).get("op").equals("<") || assignmentNode.getChildren().get(0).get("op").equals(">")) {
+                                    assignmentType = new Type("boolean", false);
+                                } else {
+                                    assignmentType = new Type("int", false);
+                                }
                             }
                         }else if (assignmentNode.getKind().equals("ArrayAccessChain")){
                             assignmentType = new Type("int", false);
