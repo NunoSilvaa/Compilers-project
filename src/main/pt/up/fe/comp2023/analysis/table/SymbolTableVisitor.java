@@ -143,6 +143,8 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                                         if (localVariable.getName().equals(assignmentName))
                                             assignmentType = new Type(localVariable.getType().getName(), localVariable.getType().isArray());
                                     }
+                                } else if (assignmentNode.getKind().equals("ArrayAccessChain")){
+                                    assignmentType = new Type("int", false);
                                 }
                                 for (Symbol localVariable : method.getLocalVariables()) {
                                     if (localVariable.getName().equals(assignmentName)) {
@@ -304,6 +306,8 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                                     }
                                 }
                             }
+                        }else if (assignmentNode.getKind().equals("ArrayAccessChain")){
+                            assignmentType = new Type("int", false);
                         }
 
                         for (Symbol localVariable : method.getLocalVariables()) {

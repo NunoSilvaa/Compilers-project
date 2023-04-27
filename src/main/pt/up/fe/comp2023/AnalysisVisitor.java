@@ -389,6 +389,8 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
                 }
                 else{
                     if(!node.getChildren().get(1).getKind().equals("Integer")){
+                        if(node.getChildren().get(1).getKind().equals("Boolean"))
+                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Index must be an integer!"));
                         for(Symbol localVariable2 : symbolTable.getLocalVariables(methodNodeName)){
                             if(localVariable2.getName().equals(node.getChildren().get(1).get("value"))){
                                 if(!symbolTable.getAssignmentNames(methodNodeName).contains(node.getChildren().get(1).get("value"))){
@@ -580,11 +582,15 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
                 }
             }
         }
+        if(node.getChildren().get(0).getKind().equals("Boolean"))
+            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Index must be an integer!"));
+        if(node.getChildren().get(1).getKind().equals("Boolean"))
+            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Value assigned must be an integer!"));
 
         if (node.getChildren().get(0).getKind().equals("Identifier")) {
-            if(node.getChildren().get(0).get("value").equals("true") || node.getChildren().get(0).get("value").equals("false")){
+            /*if(node.getChildren().get(0).get("value").equals("true") || node.getChildren().get(0).get("value").equals("false")){
                 reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Index must be an integer!"));
-            } else {
+            } else {*/
                 for (Symbol localVariable : symbolTable.getLocalVariables(methodNodeName)) {
                     if (localVariable.getName().equals(node.getChildren().get(0).get("value"))) {
                         if (!localVariable.getType().equals(new Type("int", false))) {
@@ -596,7 +602,7 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
                                 }
                             }
                         }
-                    }
+                    //}
                 }
                 for(Symbol parameter : symbolTable.getParameters(methodNodeName)){
                     if(parameter.getName().equals(node.getChildren().get(0).get("value"))){
@@ -609,9 +615,9 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
         }
 
         if (node.getChildren().get(1).getKind().equals("Identifier")) {
-            if(node.getChildren().get(1).get("value").equals("true") || node.getChildren().get(1).get("value").equals("false")){
+           /* if(node.getChildren().get(1).get("value").equals("true") || node.getChildren().get(1).get("value").equals("false")){
                 reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Value assigned must be an integer!"));
-            } else {
+            } else {*/
                 for (Symbol localVariable : symbolTable.getLocalVariables(methodNodeName)) {
                     if (localVariable.getName().equals(node.getChildren().get(1).get("value"))) {
                         if (!localVariable.getType().equals(new Type("int", false))) {
@@ -619,7 +625,7 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
                         }
                     }
                 }
-            }
+            //}
 
         }
         /*if(node.getChildren().get(1).equals("BinaryOp")){
