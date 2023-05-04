@@ -174,8 +174,7 @@ public class ImplementedJasminBackend implements JasminBackend {
             if (method.getReturnType().getTypeOfElement() == ElementType.VOID) strInst.append("\treturn\n");
         }
 
-        met.append("\t.limit stack " + stackLimit + "\n" + "\t.limit locals " +
-                localLimit + "\n");
+        met.append("\t.limit stack ").append(stackLimit).append("\n").append("\t.limit locals ").append(localLimit).append("\n");
 
         met.append(strInst);
 
@@ -201,6 +200,17 @@ public class ImplementedJasminBackend implements JasminBackend {
 
     private String loadStack(Element singleOperand, HashMap<String, Descriptor> varTable) {
         StringBuilder inst = new StringBuilder();
+        if (singleOperand instanceof Operand oper) {
+            if (oper.getName().equals("false")) {
+                inst.append("\ticonst_0").append("\n");
+                updateStackLimit(1);
+                return inst.toString();
+            } else if (oper.getName().equals("true")) {
+                inst.append("\ticonst_1").append("\n");
+                updateStackLimit(1);
+                return inst.toString();
+            }
+        }
 
         if (singleOperand instanceof LiteralElement) {
             String literal = ((LiteralElement) singleOperand).getLiteral();
@@ -551,8 +561,6 @@ public class ImplementedJasminBackend implements JasminBackend {
             case ldc -> strInst.append(loadStack(instruction.getFirstArg(), varTable));
 
             case invokestatic -> {
-
-                popper  = 0;
 
                 for (Element element : instruction.getListOfOperands()) {
                     strInst.append(this.loadStack(element, varTable));
