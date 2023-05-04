@@ -29,7 +29,7 @@ methodDeclaration
 
 localVariables
     : type varName=ID ';'
-    | varName=ID ('=' (ID | INT )) ';'
+    | varName=ID ('=' (ID)) ';'
     ;
 
 parameter: type parameterName=ID;
