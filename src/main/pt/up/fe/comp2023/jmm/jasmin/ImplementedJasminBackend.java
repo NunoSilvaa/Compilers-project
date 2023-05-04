@@ -16,10 +16,12 @@ public class ImplementedJasminBackend implements JasminBackend {
     String superClass;
     int current;
 
-    final int localLimit = 99;
-    final int stackLimit = 99;
+    int localLimit;
+    int stackLimit;
 
     int countStack;
+
+    Set<Integer> regs = new TreeSet<>();
 
     @Override
     public JasminResult toJasmin(OllirResult ollirResult) {
@@ -142,25 +144,26 @@ public class ImplementedJasminBackend implements JasminBackend {
         met.append(this.getType(method.getReturnType())).append("\n");
 
         current = 0;
+        stackLimit = 0;
+        localLimit = updateLocalLimit(method);
 
-        met.append("\t.limit stack " + stackLimit + "\n" + "\t.limit locals " +
-                localLimit + "\n");
+        StringBuilder strInst = new StringBuilder();
 
         List<Instruction> instructions = method.getInstructions();
 
         for (Instruction instruction : method.getInstructions()) {
             for (Map.Entry<String, Instruction> label : method.getLabels().entrySet()) {
-                if (label.getValue().equals(instruction)) met.append(label.getKey()).append(":\n");
+                if (label.getValue().equals(instruction)) strInst.append(label.getKey()).append(":\n");
             }
-            met.append(this.getInstruction(instruction, method.getVarTable()));
+            strInst.append(this.getInstruction(instruction, method.getVarTable()));
 
             if (instruction.getInstType() == InstructionType.CALL) {
                 CallInstruction inst = (CallInstruction) instruction;
                 ElementType ret = inst.getReturnType().getTypeOfElement();
 
                 if (ret != ElementType.VOID) {
-                    met.append("\tpop\n");
-                    current -= 1;
+                    strInst.append("\tpop\n");
+                    updateStackLimit(-1);
                 }
 
             }
@@ -168,8 +171,12 @@ public class ImplementedJasminBackend implements JasminBackend {
 
         if (!((instructions.size() > 0) && (instructions.get(instructions.size() - 1).getInstType() == InstructionType.RETURN)))
         {
-            if (method.getReturnType().getTypeOfElement() == ElementType.VOID) met.append("\treturn\n");
+            if (method.getReturnType().getTypeOfElement() == ElementType.VOID) strInst.append("\treturn\n");
         }
+
+        met.append("\t.limit stack ").append(stackLimit).append("\n").append("\t.limit locals ").append(localLimit).append("\n");
+
+        met.append(strInst);
 
         met.append(".end method\n\n");
         return met.toString();
@@ -193,6 +200,17 @@ public class ImplementedJasminBackend implements JasminBackend {
 
     private String loadStack(Element singleOperand, HashMap<String, Descriptor> varTable) {
         StringBuilder inst = new StringBuilder();
+        if (singleOperand instanceof Operand oper) {
+            if (oper.getName().equals("false")) {
+                inst.append("\ticonst_0").append("\n");
+                updateStackLimit(1);
+                return inst.toString();
+            } else if (oper.getName().equals("true")) {
+                inst.append("\ticonst_1").append("\n");
+                updateStackLimit(1);
+                return inst.toString();
+            }
+        }
 
         if (singleOperand instanceof LiteralElement) {
             String literal = ((LiteralElement) singleOperand).getLiteral();
@@ -215,19 +233,19 @@ public class ImplementedJasminBackend implements JasminBackend {
             }
             else inst.append("\tldc ").append(literal);
 
-            current += 1;
+            updateStackLimit(1);
         }
 
         else if (singleOperand instanceof ArrayOperand op) {
 
             inst.append("\taload").append(this.getVarRegister(op.getName(), varTable)).append("\n");
 
-            current += 1;
+            updateStackLimit(1);
 
             inst.append(loadStack(op.getIndexOperands().get(0), varTable));
             inst.append("\tiaload");
 
-            current -= 1;
+            updateStackLimit(-1);
 
         }
         else if (singleOperand instanceof Operand operand) {
@@ -238,7 +256,7 @@ public class ImplementedJasminBackend implements JasminBackend {
                 case THIS -> inst.append("\taload_0");
                 default -> inst.append("Error: SingleOperand ").append(operand.getType().getTypeOfElement()).append("\n");
             }
-            current += 1;
+            updateStackLimit(1);
         }
         else inst.append("Error: SingleOperand not recognized\n");
 
@@ -281,7 +299,7 @@ public class ImplementedJasminBackend implements JasminBackend {
 
         strInst.append("\n");
 
-        current -= 1;
+        updateStackLimit(-1);
 
         return strInst.toString();
     }
@@ -323,7 +341,7 @@ public class ImplementedJasminBackend implements JasminBackend {
     }
 
     private String dealWithPutField(PutFieldInstruction instruction, HashMap<String, Descriptor> varTable) {
-        current -= 2;
+        updateStackLimit(-2);
 
         return loadStack(instruction.getFirstOperand(), varTable) + loadStack(instruction.getThirdOperand(), varTable) +
                 "\tputfield " + getImpClass(((Operand) instruction.getFirstOperand()).getName()) +
@@ -358,7 +376,7 @@ public class ImplementedJasminBackend implements JasminBackend {
 
         if (destination instanceof ArrayOperand opDest) {
 
-            current += 1;
+            updateStackLimit(1);
             strInst.append("\taload").append(this.getVarRegister(opDest.getName(), varTable)).append("\n")
                     .append(loadStack(opDest.getIndexOperands().get(0), varTable));
         }
@@ -402,17 +420,17 @@ public class ImplementedJasminBackend implements JasminBackend {
 
             case OBJECTREF, THIS, STRING, ARRAYREF -> {
                 strInst.append("\tastore").append(this.getVarRegister(destination.getName(), varTable)).append("\n");
-                current -= 1;
+                updateStackLimit(-1);
             }
 
             case INT32, BOOLEAN -> {
                 if (varTable.get(destination.getName()).getVarType().getTypeOfElement() == ElementType.ARRAYREF) {
                     strInst.append("\tiastore").append("\n");
-                    current -= 3;
+                    updateStackLimit(-3);
                 }
                 else {
                     strInst.append("\tistore").append(this.getVarRegister(destination.getName(), varTable)).append("\n");
-                    current -= 1;
+                    updateStackLimit(-1);
                 }
             }
             default -> strInst.append("Error: couldn't store instruction\n");
@@ -498,8 +516,8 @@ public class ImplementedJasminBackend implements JasminBackend {
         }
         strInst.append("\t").append(op).append(" ").append(instruction.getLabel()).append("\n");
 
-        if (op.equals("if_icmplt")) current -= 2;
-        else current -= 1;
+        if (op.equals("if_icmplt")) updateStackLimit(-2);
+        else updateStackLimit(-1);
 
         return strInst.toString();
     }
@@ -598,9 +616,22 @@ public class ImplementedJasminBackend implements JasminBackend {
             default -> strInst.append("Error: call instruction not processed.");
         }
 
-        current -= popper;
+        updateStackLimit(-popper);
 
         return strInst.toString();
     }
 
+    private void updateStackLimit(int counter) {
+        current += counter;
+        stackLimit = Math.max(current, stackLimit);
+    }
+
+    private int updateLocalLimit(Method method) {
+        regs.clear();
+        regs.add(0);
+        for (Descriptor descriptor : method.getVarTable().values()) {
+            regs.add(descriptor.getVirtualReg());
+        }
+        return regs.size();
+    }
 }
