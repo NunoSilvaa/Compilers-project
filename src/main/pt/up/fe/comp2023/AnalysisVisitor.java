@@ -238,8 +238,9 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
                 }
             }
         }else if(node.getJmmParent().getKind().equals("MethodCall")){
+            var jjj = localVariableNames.contains(node.get("value"));
             if(!localVariableNames.contains(node.get("value")) && !symbolTable.getParametersNames(methodNodeName).contains(node.get("value"))){
-                if(!symbolTable.getImports().contains(node.get("value"))){
+                if(!symbolTable.getImports().contains(node.get("value")) && !symbolTable.getFieldNames().contains(node.get("value"))){
                     reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Variable not declared!"));
                 }
             }
@@ -724,7 +725,10 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
             }
         }
         if(node.getChildren().get(0).getChildren().size() - 1 != symbolTable.getParameters(node.getChildren().get(0).get("methodCallName")).size()){
-            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Method call has the wrong number of arguments!"));
+            if(!symbolTable.getImports().contains(node.getChildren().get(0).getChildren().get(0).get("value"))) {
+                var hhg = symbolTable.getImports();
+                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Method call has the wrong number of arguments!"));
+            }
         }else {
             if (node.getChildren().get(0).getKind().equals("MethodCall")) {
                 if (symbolTable.getMethods().contains(node.getChildren().get(0).get("methodCallName"))) {

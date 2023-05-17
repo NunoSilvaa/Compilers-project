@@ -59,6 +59,14 @@ public class Method {
         return new ArrayList<>(this.localVariables.values());
     }
 
+    public List<String> getLocalVariablesNames(){
+        List<String> localVariablesNames = new ArrayList<>();
+        for(Symbol localVariable : this.localVariables.values()){
+            localVariablesNames.add(localVariable.getName());
+        }
+        return localVariablesNames;
+    }
+
     public List<Symbol> getAssignments() {
         return new ArrayList<>(this.assignments.values());
     }

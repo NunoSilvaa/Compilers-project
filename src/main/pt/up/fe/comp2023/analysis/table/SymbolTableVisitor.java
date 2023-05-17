@@ -95,7 +95,8 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                     } else if (parameterNode.getKind().equals("Assignment")) {
                         var hdhh = symbolTable.getFields();
                         if (symbolTable.getFieldNames().contains(parameterNode.get("assignmentName"))) {
-                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(parameterNode.get("lineStart")), Integer.parseInt(parameterNode.get("colEnd")), "a field can not be used in a static method"));
+                            if(!method.getLocalVariablesNames().contains(parameterNode.get("assignmentName")))
+                                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(parameterNode.get("lineStart")), Integer.parseInt(parameterNode.get("colEnd")), "a field can not be used in a static method"));
                         } else {
                             for (JmmNode assignmentNode : parameterNode.getChildren()) {
                                 Type assignmentType = new Type("boolean", false);
@@ -115,6 +116,7 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                                     assignmentType = new Type("int", true);
                                 } else if (assignmentNode.getKind().equals("Identifier")) {
                                     if (symbolTable.getFieldNames().contains(assignmentNode.get("value"))) {
+                                        var ddc = symbolTable.getLocalVariables(method.getName());
                                         reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(parameterNode.get("lineStart")), Integer.parseInt(parameterNode.get("colEnd")), "a field can not be used in a static method"));
                                     } else {
                                         for (Symbol localVariable : method.getLocalVariables()) {
