@@ -135,6 +135,9 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
                     }
                 }
             }
+        }else if(node.getChildren().get(0).getKind().equals("BinaryOp")){
+            visitBinaryOp(node.getChildren().get(0), s);
+            lhsType = new Type("int", false);
         }
         else{
             for (Symbol assignment : symbolTable.getAssignments(methodNodeName)) {
@@ -196,6 +199,9 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
             }
         }else if(node.getChildren().get(1).getKind().equals("Boolean")){
             rhsType = new Type("boolean", false);
+        }else if(node.getChildren().get(1).getKind().equals("BinaryOp")){
+            visitBinaryOp(node.getChildren().get(1), s);
+            rhsType = new Type("int", false);
         }
         else {
             for (Symbol assignment : symbolTable.getAssignments(methodNodeName)) {
