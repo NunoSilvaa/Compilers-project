@@ -503,6 +503,27 @@ public class ImplementedJasminBackend implements JasminBackend {
                         strInst.append(this.getInstruction(brancher, varTable));
                         op = "ifne";
                     }
+                    case GTE -> {
+                        Element  left = binaryOpInstruction.getLeftOperand();
+                        Element right = binaryOpInstruction.getRightOperand();
+
+                        Integer counter = null;
+                        Element other = null;
+
+                        op = "if_icmpge";
+
+                        if (right instanceof LiteralElement && ((LiteralElement) right).getLiteral().equals("0")) {
+                            String lit = ((LiteralElement) right).getLiteral();
+
+                            counter = Integer.parseInt(lit);
+                            other = left;
+                            op = "ifge";
+                        }
+                        else {
+                            strInst.append(this.loadStack(right, varTable)).append(this.loadStack(left, varTable));
+                            op = "if_ge";
+                        }
+                    }
                     default -> {
                         strInst.append("Error: BinaryOper not recognized\n");
                         op = "ifne";
