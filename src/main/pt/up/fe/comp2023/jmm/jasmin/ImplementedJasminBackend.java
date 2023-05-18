@@ -497,7 +497,6 @@ public class ImplementedJasminBackend implements JasminBackend {
                         else {
                             strInst.append(this.loadStack(left, varTable)).append(this.loadStack(right, varTable));
                             op = "if_icmplt";
-                            updateStackLimit(-1);
                         }
                     }
                     case ANDB -> {
