@@ -9,6 +9,7 @@ import pt.up.fe.comp.jmm.ast.PreorderJmmVisitor;
 import pt.up.fe.comp2023.JavammBaseListener;
 import pt.up.fe.comp2023.analysis.table.ImplementedSymbolTable;
 import static pt.up.fe.comp2023.jmm.ollir.OllirUtils.getOllirStringType;
+import static pt.up.fe.comp2023.jmm.ollir.OllirUtils.getOllirType;
 
 public class ExprToOllir extends PreorderJmmVisitor<Void, ExprCodeResult> {
     private int counter;
@@ -45,32 +46,34 @@ public class ExprToOllir extends PreorderJmmVisitor<Void, ExprCodeResult> {
 
 
     private ExprCodeResult dealWithIdentifier(JmmNode jmmNode, Void unused) {
-        Type type = ((ImplementedSymbolTable) symbolTable).getFieldType(jmmNode.get("value"));
-        String varType, val;
-        if(type != null) {
-            varType = getOllirStringType(type.getName());
-            System.out.println("type: " + varType);
-            val = "getfield(this, " + jmmNode.get("value") + varType + ")" + varType;
+        String prefixCode = "";
+        String value;
+        Type varType = ((ImplementedSymbolTable) symbolTable).getLocalVarType(jmmNode.get("value"), getMethod(jmmNode, jmmNode.get("value")));
+        String varTy, val;
+        if (varType != null){
+            varTy = getOllirStringType(varType.getName());
+            val = jmmNode.get("value") + varTy;
         } else {
             String methodName = getMethod(jmmNode, jmmNode.get("value"));
-            Pair<Type, Integer> paramPair = ((ImplementedSymbolTable) symbolTable).getParameterType(jmmNode.get("value"), methodName);
+            Pair<Type, Integer> paramPair= ((ImplementedSymbolTable) symbolTable).getParameterType(jmmNode.get("value"), methodName);
             if (paramPair != null) {
-                type = paramPair.a;
-                varType = getOllirStringType(type.getName());
-                val = "$" + paramPair.b  + "." + jmmNode.get("value") ;
+                varType = paramPair.a;
+                varTy = getOllirStringType(varType.getName());
+                val = "$" + paramPair.b + "." + jmmNode.get("value") + varTy;
             } else {
-                type = ((ImplementedSymbolTable) symbolTable).getLocalVarType(jmmNode.get("value"), methodName);
-                if (type != null){
-                    varType = getOllirStringType(type.getName());
-                    val = jmmNode.get("value") + varType;
-                }
-                else {
+                varType = ((ImplementedSymbolTable) symbolTable).getFieldType(jmmNode.get("value"));
+                if (varType != null) {
+                    varTy = getOllirStringType(varType.getName());
+                    value = nextTempVar();
+                    prefixCode += value.substring(0, value.length() - 4) + varTy + " :=" + varTy + " getfield(this, " + jmmNode.get("value") + varTy + ")" + varTy + ";\n";
+                    val = value.substring(0, value.length() - 4) + varTy;
+                } else {
                     val = jmmNode.get("value");
                 }
             }
         }
 
-        return new ExprCodeResult("", val);
+        return new ExprCodeResult(prefixCode, val);
     }
 
 
