@@ -313,6 +313,12 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                             if (assignmentNode.getKind().equals("Integer"))
                                 assignmentType = new Type("int", false);
                             else if (assignmentNode.getKind().equals("NewObject")) {
+                                //var t = symbolTable.getFields();
+                                for (Symbol field : symbolTable.getFields()) {
+                                    if (field.getName().equals(assignmentName))
+                                        assignmentType = new Type(field.getType().getName(), field.getType().isArray());
+                                }
+                                //if(symbolTable.getFields())
                                 for (Symbol localVariable : method.getLocalVariables()) {
                                     if (localVariable.getName().equals(assignmentName))
                                         assignmentType = new Type(localVariable.getType().getName(), false);
