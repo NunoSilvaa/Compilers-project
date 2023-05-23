@@ -507,21 +507,24 @@ public class ImplementedJasminBackend implements JasminBackend {
                         Element  left = binaryOpInstruction.getLeftOperand();
                         Element right = binaryOpInstruction.getRightOperand();
 
-                        Integer counter = null;
-                        Element other = null;
-
-                        op = "if_icmpge";
-
                         if (right instanceof LiteralElement && ((LiteralElement) right).getLiteral().equals("0")) {
-                            String lit = ((LiteralElement) right).getLiteral();
-
-                            counter = Integer.parseInt(lit);
-                            other = left;
-                            op = "ifge";
+                            op = "if_icmpge";
                         }
                         else {
                             strInst.append(this.loadStack(right, varTable)).append(this.loadStack(left, varTable));
-                            op = "if_ge";
+                            op = "ifge";
+                        }
+                    }
+                    case LTE -> {
+                        Element  left = binaryOpInstruction.getLeftOperand();
+                        Element right = binaryOpInstruction.getRightOperand();
+
+                        if (left instanceof LiteralElement && ((LiteralElement) left).getLiteral().equals("0")) {
+                            op = "if_icmple";
+                        }
+                        else {
+                            strInst.append(this.loadStack(left, varTable)).append(this.loadStack(right, varTable));
+                            op = "ifle";
                         }
                     }
                     default -> {
