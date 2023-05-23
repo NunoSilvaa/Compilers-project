@@ -540,7 +540,7 @@ public class ImplementedJasminBackend implements JasminBackend {
         }
         strInst.append("\t").append(op).append(" ").append(instruction.getLabel()).append("\n");
 
-        if (op.equals("if_icmplt")) updateStackLimit(-2);
+        if (op.equals("if_icmplt") || op.equals("if_icmple") || op.equals("if_icmpge")) updateStackLimit(-2);
         else updateStackLimit(-1);
 
         return strInst.toString();
