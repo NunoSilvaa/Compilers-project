@@ -503,6 +503,30 @@ public class ImplementedJasminBackend implements JasminBackend {
                         strInst.append(this.getInstruction(brancher, varTable));
                         op = "ifne";
                     }
+                    case GTE -> {
+                        Element  left = binaryOpInstruction.getLeftOperand();
+                        Element right = binaryOpInstruction.getRightOperand();
+
+                        if (right instanceof LiteralElement && ((LiteralElement) right).getLiteral().equals("0")) {
+                            op = "if_icmpge";
+                        }
+                        else {
+                            strInst.append(this.loadStack(right, varTable)).append(this.loadStack(left, varTable));
+                            op = "ifge";
+                        }
+                    }
+                    case LTE -> {
+                        Element  left = binaryOpInstruction.getLeftOperand();
+                        Element right = binaryOpInstruction.getRightOperand();
+
+                        if (left instanceof LiteralElement && ((LiteralElement) left).getLiteral().equals("0")) {
+                            op = "if_icmple";
+                        }
+                        else {
+                            strInst.append(this.loadStack(left, varTable)).append(this.loadStack(right, varTable));
+                            op = "ifle";
+                        }
+                    }
                     default -> {
                         strInst.append("Error: BinaryOper not recognized\n");
                         op = "ifne";
@@ -516,7 +540,7 @@ public class ImplementedJasminBackend implements JasminBackend {
         }
         strInst.append("\t").append(op).append(" ").append(instruction.getLabel()).append("\n");
 
-        if (op.equals("if_icmplt")) updateStackLimit(-2);
+        if (op.equals("if_icmplt") || op.equals("if_icmple") || op.equals("if_icmpge")) updateStackLimit(-2);
         else updateStackLimit(-1);
 
         return strInst.toString();
