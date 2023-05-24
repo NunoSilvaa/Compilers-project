@@ -250,13 +250,22 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                             }
                             assignmentType = new Type("int", true);
                         } else if (assignmentNode.getKind().equals("Identifier")) {
-                            for (Symbol localVariable : method.getLocalVariables()) {
-                                if (localVariable.getName().equals(assignmentName)) {
-                                    for (Symbol localVariable2 : method.getLocalVariables()) {
-                                        if (localVariable2.getName().equals(assignmentNode.get("value"))) {
-                                            if (localVariable2.getType().getName().equals(symbolTable.getClassName()) && !localVariable.getType().getName().equals(symbolTable.getSuper()))
-                                                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(assignmentNode.get("lineStart")), Integer.parseInt(assignmentNode.get("colEnd")), "Class does not extends superclass"));
-                                            assignmentType = new Type(localVariable2.getType().getName(), false);
+                            var h = method.getParameterTypes();
+                            if(method.getParameterTypes().contains(assignmentNode.get("value"))){
+                                for (Symbol parameter : method.getParameters()) {
+                                    if (parameter.getName().equals(assignmentNode.get("value"))) {
+                                        assignmentType = new Type(parameter.getType().getName(), false);
+                                    }
+                                }
+                            }else {
+                                for (Symbol localVariable : method.getLocalVariables()) {
+                                    if (localVariable.getName().equals(assignmentName)) {
+                                        for (Symbol localVariable2 : method.getLocalVariables()) {
+                                            if (localVariable2.getName().equals(assignmentNode.get("value"))) {
+                                                if (localVariable2.getType().getName().equals(symbolTable.getClassName()) && !localVariable.getType().getName().equals(symbolTable.getSuper()))
+                                                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(assignmentNode.get("lineStart")), Integer.parseInt(assignmentNode.get("colEnd")), "Class does not extends superclass"));
+                                                assignmentType = new Type(localVariable2.getType().getName(), false);
+                                            }
                                         }
                                     }
                                 }
@@ -303,8 +312,14 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                                     assignmentType = new Type(localVariable.getType().getName(), localVariable.getType().isArray());
                                 }
                             }
+                        }else if(assignmentNode.getKind().equals("MethodCall")) {
+                            var h = symbolTable.getMethodsList();
+                            for (Method methodSymbol : symbolTable.getMethodsList()) {
+                                if (methodSymbol.getName().equals(assignmentNode.get("methodCallName"))) {
+                                    assignmentType = new Type(methodSymbol.getReturnType().getName(), methodSymbol.getReturnType().isArray());
+                                }
+                            }
                         }
-
                         for (Symbol localVariable : method.getLocalVariables()) {
                             if (localVariable.getName().equals(assignmentName)) {
                                 if (!localVariable.getType().getName().equals(assignmentType.getName())) {
