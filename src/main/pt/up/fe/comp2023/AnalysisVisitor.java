@@ -730,21 +730,45 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
                 }
             }
         }
-        if(node.getChildren().get(0).getChildren().size() - 1 != symbolTable.getParameters(node.getChildren().get(0).get("methodCallName")).size()){
-            if(!symbolTable.getImports().contains(node.getChildren().get(0).getChildren().get(0).get("value"))) {
-                var hhg = symbolTable.getImports();
-                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Method call has the wrong number of arguments!"));
-            }
-        }else {
-            if (node.getChildren().get(0).getKind().equals("MethodCall")) {
-                if (symbolTable.getMethods().contains(node.getChildren().get(0).get("methodCallName"))) {
-                    for (int i = 0; i < symbolTable.getParameters(node.getChildren().get(0).get("methodCallName")).size(); i++) {
-                        for (int j = 1; j < node.getChildren().get(0).getChildren().size(); j++) {
-                            if (!node.getChildren().get(0).getChildren().get(j).getKind().equals("MemberAccess")) {
-                                for (int k = 0; k < symbolTable.getLocalVariables(methodNodeName).size(); k++) {
-                                    if (!node.getChildren().get(0).getChildren().get(j).getKind().equals("MemberAccess")) {
-                                        if (symbolTable.getLocalVariables(methodNodeName).get(k).getName().equals(node.getChildren().get(0).getChildren().get(j).get("value"))) {
-                                            if (!symbolTable.getParameters(node.getChildren().get(0).get("methodCallName")).get(i).getType().equals(symbolTable.getLocalVariables(methodNodeName).get(k).getType())) {
+        if(symbolTable.getMethods().contains(node.getChildren().get(0).get("methodCallName"))) {
+            if (node.getChildren().get(0).getChildren().size() - 1 != symbolTable.getParameters(node.getChildren().get(0).get("methodCallName")).size()) {
+                if (!symbolTable.getImports().contains(node.getChildren().get(0).getChildren().get(0).get("value"))) {
+                    var hhg = symbolTable.getImports();
+                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Method call has the wrong number of arguments!"));
+                }
+            } else {
+                if (node.getChildren().get(0).getKind().equals("MethodCall")) {
+                    if (symbolTable.getMethods().contains(node.getChildren().get(0).get("methodCallName"))) {
+                        for (int i = 0; i < symbolTable.getParameters(node.getChildren().get(0).get("methodCallName")).size(); i++) {
+                            for (int j = 1; j < node.getChildren().get(0).getChildren().size(); j++) {
+                                if (!node.getChildren().get(0).getChildren().get(j).getKind().equals("MemberAccess")) {
+                                    for (int k = 0; k < symbolTable.getLocalVariables(methodNodeName).size(); k++) {
+                                        if (!node.getChildren().get(0).getChildren().get(j).getKind().equals("MemberAccess")) {
+                                            var u = 1;
+                                            if (symbolTable.getLocalVariables(methodNodeName).get(k).getName().equals(node.getChildren().get(0).getChildren().get(j).get("value"))) {
+                                                if (!symbolTable.getParameters(node.getChildren().get(0).get("methodCallName")).get(i).getType().equals(symbolTable.getLocalVariables(methodNodeName).get(k).getType())) {
+                                                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Parameter type does not match the type of the variable!"));
+                                                    i++;
+                                                } else {
+                                                    i++;
+                                                }
+                                            }
+                                        }
+                                    }
+                                        for (Symbol fields : symbolTable.getFields()) {
+                                            if (fields.getName().equals(node.getChildren().get(0).getChildren().get(j).get("value")) || fields.getName().equals(node.getChildren().get(0).getChildren().get(j).get("accessName"))) {
+                                                if (!symbolTable.getParameters(node.getChildren().get(0).get("methodCallName")).get(i).getType().equals(fields.getType())) {
+                                                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Parameter type does not match the type of the variable!"));
+                                                    i++;
+                                                } else {
+                                                    i++;
+                                                }
+                                            }
+                                        }
+                                } else {
+                                    for (Symbol fields : symbolTable.getFields()) {
+                                        if (fields.getName().equals(node.getChildren().get(0).getChildren().get(j).get("accessName"))) {
+                                            if (!symbolTable.getParameters(node.getChildren().get(0).get("methodCallName")).get(i).getType().equals(fields.getType())) {
                                                 reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Parameter type does not match the type of the variable!"));
                                                 i++;
                                             } else {
@@ -753,32 +777,13 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
                                         }
                                     }
                                 }
-                                for (Symbol fields : symbolTable.getFields()) {
-                                    if (fields.getName().equals(node.getChildren().get(0).getChildren().get(j).get("value"))) {
-                                        if (!symbolTable.getParameters(node.getChildren().get(0).get("methodCallName")).get(i).getType().equals(fields.getType())) {
-                                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Parameter type does not match the type of the variable!"));
-                                            i++;
-                                        } else {
-                                            i++;
-                                        }
-                                    }
-                                }
-                            } else {
-                                for (Symbol fields : symbolTable.getFields()) {
-                                    if (fields.getName().equals(node.getChildren().get(0).getChildren().get(j).get("accessName"))) {
-                                        if (!symbolTable.getParameters(node.getChildren().get(0).get("methodCallName")).get(i).getType().equals(fields.getType())) {
-                                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Parameter type does not match the type of the variable!"));
-                                            i++;
-                                        } else {
-                                            i++;
-                                        }
-                                    }
-                                }
                             }
                         }
                     }
                 }
             }
+        }else{
+            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Method does not exist!"));
         }
         return s;
     }
