@@ -343,7 +343,7 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                                     if (localVariable.getName().equals(assignmentName)) {
                                         for (Symbol localVariable2 : method.getLocalVariables()) {
                                             if (localVariable2.getName().equals(assignmentNode.get("value"))) {
-                                                if (!localVariable2.getType().getName().equals(symbolTable.getClassName()) && !localVariable.getType().getName().equals(symbolTable.getSuper()))
+                                                if (localVariable2.getType().getName().equals(symbolTable.getClassName()) && !localVariable.getType().getName().equals(symbolTable.getSuper()))
                                                     reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(assignmentNode.get("lineStart")), Integer.parseInt(assignmentNode.get("colEnd")), "Class does not extends superclass"));
                                                 assignmentType = new Type(localVariable2.getType().getName(), false);
                                             }
