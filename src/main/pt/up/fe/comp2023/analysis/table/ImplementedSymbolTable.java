@@ -170,4 +170,16 @@ public class ImplementedSymbolTable implements SymbolTable {
         }
         return null;
     }
+
+    public boolean isLocalVar(String s, String method){
+        return getLocalVarType(s, method) != null;
+    }
+
+    public boolean isParam(String s, String method){
+        return getParameterType(s, method) != null;
+    }
+
+    public boolean isField(String s){
+        return getFieldType(s) != null;
+    }
 }

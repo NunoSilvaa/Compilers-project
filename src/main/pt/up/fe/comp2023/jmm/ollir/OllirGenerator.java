@@ -82,8 +82,9 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
                     break;
             }
         } else {
-            //System.out.println("node: " + jmmNode.getJmmChild(0));
             if (!(jmmNode.getJmmChild(0).getKind().equals("MethodCall"))) {
+                String assignName = jmmNode.getJmmChild(0).get("value"); String method = getMethod(jmmNode, assignName);
+
                 switch (jmmNode.getJmmChild(0).getKind()) {
                     case ("Boolean"):
                         ollirCode.append(getIndentation()).append(jmmNode.get("assignmentName"))
@@ -97,7 +98,6 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
                         if(jmmNode.getJmmChild(0).getKind().equals("NewObject")) {
                             var expr = exprCode.visit(jmmNode.getJmmChild(0));
                             ollirCode.append(getIndentation()).append(expr.prefixCode());
-                            type = "." + type;
                             value = expr.value();
 
                             ollirCode.append(getIndentation()).append(jmmNode.get("assignmentName")).
@@ -105,9 +105,15 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
                                     append(value).append(";\n");
 
                         }else {
+                            if(((ImplementedSymbolTable)symbolTable).isParam(jmmNode.getJmmChild(0).get("value"), method)){
+                                var typePair = ((ImplementedSymbolTable) symbolTable).getParameterType(assignName, method);
+                                value = "$" + typePair.b + "." + value;
+                            }
+
                             ollirCode.append(getIndentation()).append(jmmNode.get("assignmentName")).
                                     append(type).append(" :=").append(type).append(" ").
                                     append(value).append(type).append(";\n");
+
                         }
                         break;
                 }
@@ -115,7 +121,6 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
             }
 
             if (jmmNode.getJmmChild(0).getKind().equals("MethodCall")) {
-
                 var code = exprCode.visit(jmmNode.getJmmChild(0));
                 ollirCode.append(code.prefixCode());
                 ollirCode.append(getIndentation()).append(jmmNode.get("assignmentName")).append(".i32").append(" :=.i32 ").append(code.value()).append(".i32;\n");
@@ -123,6 +128,18 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
         }
 
         return ollirCode.toString();
+    }
+
+    private String getMethod(JmmNode jmmNode, String var){
+        JmmNode node = jmmNode;
+        while (!(node.getKind().equals("MetDeclaration"))){
+            if (node.getKind().equals("MainDeclaration")) {
+                return "main";
+            }
+            node = node.getJmmParent();
+        }
+
+        return node.get("methodName");
     }
 
     private String dealWithMethodCall(JmmNode jmmNode, String s) {
@@ -136,9 +153,11 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
                 else
                     returnType = ".V";
 
+        var invokeCaller = exprCode.visit(jmmNode.getJmmChild(0));
+        ollirCode.append(invokeCaller.prefixCode());
+
         if (jmmNode.getJmmChild(0).getKind().equals("This")){
             ollirCode.append("\t\tinvokevirtual(");
-
         }
         else {
             if (symbolTable.getImports().contains(jmmNode.getJmmChild(0).get("value")))
@@ -147,7 +166,8 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
                 ollirCode.append("\t\tinvokevirtual(");
         }
 
-        ollirCode.append(jmmNode.getJmmChild(0).get("value")).append(",\"").append(methodName).append("\"");
+        ollirCode.append(invokeCaller.value()).append(",\"").append(methodName).append("\"");
+        // If there are parameters search for them
         if(jmmNode.getNumChildren() > 1) {
             int i = 0;
             //JmmNode params = jmmNode.getJmmChild(1);
@@ -158,7 +178,7 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
                 }
                 ollirCode.append(", ");
                 var param = exprCode.visit(child);
-                ollirCode.append(param.value()).append(".i32");
+                ollirCode.append(param.value());
             }
         }
 
@@ -241,14 +261,14 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
         var retType = getOllirType(symbolTable.getReturnType(methodName));
         ollirCode.append(retStat.prefixCode()).append(getIndentation())
                 .append("ret").append(retType)
-                .append(" ").append(retStat.value());
-        if(jmmNode.getJmmChild(0).getKind().equals("Integer")) {
+                .append(" ").append(retStat.value() + ";\n");
+        /*if(jmmNode.getJmmChild(0).getKind().equals("Integer")) {
             retType = ".i32";
             ollirCode.append(retType).append(";\n");
         }
         else
-            ollirCode.append(retType).append(";\n");
-        System.out.println("ret" + retType);
+            ollirCode.append(retType).append(";\n");*/
+        //System.out.println("ret" + retType);
         return methodName;
     }
 

@@ -24,12 +24,11 @@ varDeclaration: type varName=ID ';';
 
 methodDeclaration
     : ('public')? 'static' 'void' 'main' '(' 'String' '[' ']' methodName=ID ')' '{' ( localVariables )* ( statement )* '}' #MainDeclaration
-    | ('public')? retType methodName=ID '(' ( parameter ( ',' parameter )* )? ')' '{' ( localVariables )* ( statement )* 'return' retExpr ';' '}'#MetDeclaration
+    | ('public')? retType methodName=ID '(' ( parameter ( ',' parameter )* )? ')' '{' ( localVariables | statement )* 'return' retExpr ';' '}'#MetDeclaration
     ;
 
 localVariables
     : type varName=ID ';'
-    | varName=ID ('=' (ID)) ';'
     ;
 
 parameter: type parameterName=ID;
@@ -50,7 +49,7 @@ statement
     : expression ';' #ExpressionStatement
     | assignmentName=ID '=' expression ';' #Assignment
     | 'this' '.' assignmentName=ID '=' expression ';' #ThisAssignment
-    | bracketsAssignmentName = ID '[' expression ']' '=' expression ';' #BracketsAssignment
+    | bracketsAssignmentName=ID '[' expression ']' '=' expression ';' #BracketsAssignment
     | 'if' '(' expression ')' statement 'else' statement #IfElseStatement
     | 'while' '(' expression ')' statement #While
     | '{' ( statement )* '}' #CurlyBracesStatement
@@ -59,13 +58,13 @@ statement
 expression
     : '(' expression ')' #Parenthesis
     | expression '[' expression ']' #ArrayAccessChain
+    | expression '.' 'length' #Length
     | expression '.' methodCallName=ID '(' (expression (',' expression)*)? ')' #MethodCall
     | '!' expression #Negation
     | expression op=('*' | '/') expression #BinaryOp
     | expression op=('+' | '-') expression #BinaryOp
     | expression op=('<' | '>' | '<=' | '>=' | '==') expression #BinaryOp
     | expression op=('&&' | '||') expression #BinaryOp
-    | expression '.' 'length' #Length
     | 'new' type '[' expression ']' #NewArray
     | 'new' value=ID '(' (expression (',' expression)*)? ')' #NewObject
     | classDeclaration #ClassExpression

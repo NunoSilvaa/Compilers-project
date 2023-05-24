@@ -50,7 +50,7 @@ public class Launcher {
         analysis.semanticAnalysis(parserResult);
 
         JmmSemanticsResult semanticsResult = analysis.semanticAnalysis(parserResult);
-        //System.out.println(semanticsResult.getRootNode().toTree());
+        System.out.println(semanticsResult.getRootNode().toTree());
         TestUtils.noErrors(semanticsResult);
 
         Optimizer optimizer = new Optimizer();
