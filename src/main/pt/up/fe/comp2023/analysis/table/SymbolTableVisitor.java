@@ -195,7 +195,7 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                     if (parameterNode.getChildren().get(0).getKind().equals("MethodCall")) {
                         if(parameterNode.getChildren().get(0).getChildren().get(0).getKind().equals("This")){
                             var g = symbolTable.getSuper();
-                            if(symbolTable.getSuper() != null){
+                            if(symbolTable.getSuper() == null){
                                 reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(parameterNode.get("lineStart")), Integer.parseInt(parameterNode.get("colEnd")), "Class doesn't extend inherited method"));
                             }else{
                                 if(symbolTable.getMethods().contains(parameterNode.getChildren().get(0).get("methodCallName"))){
@@ -203,7 +203,8 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                                         reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(parameterNode.get("lineStart")), Integer.parseInt(parameterNode.get("colEnd")), "Return type mismatch"));
                                     }
                                 }else{
-                                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(parameterNode.get("lineStart")), Integer.parseInt(parameterNode.get("colEnd")), "Method does not exist!"));
+                                    if(!parameterNode.getChildren().get(0).getChildren().get(0).getKind().equals("This"))
+                                        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(parameterNode.get("lineStart")), Integer.parseInt(parameterNode.get("colEnd")), "Method does not exist!"));
                                 }
                             }
                         }
