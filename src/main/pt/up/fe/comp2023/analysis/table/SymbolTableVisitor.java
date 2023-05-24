@@ -194,8 +194,17 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                     }
                     if (parameterNode.getChildren().get(0).getKind().equals("MethodCall")) {
                         if(parameterNode.getChildren().get(0).getChildren().get(0).getKind().equals("This")){
-                            if(symbolTable.getSuper().equals(null)){
+                            var g = symbolTable.getSuper();
+                            if(symbolTable.getSuper() != null){
                                 reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(parameterNode.get("lineStart")), Integer.parseInt(parameterNode.get("colEnd")), "Class doesn't extend inherited method"));
+                            }else{
+                                if(symbolTable.getMethods().contains(parameterNode.getChildren().get(0).get("methodCallName"))){
+                                    if(!method.getReturnType().equals(symbolTable.getReturnType(parameterNode.getChildren().get(0).get("methodCallName")))){
+                                        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(parameterNode.get("lineStart")), Integer.parseInt(parameterNode.get("colEnd")), "Return type mismatch"));
+                                    }
+                                }else{
+                                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(parameterNode.get("lineStart")), Integer.parseInt(parameterNode.get("colEnd")), "Method does not exist!"));
+                                }
                             }
                         }
                         else if (symbolTable.getMethods().contains(parameterNode.getChildren().get(0).get("methodCallName")) || symbolTable.getImports().contains(parameterNode.getChildren().get(0).get("methodCallName"))) {
