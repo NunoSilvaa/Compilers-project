@@ -62,6 +62,7 @@ public class Launcher {
 
         TestUtils.noErrors(ollirResult);
 
+        System.out.println("Execute Ollir code: ");
         System.out.println(ollirResult.getOllirCode());
 
         ollirResult = optimizer.optimize(ollirResult);
@@ -72,8 +73,9 @@ public class Launcher {
         ImplementedJasminBackend implementedJasminBackend = new ImplementedJasminBackend();
         JasminResult jasminResult = implementedJasminBackend.toJasmin(ollirResult);
         jasminResult.compile();
-        System.out.println("Execute code: \n");
+        System.out.println("Execute Jasmin code: \n");
         jasminResult.run();
+        System.out.println(jasminResult.getJasminCode());
         TestUtils.noErrors(jasminResult);
     }
 
