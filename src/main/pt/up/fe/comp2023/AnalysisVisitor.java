@@ -732,8 +732,12 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
         }
         if(symbolTable.getMethods().contains(node.getChildren().get(0).get("methodCallName"))) {
             if (node.getChildren().get(0).getChildren().size() - 1 != symbolTable.getParameters(node.getChildren().get(0).get("methodCallName")).size()) {
-                if (!symbolTable.getImports().contains(node.getChildren().get(0).getChildren().get(0).get("value"))) {
-                    var hhg = symbolTable.getImports();
+                if(!node.getChildren().get(0).getChildren().get(0).getKind().equals("This")) {
+                    if (!symbolTable.getImports().contains(node.getChildren().get(0).getChildren().get(0).get("value"))) {
+                        var hhg = symbolTable.getImports();
+                        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Method call has the wrong number of arguments!"));
+                    }
+                }else{
                     reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Method call has the wrong number of arguments!"));
                 }
             } else {
