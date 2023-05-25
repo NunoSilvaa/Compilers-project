@@ -62,7 +62,7 @@ public class Launcher {
 
         TestUtils.noErrors(ollirResult);
 
-        System.out.println("Execute Ollir code: ");
+        System.out.println("Execute Ollir code: \n");
         System.out.println(ollirResult.getOllirCode());
 
         ollirResult = optimizer.optimize(ollirResult);
