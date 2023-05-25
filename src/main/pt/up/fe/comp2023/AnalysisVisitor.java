@@ -776,7 +776,7 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
                                         }
                                     }
                                         for (Symbol fields : symbolTable.getFields()) {
-                                            if (fields.getName().equals(node.getChildren().get(0).getChildren().get(j).get("value")) || fields.getName().equals(node.getChildren().get(0).getChildren().get(j).get("accessName"))) {
+                                            if (fields.getName().equals(node.getChildren().get(0).getChildren().get(j).get("value")) /*|| fields.getName().equals(node.getChildren().get(0).getChildren().get(j).get("accessName"))*/) {
                                                 if (!symbolTable.getParameters(node.getChildren().get(0).get("methodCallName")).get(i).getType().equals(fields.getType())) {
                                                     reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Parameter type does not match the type of the variable!"));
                                                     i++;
