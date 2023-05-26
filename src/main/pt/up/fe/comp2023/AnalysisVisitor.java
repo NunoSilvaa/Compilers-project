@@ -487,30 +487,34 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
         }
         if(!node.getJmmParent().getKind().equals("ExpressionStatement")){
         if(symbolTable.getMethods().contains(node.get("methodCallName")) || symbolTable.getImports().contains(node.get("methodCallName"))) {
-            for (Symbol localVariable : symbolTable.getLocalVariables(methodNodeName)) {
-                if(node.getChildren().size() > 1) {
-                    for(int i = 1; i < node.getChildren().size(); i++) {
-                        if (localVariable.getName().equals(node.getChildren().get(i).get("value"))) {
-                            for(int j = 0; j < symbolTable.getParameters(node.get("methodCallName")).size(); j++) {
-                                if(i - 1 == j){
-                                    if(!symbolTable.getParameters(node.get("methodCallName")).get(j).getType().equals(localVariable.getType())){
-                                        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Incompatible arguments type!"));
+            if (node.getChildren().size() - 1 == symbolTable.getParameters(node.get("methodCallName")).size()) {
+                for (Symbol localVariable : symbolTable.getLocalVariables(methodNodeName)) {
+                    if (node.getChildren().size() > 1) {
+                        for (int i = 1; i < node.getChildren().size(); i++) {
+                            if (localVariable.getName().equals(node.getChildren().get(i).get("value"))) {
+                                for (int j = 0; j < symbolTable.getParameters(node.get("methodCallName")).size(); j++) {
+                                    if (i - 1 == j) {
+                                        if (!symbolTable.getParameters(node.get("methodCallName")).get(j).getType().equals(localVariable.getType())) {
+                                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Incompatible arguments type!"));
+                                        }
                                     }
                                 }
-                            }
                             /*if (!symbolTable.getParameters(node.get("methodCallName")).contains(localVariable)) {
                                 var t = symbolTable.getParameters(node.get("methodCallName"));
                                 reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Incompatible arguments type!"));
                             }*/
+                            }
                         }
-                    }
                     /*if (localVariable.getName().equals(node.getChildren().get(1).get("value"))) {
                         if (!symbolTable.getParameters(node.get("methodCallName")).contains(localVariable)) {
                             var t = symbolTable.getParameters(node.get("methodCallName"));
                             reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Incompatible arguments type!"));
                         }
                     }*/
+                    }
                 }
+            }else{
+                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Method call has the wrong number of arguments!"));
             }
         }
         }
