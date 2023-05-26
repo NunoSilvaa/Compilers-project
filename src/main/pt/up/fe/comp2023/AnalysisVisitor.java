@@ -485,7 +485,7 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
                             break;
                         }
                     }
-                    if(next) {
+                    if (next) {
                         for (Symbol localVariable : symbolTable.getLocalVariables(methodNodeName)) {
                             if (node.getChildren().size() > 1) {
                                 for (int i = 1; i < node.getChildren().size(); i++) {
@@ -512,9 +512,9 @@ public class AnalysisVisitor extends PreorderJmmVisitor<String, String> {
                     }*/
                         }
                     }
+                } else {
+                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Method call has the wrong number of arguments!"));
                 }
-            } else {
-                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(node.get("lineStart")), Integer.parseInt(node.get("colEnd")), "Method call has the wrong number of arguments!"));
             }
         }
 
