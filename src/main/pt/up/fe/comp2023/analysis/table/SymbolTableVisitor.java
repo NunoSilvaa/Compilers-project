@@ -255,17 +255,24 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                             if(method.getParameterTypes().contains(assignmentNode.get("value"))){
                                 for (Symbol parameter : method.getParameters()) {
                                     if (parameter.getName().equals(assignmentNode.get("value"))) {
-                                        assignmentType = new Type(parameter.getType().getName(), false);
+                                        assignmentType = new Type(parameter.getType().getName(), parameter.getType().isArray());
                                     }
                                 }
-                            }else {
+                            }else if(symbolTable.getFieldNames().contains(assignmentNode.get("value"))) {
+                                for (Symbol field : symbolTable.getFields()) {
+                                    if (field.getName().equals(assignmentNode.get("value"))) {
+                                        assignmentType = new Type(field.getType().getName(), field.getType().isArray());
+                                    }
+                                }
+                            }
+                            else {
                                 for (Symbol localVariable : method.getLocalVariables()) {
                                     if (localVariable.getName().equals(assignmentName)) {
                                         for (Symbol localVariable2 : method.getLocalVariables()) {
                                             if (localVariable2.getName().equals(assignmentNode.get("value"))) {
                                                 if (localVariable2.getType().getName().equals(symbolTable.getClassName()) && !localVariable.getType().getName().equals(symbolTable.getSuper()))
                                                     reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(assignmentNode.get("lineStart")), Integer.parseInt(assignmentNode.get("colEnd")), "Class does not extends superclass"));
-                                                assignmentType = new Type(localVariable2.getType().getName(), false);
+                                                assignmentType = new Type(localVariable2.getType().getName(), localVariable2.getType().isArray());
                                             }
                                         }
                                     }
@@ -321,13 +328,27 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                                 }
                             }
                         }
-                        for (Symbol localVariable : method.getLocalVariables()) {
-                            if (localVariable.getName().equals(assignmentName)) {
-                                if (!localVariable.getType().getName().equals(assignmentType.getName())) {
-                                    if (symbolTable.getImports().contains(localVariable.getType().getName()) || (assignmentType.getName().equals(symbolTable.getClassName()) && localVariable.getType().getName().equals(symbolTable.getSuper())))
-                                        continue;
-                                    else
-                                        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(assignmentNode.get("lineStart")), Integer.parseInt(assignmentNode.get("colEnd")), "Assignment type mismatch"));
+                        var t = symbolTable.getFieldNames();
+                        if(method.getLocalVariablesNames().contains(assignmentName)) {
+                            for (Symbol localVariable : method.getLocalVariables()) {
+                                if (localVariable.getName().equals(assignmentName)) {
+                                    if (!localVariable.getType().getName().equals(assignmentType.getName())) {
+                                        if (symbolTable.getImports().contains(localVariable.getType().getName()) || (assignmentType.getName().equals(symbolTable.getClassName()) && localVariable.getType().getName().equals(symbolTable.getSuper())))
+                                            continue;
+                                        else
+                                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(assignmentNode.get("lineStart")), Integer.parseInt(assignmentNode.get("colEnd")), "Assignment type mismatch"));
+                                    }
+                                }
+                            }
+                        } else if(symbolTable.getFieldNames().contains(assignmentName)){
+                            for (Symbol field : symbolTable.getFields()){
+                                if(field.getName().equals(assignmentName)){
+                                    if(!field.getType().getName().equals(assignmentType.getName())){
+                                        if(symbolTable.getImports().contains(field.getType().getName()) || (assignmentType.getName().equals(symbolTable.getClassName()) && field.getType().getName().equals(symbolTable.getSuper())))
+                                            continue;
+                                        else
+                                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(assignmentNode.get("lineStart")), Integer.parseInt(assignmentNode.get("colEnd")), "Assignment type mismatch"));
+                                    }
                                 }
                             }
                         }
