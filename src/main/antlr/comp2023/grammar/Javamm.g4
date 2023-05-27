@@ -37,11 +37,11 @@ retType: type;
 
 retExpr: expression;
 
-type
-    : ty='int' ( isArray='[' ']' )?
+type locals[boolean isArray=false]
+    : ty='int' ('[' ']' {$isArray = true;})?
     | ty='int'
     | ty='boolean'
-    | ty='String'
+    | ty='String' '[' ']' {$isArray = true;}
     | ty=ID
     ;
 

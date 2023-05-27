@@ -50,6 +50,12 @@ public class OllirUtils {
         };
     }
 
+    public static Type getType(JmmNode jmmNode) {
+        boolean isArray = jmmNode.getAttributes().contains("isArray") && jmmNode.get("isArray").equals("true");
+        return new Type(jmmNode.getJmmChild(0).get("ty"), isArray);
+    }
+
+
     public static String getBooleanValue(String value) {
         return switch (value) {
             case "true" -> "1";
