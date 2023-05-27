@@ -457,7 +457,7 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
         return s + "CLASS_DECLARATION";
     }
 
-    /*private String dealWithParameters(JmmNode jmmNode, String s) {
+    private String dealWithParameters(JmmNode jmmNode, String s) {
         if (scope.equals("METHOD")) {
 
             var parameterType = jmmNode.getChildren().get(0);
@@ -471,7 +471,7 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
             this.symbolTable.getCurrentMethod().setParameters(symbol);
         }
         return s + "PARAMETER";
-    }*/
+    }
 
     public String dealWithVarDeclaration(JmmNode jmmNode, String s) {
         String name = jmmNode.get("varName");
