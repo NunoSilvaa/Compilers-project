@@ -134,8 +134,18 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
                                 append(type).append(" :=").append(type).append(" ").
                                 append(va).append(";\n");
                         break;
+                    case("Length"):
+                        var valu = jmmNode.getJmmChild(0).getJmmChild(0).get("value");
+                        var expre = exprCode.visit(jmmNode.getJmmChild(0));
+                        ollirCode.append(getIndentation()).append(expre.prefixCode());
+                        va = expre.value();
+
+                        ollirCode.append(getIndentation()).append(jmmNode.get("assignmentName")).
+                                append(type).append(" :=").append(type).append(" ").
+                                append(va).append(";\n");
+                        break;
                     default:
-                        var valu = jmmNode.getJmmChild(0).get("value");
+                        valu = jmmNode.getJmmChild(0).get("value");
                         ollirCode.append(getIndentation()).append(jmmNode.get("assignmentName")).
                                 append(type).append(" :=").append(type).append(" ").
                                 append(valu).append(type).append(";\n");
