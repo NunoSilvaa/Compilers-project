@@ -27,7 +27,7 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
         addVisit("MethodDeclaration", this::dealWithMethodDeclaration);
         addVisit("ClassDeclaration", this::dealWithClassDeclaration);
         addVisit("VarDeclaration", this::dealWithVarDeclaration);
-        //addVisit("Parameter",this::dealWithParameters);
+        addVisit("Parameter",this::dealWithParameters);
 
         setDefaultVisit(this::defaultVisit);
     }
