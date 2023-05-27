@@ -476,7 +476,6 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
     public String dealWithVarDeclaration(JmmNode jmmNode, String s) {
         String name = jmmNode.get("varName");
         String type = jmmNode.getJmmChild(0).get("ty");
-
         Type t = ImplementedSymbolTable.getType(jmmNode.getChildren().get(0), "ty");
 
         Symbol symbol = new Symbol(t, name);
