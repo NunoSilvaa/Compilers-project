@@ -36,6 +36,7 @@ public class Launcher {
 
         // Read contents of input file
         String code = SpecsIo.read(inputFile);
+        code = SpecsIo.read("test/pt/up/fe/comp/cpf/3_ollir/arrays/ComplexArrayAccess.jmm");
 
         // Instantiate JmmParser
         SimpleParser parser = new SimpleParser();
