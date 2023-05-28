@@ -51,7 +51,18 @@ public class ExprToOllir extends PreorderJmmVisitor<Void, ExprCodeResult> {
         addVisit("IfElseStatement", this::dealWithIfElse);
         addVisit("While", this::dealWithWhile);
         addVisit("Boolean",this::dealWithBoolean);
+        addVisit("Negation", this::dealWithDenial);
         setDefaultValue(() -> new ExprCodeResult("", ""));
+    }
+
+    private ExprCodeResult dealWithDenial(JmmNode jmmNode, Void unused) {
+        var value = nextTempVar() + ".bool";
+        var prefixCode = new StringBuilder();
+        var rhsCode = visit(jmmNode.getJmmChild(0));
+        prefixCode.append(rhsCode.prefixCode());
+        prefixCode.append("\t\t").append(value).append(" :=.bool ").append("!.bool ").append(rhsCode.value()).append(";\n");
+
+        return new ExprCodeResult(prefixCode.toString(),value);
     }
 
     private ExprCodeResult dealWithBoolean(JmmNode jmmNode, Void unused) {
