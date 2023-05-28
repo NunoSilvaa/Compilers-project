@@ -342,7 +342,9 @@ public class ExprToOllir extends PreorderJmmVisitor<Void, ExprCodeResult> {
     }
 
     public ExprCodeResult dealWithThis(JmmNode jmmNode, Void unused){
-        return new ExprCodeResult("", "this");
+        var value = "." + symbolTable.getClassName();
+
+        return new ExprCodeResult("", "this" + value);
     }
 
 }
