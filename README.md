@@ -49,7 +49,9 @@ During the development of your compiler you will update this file in order to se
 ## Group Members
 
 Afonso da Silva Pinto - 202008014 - 33.3%
+
 Nuno Miguel Lopes da Silva - 202005501 - 33.3%
+
 Sandra Patricia Linhares Miranda - 202007675 - 33.3%
 
 Taking into account everything we did, we believe our project should be given a 17.
