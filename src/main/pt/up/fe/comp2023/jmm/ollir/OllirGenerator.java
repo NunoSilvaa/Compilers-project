@@ -101,9 +101,9 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
                         ollirCode.append(getIndentation()).append(expr.prefixCode());
                         value = expr.value();
 
-                        ollirCode.append(getIndentation()).append(jmmNode.get("assignmentName")).
+                        /*ollirCode.append(getIndentation()).append(jmmNode.get("assignmentName")).
                                 append(type).append(" :=").append(type).append(" ").
-                                append(value).append(";\n");
+                                append(value).append(";\n");*/
 
                         if(((ImplementedSymbolTable)symbolTable).isParam(jmmNode.getJmmChild(0).get("value"), getMethod(jmmNode, jmmNode.getJmmChild(0).get("value")))){
                             var typePair = ((ImplementedSymbolTable) symbolTable).getParameterType(jmmNode.getJmmChild(0).get("value"),getMethod(jmmNode, jmmNode.getJmmChild(0).get("value")));
@@ -112,7 +112,7 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
 
                         ollirCode.append(getIndentation()).append(jmmNode.get("assignmentName")).
                                 append(type).append(" :=").append(type).append(" ").
-                                append(value).append(type).append(";\n");
+                                append(value).append(";\n");
                         break;
                     case("NewArray"):
                         var val = jmmNode.getJmmChild(0).getJmmChild(0).get("ty");
@@ -125,6 +125,7 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
                                 append(val).append(";\n");
                         break;
                     case("ArrayAccessChain"):
+                    case("Length"):
                         var va = jmmNode.getJmmChild(0).getJmmChild(0).get("value");
                         var exp = exprCode.visit(jmmNode.getJmmChild(0));
                         ollirCode.append(getIndentation()).append(exp.prefixCode());
@@ -134,18 +135,9 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
                                 append(type).append(" :=").append(type).append(" ").
                                 append(va).append(";\n");
                         break;
-                    case("Length"):
-                        var valu = jmmNode.getJmmChild(0).getJmmChild(0).get("value");
-                        var expre = exprCode.visit(jmmNode.getJmmChild(0));
-                        ollirCode.append(getIndentation()).append(expre.prefixCode());
-                        va = expre.value();
 
-                        ollirCode.append(getIndentation()).append(jmmNode.get("assignmentName")).
-                                append(type).append(" :=").append(type).append(" ").
-                                append(va).append(";\n");
-                        break;
                     default:
-                        valu = jmmNode.getJmmChild(0).get("value");
+                        var valu = jmmNode.getJmmChild(0).get("value");
                         ollirCode.append(getIndentation()).append(jmmNode.get("assignmentName")).
                                 append(type).append(" :=").append(type).append(" ").
                                 append(valu).append(type).append(";\n");
@@ -390,14 +382,9 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
 
 
     private String dealWithArray(JmmNode jmmNode, String s) {
-        var rhsCode = exprCode.visit(jmmNode.getJmmChild(1));
-        var lhsCode = exprCode.visit(jmmNode.getJmmChild(0));
+        var expr = exprCode.visit(jmmNode);
 
-        ollirCode.append(lhsCode.prefixCode());
-        ollirCode.append(rhsCode.prefixCode());
-        // Array is hard coded
-        ollirCode.append(jmmNode.get("bracketsAssignmentName")).append("[").append(lhsCode.value()).append("].i32 :=.i32 ").append(rhsCode.value()).append(";\n");
-        System.out.println("ollircode: " + ollirCode);
+        ollirCode.append(getIndentation()).append(expr.prefixCode());
 
         return s;
     }
