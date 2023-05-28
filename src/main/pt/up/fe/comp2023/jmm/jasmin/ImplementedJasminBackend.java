@@ -647,7 +647,7 @@ public class ImplementedJasminBackend implements JasminBackend {
 
     private void updateStackLimit(int counter) {
         current += counter;
-        stackLimit = Math.max(current, stackLimit);
+        stackLimit = Math.max(current + 2, stackLimit);
     }
 
     private int updateLocalLimit(Method method) {
