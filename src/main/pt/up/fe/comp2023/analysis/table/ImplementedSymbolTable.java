@@ -64,8 +64,7 @@ public class ImplementedSymbolTable implements SymbolTable {
 
     public static Type getType(JmmNode jmmNode, String attribute) {
         String strType = jmmNode.get(attribute);
-        boolean isArray = Boolean.parseBoolean(jmmNode.get("isArray"));
-        Type type = new Type(strType, isArray);
+        Type type = new Type(strType, jmmNode.hasAttribute("isArray"));
         return type;
     }
 
