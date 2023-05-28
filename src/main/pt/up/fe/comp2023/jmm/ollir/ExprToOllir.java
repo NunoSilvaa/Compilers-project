@@ -118,11 +118,7 @@ public class ExprToOllir extends PreorderJmmVisitor<Void, ExprCodeResult> {
         String value = "";
         var prefixCode = new StringBuilder();
         var type = getOllirType(OllirUtils.getType(jmmNode));
-        System.out.println(OllirUtils.getType(jmmNode));
-        System.out.println(type);
-        //System.out.println("type: "+ type);
 
-        // Assign array indice
         ExprCodeResult rhs = visit(jmmNode.getJmmChild(1));
         String indTemp = nextTempVar();
         prefixCode.append(rhs.prefixCode());
@@ -131,7 +127,7 @@ public class ExprToOllir extends PreorderJmmVisitor<Void, ExprCodeResult> {
         // Make new array line
         String newTemp = nextTempVar();
         value = newTemp + ".array.i32";
-        //System.out.println(value);
+
         //hard code type
         prefixCode.append("\t\t").append(value).append(" :=").append(".array.i32").append(" new(array, ").append(indTemp).append(type).append(")").append(".array.i32").append(";\n");
 
@@ -142,9 +138,7 @@ public class ExprToOllir extends PreorderJmmVisitor<Void, ExprCodeResult> {
         String value = nextTempVar() + ".i32";
         var prefixCode = new StringBuilder();
 
-        //System.out.println("val" + value);
         prefixCode.append(value).append(" :=.i32 ").append("arraylength(").append(jmmNode.getJmmChild(0).get("value")).append(".array.i32).i32;\n");
-        //System.out.println("prefix "+ prefixCode);
 
         return new ExprCodeResult(prefixCode.toString(), value);
     }
@@ -167,7 +161,7 @@ public class ExprToOllir extends PreorderJmmVisitor<Void, ExprCodeResult> {
 
         var rhsCode = visit(jmmNode.getJmmChild(1));
         prefixCode.append(rhsCode.prefixCode());
-        //System.out.println(prefixCode);
+
         prefixCode.append(value).append(" :=.i32 ").append(jmmNode.getJmmChild(0).get("value")).append(".array.i32[").append(rhsCode.value()).append("].i32;\n");
 
         return new ExprCodeResult(prefixCode.toString(), value);
@@ -248,8 +242,6 @@ public class ExprToOllir extends PreorderJmmVisitor<Void, ExprCodeResult> {
             code += lhsCode.value() + " :=" + getOllirStringType(lhsVarType.getName()) + " " + rhsCode.value() + ";\n";
         }
 
-        System.out.println("left " + lhsCode.value());
-
         prefixCode.append(code);
 
         return new ExprCodeResult(prefixCode.toString(), lhsVar);
@@ -267,7 +259,6 @@ public class ExprToOllir extends PreorderJmmVisitor<Void, ExprCodeResult> {
 
 
         var value = nextTempVar();
-        //var type = getOllirStringType(getType(jmmNode, jmmNode.get("name")));
         var op = OllirUtils.getReturnType(jmmNode.get("op"));
         code.append("\t\t").append(value).append(op).append(" ").append(":=").append(op).append(" ")
                 .append(lhsres.value()).append(" ").append(jmmNode.get("op")).append(op).append(" ").append(rhsres.value()).append(";\n");
@@ -331,7 +322,6 @@ public class ExprToOllir extends PreorderJmmVisitor<Void, ExprCodeResult> {
             var param = visit(child);
             //change type later;
             var type =  getType(jmmNode,param.value());
-            System.out.println("param" + param.value());
             code.append(", ").append(param.value());
         }
 

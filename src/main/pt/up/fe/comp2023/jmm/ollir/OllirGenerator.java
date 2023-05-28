@@ -84,9 +84,6 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
             }
         } else {
             if (!(jmmNode.getJmmChild(0).getKind().equals("MethodCall"))) {
-                //String assignName = jmmNode.getJmmChild(0).get("value");
-                //String method = getMethod(jmmNode, assignName);
-                //var value = jmmNode.getJmmChild(0).get("value");
                 var type = getOllirStringType(getType(jmmNode, jmmNode.get("assignmentName")));
                 switch (jmmNode.getJmmChild(0).getKind()) {
                     case ("Boolean"):
@@ -100,10 +97,6 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
                         var expr = exprCode.visit(jmmNode.getJmmChild(0));
                         ollirCode.append(getIndentation()).append(expr.prefixCode());
                         value = expr.value();
-
-                        /*ollirCode.append(getIndentation()).append(jmmNode.get("assignmentName")).
-                                append(type).append(" :=").append(type).append(" ").
-                                append(value).append(";\n");*/
 
                         if(((ImplementedSymbolTable)symbolTable).isParam(jmmNode.getJmmChild(0).get("value"), getMethod(jmmNode, jmmNode.getJmmChild(0).get("value")))){
                             var typePair = ((ImplementedSymbolTable) symbolTable).getParameterType(jmmNode.getJmmChild(0).get("value"),getMethod(jmmNode, jmmNode.getJmmChild(0).get("value")));
@@ -315,7 +308,6 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
 
         for (var field : symbolTable.getFields()) {
             ollirCode.append(getIndentation()).append(".field ").append(field.getName()).append(getOllirType(field.getType())).append(";\n");
-            //System.out.println(field.getType());
         }
         ollirCode.append("\n");
 
@@ -340,7 +332,6 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
 
     private String dealWithImport(JmmNode jmmNode, String s){
 
-        //System.out.println(symbolTable.getImports());
         for(String a : symbolTable.getImports()){
             ollirCode.append("import ").append(a).append(";\n");
         }
