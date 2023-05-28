@@ -27,7 +27,7 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
         addVisit("MethodDeclaration", this::dealWithMethodDeclaration);
         addVisit("ClassDeclaration", this::dealWithClassDeclaration);
         addVisit("VarDeclaration", this::dealWithVarDeclaration);
-        addVisit("Parameter",this::dealWithParameters);
+        //addVisit("Parameter",this::dealWithParameters);
 
         setDefaultVisit(this::defaultVisit);
     }
@@ -279,7 +279,7 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                                 }
                             }
                         } else if (assignmentNode.getKind().equals(("BinaryOp"))) {
-                    if (assignmentNode.get("op").equals("&&") || assignmentNode.get("op").equals("||") || assignmentNode.get("op").equals("<") || assignmentNode.get("op").equals(">") || assignmentNode.get("op").equals("==") || assignmentNode.get("op").equals("<=") || assignmentNode.get("op").equals(">=")) {
+                            if (assignmentNode.get("op").equals("&&") || assignmentNode.get("op").equals("||") || assignmentNode.get("op").equals("<") || assignmentNode.get("op").equals(">") || assignmentNode.get("op").equals("==") || assignmentNode.get("op").equals("<=") || assignmentNode.get("op").equals(">=")) {
                                 assignmentType = new Type("boolean", false);
                             } else {
                                 assignmentType = new Type("int", false);
@@ -435,13 +435,13 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
                             method.setAssignment(assignmentSymbol);
                         }
                     }
-                    }
                 }
-                this.symbolTable.addMethod(methodName, method.getReturnType(), method.getLocalVariables(), method.getParameters(), method.getAssignments());
             }
-            System.out.println("Methods" + this.symbolTable.getMethods());
-            return s + "METHOD_DECLARATION";
+            this.symbolTable.addMethod(methodName, method.getReturnType(), method.getLocalVariables(), method.getParameters(), method.getAssignments());
         }
+        System.out.println("Methods" + this.symbolTable.getMethods());
+        return s + "METHOD_DECLARATION";
+    }
 
 
     private String dealWithClassDeclaration(JmmNode jmmNode, String s) {
@@ -457,7 +457,7 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
         return s + "CLASS_DECLARATION";
     }
 
-    private String dealWithParameters(JmmNode jmmNode, String s) {
+    /*private String dealWithParameters(JmmNode jmmNode, String s) {
         if (scope.equals("METHOD")) {
 
             var parameterType = jmmNode.getChildren().get(0);
@@ -471,11 +471,12 @@ public class SymbolTableVisitor extends PreorderJmmVisitor<String, String> {
             this.symbolTable.getCurrentMethod().setParameters(symbol);
         }
         return s + "PARAMETER";
-    }
+    }*/
 
     public String dealWithVarDeclaration(JmmNode jmmNode, String s) {
         String name = jmmNode.get("varName");
         String type = jmmNode.getJmmChild(0).get("ty");
+
         Type t = ImplementedSymbolTable.getType(jmmNode.getChildren().get(0), "ty");
 
         Symbol symbol = new Symbol(t, name);
