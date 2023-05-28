@@ -307,7 +307,7 @@ public class OllirGenerator extends AJmmVisitor<String, String> {
         this.incrementIndentation();
 
         for (var field : symbolTable.getFields()) {
-            ollirCode.append(getIndentation()).append(".field ").append(field.getName()).append(getOllirType(new Type(field.getType().getName(), field.getType().isArray()))).append(";\n");
+            ollirCode.append(getIndentation()).append(".field ").append(field.getName()).append(getOllirType(field.getType())).append(";\n");
         }
         ollirCode.append("\n");
 
