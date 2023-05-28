@@ -118,7 +118,8 @@ public class ExprToOllir extends PreorderJmmVisitor<Void, ExprCodeResult> {
         String value = "";
         var prefixCode = new StringBuilder();
         var type = getOllirType(OllirUtils.getType(jmmNode));
-
+        System.out.println(OllirUtils.getType(jmmNode));
+        System.out.println(type);
         //System.out.println("type: "+ type);
 
         // Assign array indice
@@ -129,7 +130,7 @@ public class ExprToOllir extends PreorderJmmVisitor<Void, ExprCodeResult> {
 
         // Make new array line
         String newTemp = nextTempVar();
-        value = newTemp + type;
+        value = newTemp + ".array.i32";
         //System.out.println(value);
         //hard code type
         prefixCode.append("\t\t").append(value).append(" :=").append(".array.i32").append(" new(array, ").append(indTemp).append(type).append(")").append(".array.i32").append(";\n");
@@ -183,7 +184,7 @@ public class ExprToOllir extends PreorderJmmVisitor<Void, ExprCodeResult> {
             val = jmmNode.get("value") + varTy;
         } else {
             String methodName = getMethod(jmmNode, jmmNode.get("value"));
-            Pair<Type, Integer> paramPair= ((ImplementedSymbolTable) symbolTable).getParameterType(jmmNode.get("value"), methodName);
+            Pair<Type, Integer> paramPair = ((ImplementedSymbolTable) symbolTable).getParameterType(jmmNode.get("value"), methodName);
             if (paramPair != null) {
                 varType = paramPair.a;
                 varTy = getOllirStringType(varType.getName());
@@ -206,7 +207,9 @@ public class ExprToOllir extends PreorderJmmVisitor<Void, ExprCodeResult> {
 
 
     private ExprCodeResult dealWithInteger(JmmNode jmmNode, Void unused) {
-        return new ExprCodeResult("", jmmNode.get("value") + ".i32");
+        var value = jmmNode.get("value") + ".i32";
+
+        return new ExprCodeResult("", value);
     }
 
     public String nextTempVar() {
@@ -244,6 +247,8 @@ public class ExprToOllir extends PreorderJmmVisitor<Void, ExprCodeResult> {
         } else {
             code += lhsCode.value() + " :=" + getOllirStringType(lhsVarType.getName()) + " " + rhsCode.value() + ";\n";
         }
+
+        System.out.println("left " + lhsCode.value());
 
         prefixCode.append(code);
 
@@ -311,11 +316,11 @@ public class ExprToOllir extends PreorderJmmVisitor<Void, ExprCodeResult> {
         // Check if virtual or static with identifier
 
         if(symbolTable.getImports().contains(identifierName)){
-            code.append(identifierCode.prefixCode()).append("\t\tinvokestatic(").append(identifierName).append(", \"").append(jmmNode.get("methodCallName")).append("\"");
+            code.append(identifierCode.prefixCode()).append("invokestatic(").append(identifierName).append(", \"").append(jmmNode.get("methodCallName")).append("\"");
         } else {
             String type = ""; value += ".i32";
             if (!identifierName.equals("this")) type = getType(jmmNode,identifierName);
-            code.append(identifierCode.prefixCode()).append("\t\t"+ value).append(".i32").append(" :=.i32 ").append("invokevirtual(").append(identifierName).append(type).append(",\"").append(jmmNode.get("methodCallName")).append("\"");
+            code.append(identifierCode.prefixCode()).append("\t\t"+ value).append(" :=.i32 ").append("invokevirtual(").append(identifierName).append(type).append(",\"").append(jmmNode.get("methodCallName")).append("\"");
         }
         int i = 0;
         for (var child : jmmNode.getChildren()) {
@@ -326,7 +331,7 @@ public class ExprToOllir extends PreorderJmmVisitor<Void, ExprCodeResult> {
             var param = visit(child);
             //change type later;
             var type =  getType(jmmNode,param.value());
-
+            System.out.println("param" + param.value());
             code.append(", ").append(param.value());
         }
 
